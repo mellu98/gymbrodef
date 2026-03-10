@@ -38,12 +38,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 .hdr-sub{font-size:10px;color:var(--tm);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
 .hdr-btn{background:var(--s2);border:1px solid var(--td);color:var(--tm);border-radius:8px;padding:7px 12px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
 .hdr-btn:hover{color:var(--g);border-color:var(--gdim)}
+.hdr-btn.danger{background:rgba(255,23,68,.08);border-color:rgba(255,23,68,.28);color:var(--red)}
+.hdr-btn.danger:hover{border-color:var(--red);color:#fff}
 #installBtn{display:none}
 
 /* HOME */
 #programs{padding:20px 16px 40px}
 #home{padding:20px 16px 40px}
 .home-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.home-top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .program-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .program-card{
   background:linear-gradient(180deg,var(--s1),#0b0b0b);border:1px solid var(--td);border-radius:16px;
@@ -52,10 +55,16 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 .program-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--g);transform:scaleX(0);transform-origin:left;transition:transform .3s}
 .program-card:hover{border-color:var(--gdim);transform:translateY(-2px)}
 .program-card:hover::after{transform:scaleX(1)}
+.program-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.program-card-copy{min-width:0}
+.program-card-actions{display:flex;align-items:flex-end;flex-direction:column;gap:8px;flex-shrink:0}
 .program-card h3{font-size:16px;line-height:1.2;margin-bottom:8px}
 .program-card p{font-size:12px;color:var(--tm);line-height:1.5}
 .program-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
 .program-meta span{font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:1px;background:var(--s2);border:1px solid var(--td);border-radius:999px;padding:5px 8px}
+.program-pill{font-size:9px;font-weight:700;letter-spacing:1px;text-transform:uppercase;border-radius:999px;padding:5px 8px;background:rgba(41,182,246,.1);border:1px solid rgba(41,182,246,.3);color:var(--blue)}
+.program-delete{background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.2);color:var(--red);border-radius:8px;padding:6px 10px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;transition:all .2s}
+.program-delete:hover{border-color:var(--red);color:#fff}
 .home-greeting{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:4px}
 .home-greeting span{color:var(--g)}
 .home-sub{font-size:13px;color:var(--tm);margin-bottom:24px}
@@ -220,6 +229,52 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 .hist-empty{text-align:center;color:var(--tm);font-size:13px;margin-top:60px}
 .hist-clear{margin:0 18px 18px;background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.25);color:var(--red);border-radius:10px;padding:12px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;width:calc(100%-36px);display:block}
 
+/* IMPORT MODAL */
+#import-modal{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:340;display:none;flex-direction:column}
+#import-modal.show{display:flex}
+.imp-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:18px;border-bottom:1px solid #1a1a1a;flex-shrink:0}
+.imp-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--g)}
+.imp-sub{font-size:12px;color:var(--tm);margin-top:4px;line-height:1.5}
+.imp-scroll{flex:1;overflow-y:auto;padding:18px 18px 140px}
+.imp-actions{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;justify-content:flex-end;padding:14px 18px calc(14px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(8,8,8,0),rgba(8,8,8,.96) 24%,rgba(8,8,8,1))}
+.imp-state,.imp-card{background:var(--s1);border:1px solid var(--td);border-radius:16px;padding:16px}
+.imp-state{font-size:13px;line-height:1.6;color:var(--tm)}
+.imp-state strong{color:var(--t)}
+.imp-badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.imp-badge{font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:5px 8px;border-radius:999px;border:1px solid var(--td);background:var(--s2);color:var(--tm)}
+.imp-badge.good{border-color:rgba(0,230,118,.25);color:var(--g)}
+.imp-badge.warn{border-color:rgba(255,193,7,.28);color:var(--amber)}
+.imp-alert{background:rgba(255,193,7,.08);border:1px solid rgba(255,193,7,.25);color:var(--amber);border-radius:14px;padding:12px 14px;font-size:12px;line-height:1.6;margin-bottom:14px}
+.imp-error{background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.2);color:#ff8a9b;border-radius:14px;padding:12px 14px;font-size:12px;line-height:1.6;margin-bottom:14px}
+.imp-section{margin-top:18px}
+.imp-section:first-child{margin-top:0}
+.imp-section-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin-bottom:10px}
+.imp-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.imp-field{display:flex;flex-direction:column;gap:6px}
+.imp-field label,.imp-field-inline label{font-size:11px;color:var(--tm);text-transform:uppercase;letter-spacing:1px}
+.imp-field input,.imp-field textarea{width:100%;background:var(--s2);border:1px solid var(--td);color:var(--t);border-radius:10px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none}
+.imp-field textarea{resize:vertical;min-height:88px;line-height:1.45}
+.imp-field input:focus,.imp-field textarea:focus{border-color:var(--g)}
+.imp-day{background:var(--s1);border:1px solid var(--td);border-radius:16px;padding:14px;margin-bottom:12px}
+.imp-day-top,.imp-ex-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.imp-day-name{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:var(--g)}
+.imp-day-grid,.imp-ex-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.imp-ex-grid{grid-template-columns:minmax(0,1.8fr) 110px 130px}
+.imp-ex{background:var(--s2);border:1px solid #232323;border-radius:14px;padding:12px;margin-top:10px}
+.imp-ex-title{font-size:12px;font-weight:700;color:var(--t)}
+.imp-mini-btn{background:var(--s2);border:1px solid var(--td);color:var(--tm);border-radius:9px;padding:8px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.imp-mini-btn:hover{border-color:var(--g);color:var(--g)}
+.imp-mini-btn.danger{background:rgba(255,23,68,.08);border-color:rgba(255,23,68,.22);color:var(--red)}
+.imp-mini-btn.danger:hover{border-color:var(--red);color:#fff}
+.imp-empty{font-size:12px;color:var(--tm);padding:12px 0}
+
+@media (max-width: 760px){
+  .program-grid,.day-grid,.imp-grid,.imp-day-grid,.imp-ex-grid{grid-template-columns:1fr}
+  .hdr{padding:12px 14px}
+  .hdr-actions{gap:6px;flex-wrap:wrap;justify-content:flex-end}
+  .hdr-btn{padding:7px 10px}
+}
+
 @keyframes pop{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
 .pop{animation:pop .25s ease forwards}
 </style>
@@ -236,6 +291,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
   </div>
   <div class="hdr-actions">
     <button class="hdr-btn" id="history-btn" onclick="openHist()" style="display:none">Storico</button>
+    <button class="hdr-btn" id="importBtn" onclick="triggerPdfImport()">Importa PDF</button>
     <button class="hdr-btn" id="installBtn">Installa</button>
   </div>
 </div>
@@ -257,7 +313,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 <div id="home" style="display:none">
   <div style="padding:20px 16px 0">
     <div class="home-top">
-      <button class="hdr-btn" onclick="showPrograms()">&larr; Schede</button>
+      <div class="home-top-actions">
+        <button class="hdr-btn" onclick="showPrograms()">&larr; Schede</button>
+      </div>
+      <div class="home-top-actions" id="home-top-actions"></div>
     </div>
     <div class="home-greeting">Ciao, <span>Massi</span></div>
     <div class="home-sub" style="margin-bottom:20px">Scegli l'allenamento di oggi</div>
@@ -333,6 +392,24 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
   </div>
   <div class="hist-scroll" id="hist-content"></div>
   <button class="hist-clear" onclick="clearHist()">Cancella tutto lo storico</button>
+</div>
+
+<input id="pdf-file-input" type="file" accept="application/pdf" hidden>
+
+<!-- IMPORT MODAL -->
+<div id="import-modal">
+  <div class="imp-hdr">
+    <div>
+      <div class="imp-title">Importa PDF PT</div>
+      <div class="imp-sub" id="import-subtitle">Carica una scheda PDF del personal trainer, controlla la bozza e aggiungila alle schede esistenti.</div>
+    </div>
+    <button class="hist-close" onclick="closeImportModal()">X</button>
+  </div>
+  <div class="imp-scroll" id="import-content"></div>
+  <div class="imp-actions">
+    <button class="t-btn" id="import-close-btn" onclick="closeImportModal()">Chiudi</button>
+    <button class="t-btn" id="import-save-btn" onclick="saveImportedProgram()" style="display:none">Aggiungi scheda</button>
+  </div>
 </div>
 
 <script id="programs-inline" type="application/json">
@@ -631,7 +708,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 
 <script>
 const PROGRAMS_URL = './programs.json';
+const IMPORT_API_BASE_URL = String(window.MASSI_CONFIG?.importApiBaseUrl || '').replace(/\/$/, '');
+const USER_PROGRAMS_KEY = 'massi_user_programs';
 let PROGRAMS = [];
+let bundledPrograms = [];
 let currentProgram = null;
 let currentProgramIndex = -1;
 let currentDay = null;
@@ -639,6 +719,9 @@ let currentTab = 'list';
 let focusIdx = 0;
 let sessionData = {};
 let deferredPrompt = null;
+let importDraft = null;
+let importMeta = null;
+let importBusy = false;
 // Timer state
 let timerInterval = null;
 let timerTotal = 90;
@@ -660,6 +743,18 @@ function repairText(value) {
   try { return decodeURIComponent(escape(value)); } catch(e) { return value; }
 }
 
+function cleanText(value) {
+  return repairText(String(value ?? ''))
+    .replace(/\u00a0/g, ' ')
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/[ÓÕ]/g, '"')
+    .replace(/[Þ]/g, 'fi')
+    .replace(/[ß]/g, 'fl')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function escapeHtml(value) {
   return String(value || '')
     .replaceAll('&', '&amp;')
@@ -669,23 +764,80 @@ function escapeHtml(value) {
     .replaceAll("'", '&#039;');
 }
 
-function normalizePrograms(programs) {
+function slugify(value) {
+  return cleanText(value)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60) || 'scheda-importata';
+}
+
+function cloneValue(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function normalizePrograms(programs, sourceFallback = 'bundled') {
   return (Array.isArray(programs) ? programs : []).map((program, pi) => ({
     id: String(program?.id || 'program-' + (pi + 1)).replace(/[^a-zA-Z0-9_-]/g, '_'),
-    title: repairText(program?.title || 'Scheda ' + (pi + 1)),
-    subtitle: repairText(program?.subtitle || 'Scheda allenamento'),
-    weeks: repairText(program?.weeks || ''),
+    title: cleanText(program?.title || 'Scheda ' + (pi + 1)),
+    subtitle: cleanText(program?.subtitle || 'Scheda allenamento'),
+    weeks: cleanText(program?.weeks || ''),
+    source: program?.source === 'imported' || sourceFallback === 'imported' ? 'imported' : 'bundled',
+    importMeta: program?.source === 'imported' || sourceFallback === 'imported' ? {
+      filename: cleanText(program?.importMeta?.filename || ''),
+      importedAt: cleanText(program?.importMeta?.importedAt || ''),
+      parserVersion: cleanText(program?.importMeta?.parserVersion || ''),
+      confidence: Math.max(0, Math.min(1, Number(program?.importMeta?.confidence) || 0))
+    } : null,
     days: (Array.isArray(program?.days) ? program.days : []).map((day, di) => ({
-      name: repairText(day?.name || 'Day ' + (di + 1)),
-      label: repairText(day?.label || ''),
+      name: cleanText(day?.name || 'Day ' + (di + 1)),
+      label: cleanText(day?.label || ''),
       exercises: (Array.isArray(day?.exercises) ? day.exercises : []).map((ex, ei) => ({
-        name: repairText(ex?.name || 'Esercizio ' + (ei + 1)),
+        name: cleanText(ex?.name || 'Esercizio ' + (ei + 1)),
         series: Math.max(0, parseInt(ex?.series, 10) || 0),
-        reps: repairText(String(ex?.reps ?? '-')),
-        note: repairText(ex?.note || '')
+        reps: cleanText(String(ex?.reps ?? '-')),
+        note: cleanText(ex?.note || '')
       }))
     }))
   }));
+}
+
+function getUserPrograms() {
+  try {
+    return normalizePrograms(JSON.parse(localStorage.getItem(USER_PROGRAMS_KEY) || '[]'), 'imported');
+  } catch (e) {
+    return [];
+  }
+}
+
+function saveUserPrograms(programs) {
+  try {
+    localStorage.setItem(USER_PROGRAMS_KEY, JSON.stringify(normalizePrograms(programs, 'imported')));
+  } catch (e) {}
+}
+
+function syncCurrentProgram() {
+  if (!currentProgram) return;
+  const idx = PROGRAMS.findIndex((program) => program.id === currentProgram.id);
+  if (idx === -1) {
+    currentProgram = null;
+    currentProgramIndex = -1;
+    currentDay = null;
+    return;
+  }
+  currentProgramIndex = idx;
+  currentProgram = PROGRAMS[idx];
+}
+
+function mergePrograms() {
+  PROGRAMS = [...bundledPrograms, ...getUserPrograms()];
+  syncCurrentProgram();
+}
+
+function makeImportedProgramId(title) {
+  return 'import-' + Date.now() + '-' + slugify(title);
 }
 
 function getDays() { return currentProgram ? currentProgram.days : []; }
@@ -733,6 +885,8 @@ function setDayDone(di, v) { try { const d=JSON.parse(localStorage.getItem(getDo
 function updateHeader() {
   const sub = document.getElementById('hdr-sub');
   const historyBtn = document.getElementById('history-btn');
+  const importBtn = document.getElementById('importBtn');
+  importBtn.style.display = currentDay === null ? 'inline-block' : 'none';
   if (!currentProgram) {
     sub.textContent = 'Schede modulari interattive';
     historyBtn.style.display = 'none';
@@ -755,8 +909,15 @@ function renderPrograms() {
     card.className = 'program-card pop';
     card.style.animationDelay = (i * 0.05) + 's';
     card.innerHTML = `
-      <h3>${escapeHtml(program.title)}</h3>
-      <p>${escapeHtml(program.subtitle || 'Scheda allenamento')}</p>
+      <div class="program-card-top">
+        <div class="program-card-copy">
+          <h3>${escapeHtml(program.title)}</h3>
+          <p>${escapeHtml(program.subtitle || 'Scheda allenamento')}</p>
+        </div>
+        <div class="program-card-actions">
+          ${program.source === 'imported' ? '<span class="program-pill">Importata</span><button class="program-delete" type="button">Elimina</button>' : ''}
+        </div>
+      </div>
       <div class="program-meta">
         <span>${program.days.length} giorni</span>
         <span>${escapeHtml(program.weeks || 'ciclo attivo')}</span>
@@ -764,6 +925,13 @@ function renderPrograms() {
         <span>${stats.hist} sessioni</span>
       </div>
     `;
+    if (program.source === 'imported') {
+      const deleteBtn = card.querySelector('.program-delete');
+      deleteBtn.onclick = (event) => {
+        event.stopPropagation();
+        deleteImportedProgram(program.id);
+      };
+    }
     card.onclick = () => openProgram(i);
     grid.appendChild(card);
   });
@@ -801,7 +969,7 @@ async function loadPrograms() {
       const res = await fetch(PROGRAMS_URL, { cache: 'no-store' });
       if (!res.ok) throw new Error('HTTP ' + res.status);
       const data = await res.json();
-      PROGRAMS = normalizePrograms(data.programs);
+      bundledPrograms = normalizePrograms(data.programs, 'bundled');
     } else {
       throw new Error('file-protocol');
     }
@@ -809,12 +977,13 @@ async function loadPrograms() {
     console.error('Errore caricamento schede', e);
     try {
       const fallback = JSON.parse(document.getElementById('programs-inline').textContent);
-      PROGRAMS = normalizePrograms(fallback.programs);
+      bundledPrograms = normalizePrograms(fallback.programs, 'bundled');
     } catch (fallbackError) {
       console.error('Errore fallback schede', fallbackError);
-      PROGRAMS = [];
+      bundledPrograms = [];
     }
   }
+  mergePrograms();
   renderPrograms();
   updateHeader();
 }
@@ -848,8 +1017,17 @@ function renderHome() {
   const grid = document.getElementById('day-grid');
   const greeting = document.querySelector('#home .home-greeting');
   const subtitle = document.querySelector('#home .home-sub');
+  const actions = document.getElementById('home-top-actions');
   greeting.innerHTML = currentProgram ? 'Scheda <span>' + escapeHtml(currentProgram.title) + '</span>' : 'Le tue <span>schede</span>';
   subtitle.textContent = currentProgram ? (currentProgram.subtitle || 'Scegli l\'allenamento di oggi') : 'Scegli il programma da aprire';
+  actions.innerHTML = '';
+  if (currentProgram?.source === 'imported') {
+    const deleteBtn = document.createElement('button');
+    deleteBtn.className = 'hdr-btn danger';
+    deleteBtn.textContent = 'Elimina scheda';
+    deleteBtn.onclick = () => deleteImportedProgram(currentProgram.id);
+    actions.appendChild(deleteBtn);
+  }
   grid.innerHTML = '';
   days.forEach((day, i) => {
     const done = getDayDone(i);
@@ -1249,8 +1427,350 @@ function clearHist() {
   }
 }
 
+// IMPORT PDF
+function getImportEndpoint() {
+  return (IMPORT_API_BASE_URL || '') + '/api/import-pdf';
+}
+
+function openImportModal() {
+  document.getElementById('import-modal').classList.add('show');
+}
+
+function closeImportModal(force = false) {
+  if (importBusy && !force) return;
+  document.getElementById('import-modal').classList.remove('show');
+  document.getElementById('import-content').innerHTML = '';
+  document.getElementById('import-subtitle').textContent = 'Carica una scheda PDF del personal trainer, controlla la bozza e aggiungila alle schede esistenti.';
+  document.getElementById('import-save-btn').style.display = 'none';
+  document.getElementById('import-save-btn').disabled = false;
+  document.getElementById('import-close-btn').disabled = false;
+  document.getElementById('pdf-file-input').value = '';
+  importDraft = null;
+  importMeta = null;
+  importBusy = false;
+}
+
+function setImportView({ subtitle, html, canSave = false, saveLabel = 'Aggiungi scheda' }) {
+  openImportModal();
+  document.getElementById('import-subtitle').textContent = subtitle;
+  document.getElementById('import-content').innerHTML = html;
+  const saveBtn = document.getElementById('import-save-btn');
+  saveBtn.style.display = canSave ? 'inline-block' : 'none';
+  saveBtn.textContent = saveLabel;
+  saveBtn.disabled = false;
+}
+
+function renderImportError(message) {
+  setImportView({
+    subtitle: 'Import non riuscito',
+    html: `<div class="imp-error">${escapeHtml(message)}</div>
+      <div class="imp-state">
+        <strong>Nessuna scheda e&apos; stata aggiunta.</strong><br>
+        Controlla che il PDF sia esportato dal PT e che l'app sia online, poi riprova.
+      </div>`
+  });
+}
+
+function triggerPdfImport() {
+  if (window.location.protocol === 'file:' && !IMPORT_API_BASE_URL) {
+    renderImportError('L\'import PDF funziona solo nella versione pubblicata dell\'app o con un server configurato.');
+    return;
+  }
+  if (!navigator.onLine) {
+    renderImportError('Serve connessione internet per leggere il PDF del PT.');
+    return;
+  }
+  const input = document.getElementById('pdf-file-input');
+  input.value = '';
+  input.click();
+}
+
+function buildImportDraft(candidateProgram, payload) {
+  const normalized = normalizePrograms([{
+    ...candidateProgram,
+    source: 'imported',
+    importMeta: {
+      filename: payload.sourceFilename || '',
+      importedAt: new Date().toISOString(),
+      parserVersion: payload.parserVersion || '',
+      confidence: Number(payload.confidence) || 0
+    }
+  }], 'imported')[0];
+  normalized.id = '';
+  return normalized;
+}
+
+async function handlePdfInputChange(event) {
+  const file = event.target.files && event.target.files[0];
+  if (!file) return;
+
+  if (file.type !== 'application/pdf') {
+    renderImportError('Carica un file PDF valido.');
+    return;
+  }
+
+  if (file.size > 10 * 1024 * 1024) {
+    renderImportError('Il PDF supera il limite di 10 MB.');
+    return;
+  }
+
+  importBusy = true;
+  document.getElementById('import-close-btn').disabled = true;
+  setImportView({
+    subtitle: 'Parsing in corso',
+    html: `<div class="imp-state">
+      <strong>${escapeHtml(file.name)}</strong><br>
+      Sto leggendo il PDF del PT e preparando una bozza modificabile della scheda.
+    </div>`
+  });
+
+  try {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await fetch(getImportEndpoint(), {
+      method: 'POST',
+      body: formData
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(payload.error || 'Import PDF non riuscito.');
+    }
+    importMeta = {
+      sourceFilename: cleanText(payload.sourceFilename || file.name),
+      parserVersion: cleanText(payload.parserVersion || 'pt-pdf-v1'),
+      confidence: Math.max(0, Math.min(1, Number(payload.confidence) || 0)),
+      warnings: Array.isArray(payload.warnings) ? payload.warnings.map(cleanText).filter(Boolean) : []
+    };
+    importDraft = buildImportDraft(payload.candidateProgram || {}, payload);
+    renderImportReview();
+  } catch (error) {
+    console.error('Errore import PDF', error);
+    renderImportError(error.message || 'Import PDF non riuscito.');
+  } finally {
+    importBusy = false;
+    document.getElementById('import-close-btn').disabled = false;
+    document.getElementById('pdf-file-input').value = '';
+  }
+}
+
+function validateImportDraft(draft) {
+  if (!draft) return 'Bozza non disponibile.';
+  if (!cleanText(draft.title)) return 'Inserisci un titolo per la scheda.';
+  if (!draft.days.length) return 'Aggiungi almeno un giorno alla scheda.';
+  for (let di = 0; di < draft.days.length; di++) {
+    const day = draft.days[di];
+    if (!cleanText(day.name)) return 'Il giorno ' + (di + 1) + ' deve avere un nome.';
+    if (!day.exercises.length) return 'Il giorno ' + (di + 1) + ' deve contenere almeno un esercizio.';
+    for (let ei = 0; ei < day.exercises.length; ei++) {
+      const ex = day.exercises[ei];
+      if (!cleanText(ex.name)) return 'Compila il nome dell\'esercizio ' + (ei + 1) + ' del giorno ' + (di + 1) + '.';
+      if ((parseInt(ex.series, 10) || 0) < 1) return 'Le serie di ' + cleanText(ex.name || ('esercizio ' + (ei + 1))) + ' devono essere almeno 1.';
+      if (!cleanText(ex.reps)) return 'Compila le reps di ' + cleanText(ex.name || ('esercizio ' + (ei + 1))) + '.';
+    }
+  }
+  return '';
+}
+
+function renderImportReview(validationError = '') {
+  if (!importDraft || !importMeta) return;
+
+  const warningHtml = importMeta.warnings.length ? `
+    <div class="imp-alert">
+      <strong>Controlla questi punti prima di salvare:</strong><br>
+      ${importMeta.warnings.map((warning) => '• ' + escapeHtml(warning)).join('<br>')}
+    </div>` : '';
+
+  const errorHtml = validationError ? `<div class="imp-error">${escapeHtml(validationError)}</div>` : '';
+
+  const daysHtml = importDraft.days.map((day, di) => `
+    <div class="imp-day">
+      <div class="imp-day-top">
+        <div class="imp-day-name">Giorno ${di + 1}</div>
+        <button class="imp-mini-btn danger" type="button" onclick="removeImportDay(${di})">Rimuovi giorno</button>
+      </div>
+      <div class="imp-day-grid">
+        <div class="imp-field">
+          <label>Nome giorno</label>
+          <input type="text" value="${escapeHtml(day.name)}" oninput="updateImportDayField(${di}, 'name', this.value)">
+        </div>
+        <div class="imp-field">
+          <label>Label</label>
+          <input type="text" value="${escapeHtml(day.label)}" oninput="updateImportDayField(${di}, 'label', this.value)">
+        </div>
+      </div>
+      <div class="imp-section">
+        <div class="imp-section-title">Esercizi</div>
+        ${day.exercises.length ? day.exercises.map((exercise, ei) => `
+          <div class="imp-ex">
+            <div class="imp-ex-top">
+              <div class="imp-ex-title">Esercizio ${ei + 1}</div>
+              <button class="imp-mini-btn danger" type="button" onclick="removeImportExercise(${di}, ${ei})">Rimuovi</button>
+            </div>
+            <div class="imp-ex-grid">
+              <div class="imp-field">
+                <label>Nome</label>
+                <input type="text" value="${escapeHtml(exercise.name)}" oninput="updateImportExerciseField(${di}, ${ei}, 'name', this.value)">
+              </div>
+              <div class="imp-field">
+                <label>Serie</label>
+                <input type="number" min="1" value="${escapeHtml(exercise.series)}" oninput="updateImportExerciseField(${di}, ${ei}, 'series', this.value)">
+              </div>
+              <div class="imp-field">
+                <label>Reps</label>
+                <input type="text" value="${escapeHtml(exercise.reps)}" oninput="updateImportExerciseField(${di}, ${ei}, 'reps', this.value)">
+              </div>
+            </div>
+            <div class="imp-field" style="margin-top:10px">
+              <label>Note</label>
+              <textarea oninput="updateImportExerciseField(${di}, ${ei}, 'note', this.value)">${escapeHtml(exercise.note)}</textarea>
+            </div>
+          </div>
+        `).join('') : '<div class="imp-empty">Nessun esercizio in questo giorno.</div>'}
+        <button class="imp-mini-btn" type="button" onclick="addImportExercise(${di})">+ Aggiungi esercizio</button>
+      </div>
+    </div>
+  `).join('');
+
+  setImportView({
+    subtitle: 'Controlla la bozza prima di salvarla tra le tue schede',
+    canSave: true,
+    saveLabel: 'Aggiungi scheda',
+    html: `
+      ${errorHtml}
+      ${warningHtml}
+      <div class="imp-card imp-section">
+        <div class="imp-section-title">Riepilogo import</div>
+        <div class="imp-badge-row">
+          <span class="imp-badge good">PDF: ${escapeHtml(importMeta.sourceFilename)}</span>
+          <span class="imp-badge ${importMeta.confidence >= 0.7 ? 'good' : 'warn'}">Confidenza: ${Math.round(importMeta.confidence * 100)}%</span>
+          <span class="imp-badge">Parser: ${escapeHtml(importMeta.parserVersion || 'pt-pdf-v1')}</span>
+        </div>
+      </div>
+      <div class="imp-card imp-section">
+        <div class="imp-section-title">Dati scheda</div>
+        <div class="imp-grid">
+          <div class="imp-field">
+            <label>Titolo</label>
+            <input type="text" value="${escapeHtml(importDraft.title)}" oninput="updateImportField('title', this.value)">
+          </div>
+          <div class="imp-field">
+            <label>Sottotitolo</label>
+            <input type="text" value="${escapeHtml(importDraft.subtitle)}" oninput="updateImportField('subtitle', this.value)">
+          </div>
+          <div class="imp-field">
+            <label>Durata</label>
+            <input type="text" value="${escapeHtml(importDraft.weeks)}" oninput="updateImportField('weeks', this.value)">
+          </div>
+        </div>
+      </div>
+      <div class="imp-section">
+        <div class="imp-section-title">Giorni della scheda</div>
+        ${daysHtml}
+        <button class="imp-mini-btn" type="button" onclick="addImportDay()">+ Aggiungi giorno</button>
+      </div>`
+  });
+}
+
+function updateImportField(field, value) {
+  if (!importDraft) return;
+  importDraft[field] = cleanText(value);
+}
+
+function updateImportDayField(dayIndex, field, value) {
+  if (!importDraft?.days[dayIndex]) return;
+  importDraft.days[dayIndex][field] = cleanText(value);
+}
+
+function updateImportExerciseField(dayIndex, exerciseIndex, field, value) {
+  const exercise = importDraft?.days?.[dayIndex]?.exercises?.[exerciseIndex];
+  if (!exercise) return;
+  if (field === 'series') {
+    exercise[field] = Math.max(1, parseInt(value, 10) || 1);
+  } else {
+    exercise[field] = field === 'note' ? String(value || '') : cleanText(value);
+  }
+}
+
+function addImportDay() {
+  if (!importDraft) return;
+  importDraft.days.push({
+    name: 'Day ' + (importDraft.days.length + 1),
+    label: '',
+    exercises: [{ name: '', series: 3, reps: '', note: '' }]
+  });
+  renderImportReview();
+}
+
+function removeImportDay(dayIndex) {
+  if (!importDraft?.days[dayIndex]) return;
+  importDraft.days.splice(dayIndex, 1);
+  renderImportReview();
+}
+
+function addImportExercise(dayIndex) {
+  if (!importDraft?.days[dayIndex]) return;
+  importDraft.days[dayIndex].exercises.push({ name: '', series: 3, reps: '', note: '' });
+  renderImportReview();
+}
+
+function removeImportExercise(dayIndex, exerciseIndex) {
+  if (!importDraft?.days?.[dayIndex]?.exercises?.[exerciseIndex]) return;
+  importDraft.days[dayIndex].exercises.splice(exerciseIndex, 1);
+  renderImportReview();
+}
+
+function saveImportedProgram() {
+  const validationError = validateImportDraft(importDraft);
+  if (validationError) {
+    renderImportReview(validationError);
+    return;
+  }
+
+  const finalProgram = normalizePrograms([{
+    ...cloneValue(importDraft),
+    id: makeImportedProgramId(importDraft.title || 'scheda-importata'),
+    source: 'imported',
+    importMeta: {
+      filename: importMeta?.sourceFilename || '',
+      importedAt: new Date().toISOString(),
+      parserVersion: importMeta?.parserVersion || 'pt-pdf-v1',
+      confidence: importMeta?.confidence || 0
+    }
+  }], 'imported')[0];
+
+  const userPrograms = getUserPrograms();
+  userPrograms.unshift(finalProgram);
+  saveUserPrograms(userPrograms);
+  mergePrograms();
+  closeImportModal(true);
+  showPrograms();
+}
+
+function deleteImportedProgram(programId) {
+  const program = PROGRAMS.find((item) => item.id === programId);
+  if (!program || program.source !== 'imported') return;
+  if (!confirm('Eliminare la scheda importata "' + program.title + '"?')) return;
+
+  const userPrograms = getUserPrograms().filter((item) => item.id !== programId);
+  saveUserPrograms(userPrograms);
+  try { localStorage.removeItem('massi_hist_' + programId); } catch(e) {}
+  try { localStorage.removeItem('massi_done_' + programId); } catch(e) {}
+  try { delete sessionData[programId]; } catch(e) {}
+
+  const isCurrent = currentProgram && currentProgram.id === programId;
+  mergePrograms();
+  if (isCurrent) {
+    showPrograms();
+    return;
+  }
+  renderPrograms();
+  if (document.getElementById('home').style.display !== 'none' && currentProgram) renderHome();
+  updateHeader();
+}
+
 // INIT
 initPwa();
+document.getElementById('pdf-file-input').addEventListener('change', handlePdfInputChange);
 showPrograms();
 loadPrograms();
 </script>
