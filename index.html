@@ -1,0 +1,1260 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Massi Gym</title>
+<link rel="manifest" href="./app.webmanifest">
+<link rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+<meta name="theme-color" content="#00e676">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#00e676;--gd:#00c853;--gdim:#1b5e20;
+  --bg:#080808;--s1:#101010;--s2:#181818;--s3:#202020;
+  --t:#efefef;--tm:#666;--td:#333;
+  --red:#ff1744;--amber:#ffc107;--blue:#29b6f6;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);display:flex;flex-direction:column}
+
+/* SCROLLABLE CONTENT AREA */
+#app{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+
+/* HEADER */
+.hdr{
+  background:var(--s1);border-bottom:1px solid #1a1a1a;
+  padding:12px 18px;display:flex;align-items:center;justify-content:space-between;
+  flex-shrink:0;
+}
+.hdr-brand{display:flex;align-items:center;gap:12px;min-width:0}
+.hdr-copy{min-width:0}
+.hdr-logo{display:block;height:clamp(42px,6vw,54px);width:auto;max-width:min(58vw,280px);object-fit:contain;filter:drop-shadow(0 8px 18px rgba(0,0,0,.28))}
+.hdr-actions{display:flex;align-items:center;gap:8px}
+.hdr-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--g)}
+.hdr-sub{font-size:10px;color:var(--tm);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
+.hdr-btn{background:var(--s2);border:1px solid var(--td);color:var(--tm);border-radius:8px;padding:7px 12px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.hdr-btn:hover{color:var(--g);border-color:var(--gdim)}
+#installBtn{display:none}
+
+/* HOME */
+#programs{padding:20px 16px 40px}
+#home{padding:20px 16px 40px}
+.home-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px;flex-wrap:wrap}
+.program-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.program-card{
+  background:linear-gradient(180deg,var(--s1),#0b0b0b);border:1px solid var(--td);border-radius:16px;
+  padding:18px 14px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden
+}
+.program-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--g);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.program-card:hover{border-color:var(--gdim);transform:translateY(-2px)}
+.program-card:hover::after{transform:scaleX(1)}
+.program-card h3{font-size:16px;line-height:1.2;margin-bottom:8px}
+.program-card p{font-size:12px;color:var(--tm);line-height:1.5}
+.program-meta{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.program-meta span{font-size:10px;color:var(--tm);text-transform:uppercase;letter-spacing:1px;background:var(--s2);border:1px solid var(--td);border-radius:999px;padding:5px 8px}
+.home-greeting{font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:2px;margin-bottom:4px}
+.home-greeting span{color:var(--g)}
+.home-sub{font-size:13px;color:var(--tm);margin-bottom:24px}
+.section-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin-bottom:12px}
+.day-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.day-card{
+  background:var(--s1);border:1px solid var(--td);border-radius:16px;
+  padding:18px 14px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden
+}
+.day-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--g);transform:scaleX(0);transform-origin:left;transition:transform .3s}
+.day-card:hover{border-color:var(--gdim);transform:translateY(-2px)}
+.day-card:hover::after{transform:scaleX(1)}
+.day-card:active{transform:scale(.97)}
+.dc-num{font-family:'Bebas Neue',sans-serif;font-size:42px;color:var(--gdim);line-height:1}
+.dc-name{font-size:13px;font-weight:700;margin-top:4px;line-height:1.3}
+.dc-count{font-size:11px;color:var(--tm);margin-top:3px}
+.dc-done{position:absolute;top:10px;right:10px;background:var(--g);color:#000;font-size:9px;font-weight:700;padding:3px 7px;border-radius:20px;letter-spacing:1px}
+
+/* SESSION */
+#session{display:none;flex-direction:column;height:100%}
+.sess-hdr{padding:12px 16px 0;flex-shrink:0}
+.back-btn{background:none;border:none;color:var(--tm);font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;display:flex;align-items:center;gap:5px;transition:color .2s;padding:0}
+.back-btn:hover{color:var(--g)}
+.sess-title{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--g);margin-top:6px}
+.sess-info{font-size:11px;color:var(--tm);margin-top:1px}
+.prog-bar{height:2px;background:var(--s3);margin:12px 0 0;position:relative}
+.prog-fill{height:100%;background:var(--g);transition:width .4s ease;border-radius:1px}
+
+/* TABS */
+.tabs{display:flex;margin:10px 16px 0;background:var(--s2);border-radius:10px;padding:3px;gap:3px;flex-shrink:0}
+.tab-btn{flex:1;background:none;border:none;color:var(--tm);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:8px;border-radius:7px;cursor:pointer;transition:all .2s}
+.tab-btn.on{background:var(--g);color:#000}
+
+/* SESS SCROLL */
+.sess-scroll{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:10px 16px 120px}
+
+/* LIST VIEW */
+.ex-card{background:var(--s1);border:1px solid var(--td);border-radius:14px;margin-bottom:10px;overflow:hidden;transition:border-color .2s}
+.ex-card.completed{border-color:var(--gdim)}
+.ex-card-hdr{display:flex;align-items:center;gap:10px;padding:12px 14px;cursor:pointer}
+.ex-idx{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gdim);min-width:24px}
+.ex-info{flex:1}
+.ex-name{font-size:13px;font-weight:700;line-height:1.3}
+.ex-meta{font-size:11px;color:var(--tm);margin-top:2px}
+.ex-chk{width:26px;height:26px;border-radius:50%;border:2px solid var(--td);display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0;cursor:pointer}
+.ex-chk.on{background:var(--g);border-color:var(--g)}
+.chk-icon{opacity:0;transition:opacity .15s;color:#000;font-size:13px;font-weight:700}
+.ex-chk.on .chk-icon{opacity:1}
+.ex-body{padding:0 14px 14px;border-top:1px solid #1a1a1a}
+.ex-note-box{background:rgba(255,193,7,.07);border-left:2px solid var(--amber);padding:8px 10px;border-radius:6px;margin:10px 0;font-size:12px;color:var(--amber);line-height:1.5}
+.series-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;margin:8px 0}
+.serie-box{background:var(--s2);border:1px solid var(--td);border-radius:10px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .2s}
+.serie-box.done{background:rgba(0,230,118,.1);border-color:var(--g)}
+.sb-lbl{font-size:9px;color:var(--tm);text-transform:uppercase;letter-spacing:1px}
+.sb-reps{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;margin:2px 0}
+.sb-kg{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--g);min-height:14px}
+.kg-inp{width:100%;background:var(--s3);border:1px solid var(--td);color:var(--t);border-radius:6px;padding:5px 4px;font-family:'JetBrains Mono',monospace;font-size:12px;text-align:center;outline:none;margin-top:3px}
+.kg-inp:focus{border-color:var(--g)}
+.note-inp{width:100%;background:var(--s2);border:1px solid var(--td);color:var(--t);border-radius:8px;padding:8px 10px;font-family:'DM Sans',sans-serif;font-size:12px;outline:none;resize:none;margin-top:8px;line-height:1.4}
+.note-inp:focus{border-color:var(--g)}
+
+/* FOCUS VIEW */
+#focus-view{display:none}
+.focus-nav{display:flex;align-items:center;justify-content:space-between;padding:10px 0 8px}
+.fnav-btn{background:var(--s2);border:1px solid var(--td);color:var(--t);border-radius:10px;padding:9px 16px;font-size:12px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.fnav-btn:hover{border-color:var(--g);color:var(--g)}
+.fnav-btn:disabled{opacity:.3;cursor:default}
+.fnav-ctr{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--tm)}
+.focus-card{background:var(--s1);border:1px solid var(--td);border-radius:18px;padding:22px 18px}
+.fc-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;line-height:1.1;color:var(--t)}
+.fc-meta{font-size:13px;color:var(--tm);margin-top:6px}
+.fc-note{background:rgba(255,193,7,.07);border-left:2px solid var(--amber);padding:10px 12px;border-radius:6px;margin:14px 0;font-size:12px;color:var(--amber);line-height:1.5}
+.fc-series-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin-bottom:8px}
+.fc-serie-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #161616}
+.fc-serie-row:last-child{border-bottom:none}
+.fsr-num{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gdim);min-width:26px}
+.fsr-reps{font-size:13px;font-weight:600;flex:1}
+.fsr-kg input{width:72px;background:var(--s3);border:1px solid var(--td);color:var(--t);border-radius:7px;padding:6px 8px;font-family:'JetBrains Mono',monospace;font-size:12px;text-align:center;outline:none}
+.fsr-kg input:focus{border-color:var(--g)}
+.fsr-chk{width:30px;height:30px;border-radius:50%;border:2px solid var(--td);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;flex-shrink:0}
+.fsr-chk.on{background:var(--g);border-color:var(--g)}
+.fsr-chk.on span{opacity:1;color:#000}
+.fsr-chk span{opacity:0;font-size:13px;font-weight:700;transition:opacity .15s}
+.fc-textnote{width:100%;background:var(--s2);border:1px solid var(--td);color:var(--t);border-radius:10px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:12px;outline:none;resize:none;margin-top:14px;line-height:1.4}
+.fc-textnote:focus{border-color:var(--g)}
+
+/* TIMER FLOAT BTN */
+#fab{
+  position:fixed;bottom:24px;right:18px;z-index:50;
+  width:56px;height:56px;border-radius:50%;background:var(--g);color:#000;
+  border:none;font-size:22px;cursor:pointer;
+  box-shadow:0 4px 20px rgba(0,230,118,.35);
+  display:none;align-items:center;justify-content:center;
+  transition:transform .15s
+}
+#fab.show{display:flex}
+#fab:active{transform:scale(.9)}
+
+/* FINISH BTN */
+#btn-finish{
+  position:fixed;bottom:24px;left:18px;z-index:50;
+  background:var(--s2);border:1px solid var(--td);color:var(--tm);
+  border-radius:14px;padding:13px 20px;
+  font-family:'DM Sans',sans-serif;font-size:13px;font-weight:700;
+  cursor:pointer;display:none;transition:all .2s
+}
+#btn-finish.show{display:block}
+#btn-finish:hover{border-color:var(--g);color:var(--g)}
+
+/* TIMER OVERLAY */
+#timer-ov{
+  position:fixed;inset:0;background:rgba(0,0,0,.94);z-index:200;
+  display:none;flex-direction:column;align-items:center;justify-content:center;gap:18px
+}
+#timer-ov.show{display:flex}
+.t-label{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--tm)}
+.t-dur-row{display:flex;gap:8px}
+.t-dur-btn{background:var(--s2);border:1px solid var(--td);color:var(--tm);border-radius:8px;padding:7px 14px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.t-dur-btn.on{background:rgba(0,230,118,.15);border-color:var(--g);color:var(--g)}
+.t-ring{position:relative;width:190px;height:190px}
+.t-ring svg{transform:rotate(-90deg)}
+.t-ring-bg{stroke:#1a1a1a}
+.t-ring-fg{stroke:var(--g);stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+.t-display{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.t-num{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--g);letter-spacing:2px;line-height:1}
+.t-sub{font-family:'DM Sans',sans-serif;font-size:11px;color:var(--tm);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.t-btns{display:flex;gap:10px}
+.t-btn{background:var(--s2);border:1px solid var(--td);color:var(--t);border-radius:12px;padding:11px 22px;font-size:13px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.t-btn:hover{border-color:var(--g);color:var(--g)}
+.t-btn.danger{border-color:rgba(255,23,68,.3);color:var(--red)}
+.t-btn.danger:hover{border-color:var(--red)}
+
+/* NEG TIMER (small inline) */
+.neg-timer-row{display:flex;align-items:center;gap:8px;margin:10px 0}
+.neg-label{font-size:11px;color:var(--tm)}
+.neg-secs{font-family:'JetBrains Mono',monospace;font-size:22px;color:var(--blue);font-weight:700;min-width:36px}
+.neg-btns{display:flex;gap:6px}
+.neg-btn{background:var(--s2);border:1px solid var(--td);color:var(--tm);border-radius:7px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.neg-btn:hover{color:var(--blue);border-color:var(--blue)}
+.neg-dur-sel{background:var(--s3);border:1px solid var(--td);color:var(--t);border-radius:7px;padding:5px 8px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;outline:none}
+.neg-dur-sel:focus{border-color:var(--blue)}
+
+/* CHRONO */
+.chrono-row{display:flex;align-items:center;gap:8px;margin:6px 0 10px}
+.chrono-lbl{font-size:11px;color:var(--tm)}
+.chrono-disp{font-family:'JetBrains Mono',monospace;font-size:22px;color:var(--amber);font-weight:700;min-width:60px}
+.chrono-btns{display:flex;gap:6px}
+.chrono-btn{background:var(--s2);border:1px solid var(--td);color:var(--tm);border-radius:7px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.chrono-btn:hover{color:var(--amber);border-color:var(--amber)}
+
+/* HISTORY MODAL */
+#hist-modal{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:300;display:none;flex-direction:column}
+#hist-modal.show{display:flex}
+.hist-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 18px;border-bottom:1px solid #1a1a1a;flex-shrink:0}
+.hist-hdr h2{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--g)}
+.hist-close{background:none;border:none;color:var(--tm);font-size:20px;cursor:pointer}
+.hist-scroll{flex:1;overflow-y:auto;padding:16px 18px}
+.hist-entry{background:var(--s1);border:1px solid var(--td);border-radius:12px;padding:14px;margin-bottom:10px}
+.he-date{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--g);margin-bottom:6px}
+.he-day{font-size:13px;font-weight:700;margin-bottom:6px}
+.he-ex{font-size:11px;color:var(--tm);margin:3px 0;line-height:1.4}
+.hist-empty{text-align:center;color:var(--tm);font-size:13px;margin-top:60px}
+.hist-clear{margin:0 18px 18px;background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.25);color:var(--red);border-radius:10px;padding:12px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;width:calc(100%-36px);display:block}
+
+@keyframes pop{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
+.pop{animation:pop .25s ease forwards}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr" id="main-hdr">
+  <div class="hdr-brand">
+    <img class="hdr-logo" src="./icons/logo-header-v2.png" alt="Massi Gym logo">
+    <div class="hdr-copy">
+      <div class="hdr-sub" id="hdr-sub">Schede modulari interattive</div>
+    </div>
+  </div>
+  <div class="hdr-actions">
+    <button class="hdr-btn" id="history-btn" onclick="openHist()" style="display:none">Storico</button>
+    <button class="hdr-btn" id="installBtn">Installa</button>
+  </div>
+</div>
+
+<!-- APP SCROLL AREA -->
+<div id="app">
+
+<!-- PROGRAMS -->
+<div id="programs">
+  <div style="padding:20px 16px 0">
+    <div class="home-greeting">Le tue <span>schede</span></div>
+    <div class="home-sub" style="margin-bottom:20px">Scegli il programma da aprire</div>
+    <div class="section-label">Programmi disponibili</div>
+    <div class="program-grid" id="program-grid"></div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="home" style="display:none">
+  <div style="padding:20px 16px 0">
+    <div class="home-top">
+      <button class="hdr-btn" onclick="showPrograms()">&larr; Schede</button>
+    </div>
+    <div class="home-greeting">Ciao, <span>Massi</span></div>
+    <div class="home-sub" style="margin-bottom:20px">Scegli l'allenamento di oggi</div>
+    <div class="section-label">I tuoi giorni</div>
+    <div class="day-grid" id="day-grid"></div>
+  </div>
+</div>
+
+<!-- SESSION -->
+<div id="session" style="display:none">
+  <div class="sess-hdr">
+    <button class="back-btn" onclick="goHome()">&larr; Torna ai giorni</button>
+    <div class="sess-title" id="sess-title"></div>
+    <div class="sess-info" id="sess-info"></div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn on" id="tab-list" onclick="switchTab('list')">Lista</button>
+    <button class="tab-btn" id="tab-focus" onclick="switchTab('focus')">Focus</button>
+  </div>
+  <div class="sess-scroll">
+    <div id="list-view"></div>
+    <div id="focus-view" style="display:none">
+      <div class="focus-nav">
+        <button class="fnav-btn" id="fnav-prev" onclick="focusNav(-1)">&larr; Prec</button>
+        <span class="fnav-ctr" id="fnav-ctr"></span>
+        <button class="fnav-btn" id="fnav-next" onclick="focusNav(1)">Succ &rarr;</button>
+      </div>
+      <div class="focus-card" id="focus-card"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end #app -->
+
+<!-- FAB TIMER -->
+<button id="fab" onclick="openTimer()">T</button>
+
+<!-- FINISH BTN -->
+<button id="btn-finish" onclick="finishSession()">Termina</button>
+
+<!-- TIMER OVERLAY -->
+<div id="timer-ov">
+  <div class="t-label" id="t-label">RECUPERO TRA SERIE</div>
+  <div class="t-dur-row" id="t-dur-row">
+    <button class="t-dur-btn" onclick="setDur(60,this)">60"</button>
+    <button class="t-dur-btn" onclick="setDur(75,this)">75"</button>
+    <button class="t-dur-btn on" onclick="setDur(90,this)">90"</button>
+    <button class="t-dur-btn" onclick="setDur(120,this)">120"</button>
+  </div>
+  <div class="t-ring">
+    <svg width="190" height="190" viewBox="0 0 190 190">
+      <circle class="t-ring-bg" cx="95" cy="95" r="82" fill="none" stroke-width="8"/>
+      <circle class="t-ring-fg" id="t-circle" cx="95" cy="95" r="82" fill="none" stroke-width="8"
+        stroke-dasharray="515" stroke-dashoffset="0"/>
+    </svg>
+    <div class="t-display">
+      <div class="t-num" id="t-num">90</div>
+      <div class="t-sub" id="t-sub">secondi</div>
+    </div>
+  </div>
+  <div class="t-btns">
+    <button class="t-btn" id="t-pause-btn" onclick="toggleTimer()">Pausa</button>
+    <button class="t-btn danger" onclick="closeTimer()">Chiudi</button>
+  </div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div id="hist-modal">
+  <div class="hist-hdr">
+    <h2>Storico</h2>
+    <button class="hist-close" onclick="closeHist()">X</button>
+  </div>
+  <div class="hist-scroll" id="hist-content"></div>
+  <button class="hist-clear" onclick="clearHist()">Cancella tutto lo storico</button>
+</div>
+
+<script id="programs-inline" type="application/json">
+{
+  "programs": [
+    {
+      "id": "recomp-5w",
+      "title": "Recomp 5 Weeks",
+      "subtitle": "Protocollo Luca Biolo Â· scheda attuale",
+      "weeks": "5 settimane",
+      "days": [
+        {
+          "name": "Day 1",
+          "label": "Petto & Spalle",
+          "exercises": [
+            {
+              "name": "Distensioni inclinata bilanciere multipower",
+              "series": 4,
+              "reps": "8",
+              "note": "Negativa lenta, fermo 1\" a 2cm dal petto, esplodi su"
+            },
+            {
+              "name": "Chest Press",
+              "series": 3,
+              "reps": "8-10",
+              "note": "Ultima serie: 1 rest pause 15\""
+            },
+            {
+              "name": "Croci cavi bassi / Pectoral",
+              "series": 3,
+              "reps": "20",
+              "note": "Tensione lenta e continua, enfatizza lo stretch"
+            },
+            {
+              "name": "Distensioni piana manubri / macchina",
+              "series": 3,
+              "reps": "8-12",
+              "note": "3-5\" pausa in stretch su ogni rep"
+            },
+            {
+              "name": "Alzate laterali",
+              "series": 3,
+              "reps": "20/15/10",
+              "note": "2 rest pause 20\", parziali ad esaurimento"
+            },
+            {
+              "name": "Alzate laterali singole al cavo",
+              "series": 3,
+              "reps": "12",
+              "note": "Ultima serie: 2 drop set"
+            },
+            {
+              "name": "Leg Raises",
+              "series": 3,
+              "reps": "10-15",
+              "note": "Ultimo con 2 rest pause 15\""
+            },
+            {
+              "name": "Crunches",
+              "series": 3,
+              "reps": "30",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "name": "Day 2",
+          "label": "Back & Biceps",
+          "exercises": [
+            {
+              "name": "Pulley",
+              "series": 3,
+              "reps": "8-12",
+              "note": "1 rep+1/4 in contrazione"
+            },
+            {
+              "name": "Lat presa inversa",
+              "series": 4,
+              "reps": "8-10",
+              "note": "Negativa 4\", ultima serie 2 rest pause 20\""
+            },
+            {
+              "name": "Curl bilanciere Scott",
+              "series": 3,
+              "reps": "8 / 8 / 8-12",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Curl manubri su inclinata",
+              "series": 3,
+              "reps": "8-10",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Curl alla fune",
+              "series": 4,
+              "reps": "15",
+              "note": "20\" rest tra le serie"
+            },
+            {
+              "name": "Alzate busto flesso su panca 30Â°",
+              "series": 2,
+              "reps": "20",
+              "note": ""
+            },
+            {
+              "name": "Calf seduto",
+              "series": 3,
+              "reps": "20/15/10",
+              "note": "Pausa 5\" in stretch"
+            }
+          ]
+        },
+        {
+          "name": "Day 3",
+          "label": "Legs",
+          "exercises": [
+            {
+              "name": "Leg Curl sdraiato",
+              "series": 4,
+              "reps": "8 / 6-10",
+              "note": "Contrazione picco 2\", ultima 2 rest pause 20\""
+            },
+            {
+              "name": "Stacchi gambe semitese singole",
+              "series": 3,
+              "reps": "12",
+              "note": ""
+            },
+            {
+              "name": "Leg Extensions",
+              "series": 4,
+              "reps": "30/20/15/10",
+              "note": "2 rest pause 20\", parziali a cedimento"
+            },
+            {
+              "name": "Hack Squat",
+              "series": 4,
+              "reps": "10",
+              "note": "Negativa controllata 4\", ultima 2 rest pause 20\""
+            },
+            {
+              "name": "Leg Press",
+              "series": 4,
+              "reps": "8/20/20/30",
+              "note": ""
+            },
+            {
+              "name": "Stretch quadricipiti",
+              "series": 1,
+              "reps": "60\"",
+              "note": "Continuati"
+            },
+            {
+              "name": "Calf in piedi",
+              "series": 3,
+              "reps": "15",
+              "note": ""
+            },
+            {
+              "name": "Calf seduto",
+              "series": 3,
+              "reps": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "name": "Day 4",
+          "label": "Spalle & Tricipiti",
+          "exercises": [
+            {
+              "name": "Distensioni verticali multipower",
+              "series": 3,
+              "reps": "6-8",
+              "note": "2 rest pause 15\""
+            },
+            {
+              "name": "Alzate laterali",
+              "series": 3,
+              "reps": "12/10/8",
+              "note": "2 rest pause 15\""
+            },
+            {
+              "name": "Tirate al petto presa larga",
+              "series": 3,
+              "reps": "15",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Distensioni panca stretta Smith",
+              "series": 4,
+              "reps": "15/10/8/6-8",
+              "note": "2 rest pause 15\""
+            },
+            {
+              "name": "French Press manubri",
+              "series": 3,
+              "reps": "10",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Estensioni dietro testa fune",
+              "series": 3,
+              "reps": "15",
+              "note": "+20\" in stretch"
+            },
+            {
+              "name": "Crunches al cavo",
+              "series": 3,
+              "reps": "8-12",
+              "note": "Ultimo: 2 rest pause 15\""
+            }
+          ]
+        },
+        {
+          "name": "Day 5",
+          "label": "Dorso",
+          "exercises": [
+            {
+              "name": "Rematore bilanciere presa inversa",
+              "series": 4,
+              "reps": "10/8/6/20",
+              "note": ""
+            },
+            {
+              "name": "Rack Chins presa larga",
+              "series": 3,
+              "reps": "10/10/10-12",
+              "note": "Ultima: 2 rest pause 20\""
+            },
+            {
+              "name": "Pulley presa medio larga",
+              "series": 4,
+              "reps": "10/10/10/8",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Shrugs manubri",
+              "series": 3,
+              "reps": "12",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Calf in piedi",
+              "series": 4,
+              "reps": "10",
+              "note": "3-5\" pausa in stretch"
+            },
+            {
+              "name": "Appeso (stretch dorso)",
+              "series": 1,
+              "reps": "60\"",
+              "note": "Stretch sul dorso"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "nuova-scheda",
+      "title": "Nuova Scheda PT",
+      "subtitle": "Template pronto per il prossimo ciclo",
+      "weeks": "da aggiornare",
+      "days": [
+        {
+          "name": "Day 1",
+          "label": "Da compilare",
+          "exercises": [
+            {
+              "name": "Nuovo esercizio 1",
+              "series": 3,
+              "reps": "8-12",
+              "note": "Sostituisci questa scheda quando il PT ti manda il nuovo programma."
+            }
+          ]
+        },
+        {
+          "name": "Day 2",
+          "label": "Da compilare",
+          "exercises": [
+            {
+              "name": "Nuovo esercizio 2",
+              "series": 3,
+              "reps": "8-12",
+              "note": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+</script>
+
+<script>
+const PROGRAMS_URL = './programs.json';
+let PROGRAMS = [];
+let currentProgram = null;
+let currentProgramIndex = -1;
+let currentDay = null;
+let currentTab = 'list';
+let focusIdx = 0;
+let sessionData = {};
+let deferredPrompt = null;
+// Timer state
+let timerInterval = null;
+let timerTotal = 90;
+let timerLeft = 90;
+let timerRunning = false;
+// Chrono state
+let chronoInterval = null;
+let chronoSecs = 0;
+let chronoRunning = false;
+// Neg timer
+let negInterval = null;
+let negLeft = 4;
+let negRunning = false;
+let negDur = 4;
+
+function repairText(value) {
+  if (typeof value !== 'string') return value;
+  if (!/[ÃÂâð]/.test(value)) return value;
+  try { return decodeURIComponent(escape(value)); } catch(e) { return value; }
+}
+
+function escapeHtml(value) {
+  return String(value || '')
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#039;');
+}
+
+function normalizePrograms(programs) {
+  return (Array.isArray(programs) ? programs : []).map((program, pi) => ({
+    id: String(program?.id || 'program-' + (pi + 1)).replace(/[^a-zA-Z0-9_-]/g, '_'),
+    title: repairText(program?.title || 'Scheda ' + (pi + 1)),
+    subtitle: repairText(program?.subtitle || 'Scheda allenamento'),
+    weeks: repairText(program?.weeks || ''),
+    days: (Array.isArray(program?.days) ? program.days : []).map((day, di) => ({
+      name: repairText(day?.name || 'Day ' + (di + 1)),
+      label: repairText(day?.label || ''),
+      exercises: (Array.isArray(day?.exercises) ? day.exercises : []).map((ex, ei) => ({
+        name: repairText(ex?.name || 'Esercizio ' + (ei + 1)),
+        series: Math.max(0, parseInt(ex?.series, 10) || 0),
+        reps: repairText(String(ex?.reps ?? '-')),
+        note: repairText(ex?.note || '')
+      }))
+    }))
+  }));
+}
+
+function getDays() { return currentProgram ? currentProgram.days : []; }
+function getCurrentProgramId() { return currentProgram ? currentProgram.id : 'default'; }
+function getHistoryKey() { return 'massi_hist_' + getCurrentProgramId(); }
+function getDoneKey() { return 'massi_done_' + getCurrentProgramId(); }
+
+function getProgramStats(program) {
+  try {
+    const hist = JSON.parse(localStorage.getItem('massi_hist_' + program.id) || '[]');
+    const done = JSON.parse(localStorage.getItem('massi_done_' + program.id) || '{}');
+    return { hist: hist.length, done: Object.values(done).filter(Boolean).length };
+  } catch(e) {
+    return { hist: 0, done: 0 };
+  }
+}
+
+function getProgramSession() {
+  const pid = getCurrentProgramId();
+  if (!sessionData[pid]) sessionData[pid] = {};
+  return sessionData[pid];
+}
+
+function getSD(di, ei) {
+  const days = getDays();
+  const programSession = getProgramSession();
+  if (!programSession[di]) programSession[di] = {};
+  if (!programSession[di][ei]) {
+    const ex = days[di].exercises[ei];
+    programSession[di][ei] = {
+      seriesDone: Array(ex.series).fill(false),
+      kg: Array(ex.series).fill(''),
+      note: '',
+      exDone: false
+    };
+  }
+  return programSession[di][ei];
+}
+
+function getHistory() { try { return JSON.parse(localStorage.getItem(getHistoryKey())||'[]'); } catch(e){return [];} }
+function saveHistory(h) { try { localStorage.setItem(getHistoryKey(), JSON.stringify(h)); } catch(e){} }
+function getDayDone(di) { try { const d=JSON.parse(localStorage.getItem(getDoneKey())||'{}'); return d[di]||false; } catch(e){return false;} }
+function setDayDone(di, v) { try { const d=JSON.parse(localStorage.getItem(getDoneKey())||'{}'); d[di]=v; localStorage.setItem(getDoneKey(),JSON.stringify(d)); } catch(e){} }
+
+function updateHeader() {
+  const sub = document.getElementById('hdr-sub');
+  const historyBtn = document.getElementById('history-btn');
+  if (!currentProgram) {
+    sub.textContent = 'Schede modulari interattive';
+    historyBtn.style.display = 'none';
+    return;
+  }
+  sub.textContent = currentProgram.subtitle || currentProgram.title;
+  historyBtn.style.display = 'inline-block';
+}
+
+function renderPrograms() {
+  const grid = document.getElementById('program-grid');
+  grid.innerHTML = '';
+  if (!PROGRAMS.length) {
+    grid.innerHTML = '<div class="program-card"><h3>Nessuna scheda</h3><p>Controlla programs.json</p></div>';
+    return;
+  }
+  PROGRAMS.forEach((program, i) => {
+    const stats = getProgramStats(program);
+    const card = document.createElement('div');
+    card.className = 'program-card pop';
+    card.style.animationDelay = (i * 0.05) + 's';
+    card.innerHTML = `
+      <h3>${escapeHtml(program.title)}</h3>
+      <p>${escapeHtml(program.subtitle || 'Scheda allenamento')}</p>
+      <div class="program-meta">
+        <span>${program.days.length} giorni</span>
+        <span>${escapeHtml(program.weeks || 'ciclo attivo')}</span>
+        <span>${stats.done} fatti</span>
+        <span>${stats.hist} sessioni</span>
+      </div>
+    `;
+    card.onclick = () => openProgram(i);
+    grid.appendChild(card);
+  });
+}
+
+function showPrograms() {
+  currentProgram = null;
+  currentProgramIndex = -1;
+  currentDay = null;
+  document.getElementById('programs').style.display = 'block';
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('session').style.display = 'none';
+  document.getElementById('fab').classList.remove('show');
+  document.getElementById('btn-finish').classList.remove('show');
+  stopTimer(); stopChrono(); stopNeg();
+  renderPrograms();
+  updateHeader();
+}
+
+function openProgram(index) {
+  currentProgramIndex = index;
+  currentProgram = PROGRAMS[index] || null;
+  currentDay = null;
+  focusIdx = 0;
+  document.getElementById('programs').style.display = 'none';
+  document.getElementById('home').style.display = 'block';
+  document.getElementById('session').style.display = 'none';
+  updateHeader();
+  renderHome();
+}
+
+async function loadPrograms() {
+  try {
+    if (window.location.protocol !== 'file:') {
+      const res = await fetch(PROGRAMS_URL, { cache: 'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      const data = await res.json();
+      PROGRAMS = normalizePrograms(data.programs);
+    } else {
+      throw new Error('file-protocol');
+    }
+  } catch (e) {
+    console.error('Errore caricamento schede', e);
+    try {
+      const fallback = JSON.parse(document.getElementById('programs-inline').textContent);
+      PROGRAMS = normalizePrograms(fallback.programs);
+    } catch (fallbackError) {
+      console.error('Errore fallback schede', fallbackError);
+      PROGRAMS = [];
+    }
+  }
+  renderPrograms();
+  updateHeader();
+}
+
+function initPwa() {
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(err => console.error('SW registration failed', err)));
+  }
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    document.getElementById('installBtn').style.display = 'inline-block';
+  });
+  window.addEventListener('appinstalled', () => {
+    deferredPrompt = null;
+    document.getElementById('installBtn').style.display = 'none';
+  });
+  document.getElementById('installBtn').addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById('installBtn').style.display = 'none';
+  });
+}
+
+
+// â”€â”€â”€ HOME â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function renderHome() {
+  const days = getDays();
+  const grid = document.getElementById('day-grid');
+  const greeting = document.querySelector('#home .home-greeting');
+  const subtitle = document.querySelector('#home .home-sub');
+  greeting.innerHTML = currentProgram ? 'Scheda <span>' + escapeHtml(currentProgram.title) + '</span>' : 'Le tue <span>schede</span>';
+  subtitle.textContent = currentProgram ? (currentProgram.subtitle || 'Scegli l\'allenamento di oggi') : 'Scegli il programma da aprire';
+  grid.innerHTML = '';
+  days.forEach((day, i) => {
+    const done = getDayDone(i);
+    const card = document.createElement('div');
+    card.className = 'day-card pop';
+    card.style.animationDelay = (i*0.07)+'s';
+    card.innerHTML = `
+      ${done ? '<div class="dc-done">FATTO</div>' : ''}
+      <div class="dc-num">${i+1}</div>
+      <div class="dc-name">${day.label || day.name}</div>
+      <div class="dc-count">${day.exercises.length} esercizi</div>
+    `;
+    card.onclick = () => startSession(i);
+    grid.appendChild(card);
+  });
+}
+
+// â”€â”€â”€ SESSION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function startSession(di) {
+  const days = getDays();
+  if (!days[di]) return;
+  currentDay = di;
+  focusIdx = 0;
+  document.getElementById('programs').style.display = 'none';
+  document.getElementById('home').style.display = 'none';
+  document.getElementById('session').style.display = 'block';
+  document.getElementById('sess-title').textContent = days[di].name + ' - ' + (days[di].label || '');
+  document.getElementById('sess-info').textContent = days[di].exercises.length + ' esercizi - Recupero 60-120s - ' + (currentProgram?.weeks || 'scheda attiva');
+  document.getElementById('fab').classList.add('show');
+  document.getElementById('btn-finish').classList.add('show');
+  switchTab('list');
+  updateProgress(di);
+}
+
+function goHome() {
+  currentDay = null;
+  document.getElementById('programs').style.display = 'none';
+  document.getElementById('home').style.display = 'block';
+  document.getElementById('session').style.display = 'none';
+  document.getElementById('fab').classList.remove('show');
+  document.getElementById('btn-finish').classList.remove('show');
+  stopTimer(); stopChrono(); stopNeg();
+  renderHome();
+  updateHeader();
+}
+
+function updateProgress(di) {
+  const exs = getDays()[di].exercises;
+  let done = 0;
+  exs.forEach((_, ei) => { if (getSD(di, ei).exDone) done++; });
+  const pct = Math.round((done / exs.length) * 100);
+  document.getElementById('prog-fill').style.width = pct + '%';
+}
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('tab-list').className = 'tab-btn' + (tab==='list' ? ' on' : '');
+  document.getElementById('tab-focus').className = 'tab-btn' + (tab==='focus' ? ' on' : '');
+  document.getElementById('list-view').style.display = tab==='list' ? 'block' : 'none';
+  document.getElementById('focus-view').style.display = tab==='focus' ? 'block' : 'none';
+  if (currentDay === null) return;
+  if (tab === 'list') renderListView(currentDay);
+  else renderFocusView(currentDay, focusIdx);
+}
+
+// â”€â”€â”€ LIST VIEW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function renderListView(di) {
+  const days = getDays();
+  const wrap = document.getElementById('list-view');
+  wrap.innerHTML = '';
+  days[di].exercises.forEach((ex, ei) => {
+    const sd = getSD(di, ei);
+    const card = document.createElement('div');
+    card.className = 'ex-card' + (sd.exDone ? ' completed' : '');
+    card.id = 'ex-card-' + ei;
+
+    // Build series grid html
+    let seriesHtml = '<div class="series-grid">';
+    for (let s = 0; s < ex.series; s++) {
+      seriesHtml += `
+        <div class="serie-box${sd.seriesDone[s]?' done':''}" id="sb-${ei}-${s}" onclick="toggleSerie(${di},${ei},${s})">
+          <div class="sb-lbl">Serie ${s+1}</div>
+          <div class="sb-reps">${ex.reps}</div>
+          <div class="sb-kg" id="sb-kg-${ei}-${s}">${sd.kg[s]||''}</div>
+          <input class="kg-inp" id="kg-${ei}-${s}" type="number" inputmode="decimal" placeholder="kg"
+            value="${sd.kg[s]||''}"
+            onclick="event.stopPropagation()"
+            onchange="saveKg(${di},${ei},${s},this.value)"
+            oninput="saveKg(${di},${ei},${s},this.value)">
+        </div>`;
+    }
+    seriesHtml += '</div>';
+
+    card.innerHTML = `
+      <div class="ex-card-hdr" onclick="toggleCard(${ei})">
+        <div class="ex-idx">${ei+1}</div>
+        <div class="ex-info">
+          <div class="ex-name">${ex.name}</div>
+          <div class="ex-meta">${ex.series} serie - ${ex.reps} reps</div>
+        </div>
+        <div class="ex-chk${sd.exDone?' on':''}" id="echk-${ei}" onclick="event.stopPropagation();toggleExDone(${di},${ei})">
+          <span class="chk-icon">&#10003;</span>
+        </div>
+      </div>
+      <div class="ex-body" id="ex-body-${ei}" style="display:none">
+        ${ex.note ? `<div class="ex-note-box">${ex.note}</div>` : ''}
+        ${seriesHtml}
+        <textarea class="note-inp" id="note-${ei}" rows="2" placeholder="Note esercizio..."
+          onchange="saveNote(${di},${ei},this.value)"
+          oninput="saveNote(${di},${ei},this.value)">${sd.note}</textarea>
+      </div>
+    `;
+    wrap.appendChild(card);
+  });
+}
+
+function toggleCard(ei) {
+  const body = document.getElementById('ex-body-' + ei);
+  body.style.display = body.style.display === 'none' ? 'block' : 'none';
+}
+
+function toggleSerie(di, ei, s) {
+  const sd = getSD(di, ei);
+  sd.seriesDone[s] = !sd.seriesDone[s];
+  const box = document.getElementById('sb-' + ei + '-' + s);
+  box.className = 'serie-box' + (sd.seriesDone[s] ? ' done' : '');
+  if (sd.seriesDone[s]) openTimer();
+}
+
+function toggleExDone(di, ei) {
+  const sd = getSD(di, ei);
+  sd.exDone = !sd.exDone;
+  const chk = document.getElementById('echk-' + ei);
+  chk.className = 'ex-chk' + (sd.exDone ? ' on' : '');
+  const card = document.getElementById('ex-card-' + ei);
+  card.className = 'ex-card' + (sd.exDone ? ' completed' : '');
+  updateProgress(di);
+}
+
+function saveKg(di, ei, s, val) {
+  getSD(di, ei).kg[s] = val;
+}
+
+function saveNote(di, ei, val) {
+  getSD(di, ei).note = val;
+}
+
+// â”€â”€â”€ FOCUS VIEW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function renderFocusView(di, ei) {
+  const days = getDays();
+  focusIdx = ei;
+  const ex = days[di].exercises[ei];
+  const sd = getSD(di, ei);
+  document.getElementById('fnav-ctr').textContent = (ei+1) + ' / ' + days[di].exercises.length;
+  document.getElementById('fnav-prev').disabled = ei === 0;
+  document.getElementById('fnav-next').disabled = ei === days[di].exercises.length - 1;
+
+  // Build series rows
+  let seriesHtml = `<div class="fc-series-lbl">Serie</div>`;
+  for (let s = 0; s < ex.series; s++) {
+    seriesHtml += `
+      <div class="fc-serie-row">
+        <div class="fsr-num">${s+1}</div>
+        <div class="fsr-reps">${ex.reps} reps</div>
+        <div class="fsr-kg">
+          <input type="number" inputmode="decimal" placeholder="kg"
+            value="${sd.kg[s]||''}"
+            onchange="saveKg(${di},${ei},${s},this.value)"
+            oninput="saveKg(${di},${ei},${s},this.value)">
+        </div>
+        <div class="fsr-chk${sd.seriesDone[s]?' on':''}" id="fchk-${ei}-${s}" onclick="toggleFSerie(${di},${ei},${s})">
+          <span>&#10003;</span>
+        </div>
+      </div>`;
+  }
+
+  document.getElementById('focus-card').innerHTML = `
+    <div class="fc-name">${ex.name}</div>
+    <div class="fc-meta">${ex.series} serie - ${ex.reps} reps</div>
+    ${ex.note ? `<div class="fc-note">${ex.note}</div>` : ''}
+    <div class="chrono-row">
+      <span class="chrono-lbl">Cronometro serie:</span>
+      <span class="chrono-disp" id="chrono-disp">${String(Math.floor(chronoSecs/60)).padStart(2,'0')}:${String(chronoSecs%60).padStart(2,'0')}</span>
+      <div class="chrono-btns">
+        <button class="chrono-btn" onclick="toggleChrono()">${chronoRunning ? 'Pausa' : 'Start'}</button>
+        <button class="chrono-btn" onclick="resetChrono()">Reset</button>
+      </div>
+    </div>
+    <div class="neg-timer-row">
+      <span class="neg-label">Neg:</span>
+      <span class="neg-secs" id="neg-disp">${negLeft}</span>
+      <select class="neg-dur-sel" onchange="negDur=parseInt(this.value);negLeft=negDur;updateNegDisp()" >
+        <option value="3"${negDur===3?' selected':''}>3"</option>
+        <option value="4"${negDur===4?' selected':''}>4"</option>
+        <option value="5"${negDur===5?' selected':''}>5"</option>
+      </select>
+      <div class="neg-btns">
+        <button class="neg-btn" onclick="startNeg()">Start</button>
+        <button class="neg-btn" onclick="stopNeg()">Reset</button>
+      </div>
+    </div>
+    ${seriesHtml}
+    <textarea class="fc-textnote" rows="2" placeholder="Note..."
+      onchange="saveNote(${di},${ei},this.value)"
+      oninput="saveNote(${di},${ei},this.value)">${sd.note}</textarea>
+  `;
+  updateNegDisp();
+}
+
+function toggleFSerie(di, ei, s) {
+  const sd = getSD(di, ei);
+  sd.seriesDone[s] = !sd.seriesDone[s];
+  const chk = document.getElementById('fchk-' + ei + '-' + s);
+  if (chk) chk.className = 'fsr-chk' + (sd.seriesDone[s] ? ' on' : '');
+  const box = document.getElementById('sb-' + ei + '-' + s);
+  if (box) box.className = 'serie-box' + (sd.seriesDone[s] ? ' done' : '');
+  if (sd.seriesDone[s]) openTimer();
+}
+
+function focusNav(dir) {
+  const next = focusIdx + dir;
+  if (next < 0 || next >= getDays()[currentDay].exercises.length) return;
+  stopChrono(); stopNeg();
+  renderFocusView(currentDay, next);
+}
+
+// â”€â”€â”€ CHRONO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function toggleChrono() {
+  if (chronoRunning) {
+    clearInterval(chronoInterval); chronoRunning = false;
+  } else {
+    chronoRunning = true;
+    chronoInterval = setInterval(() => {
+      chronoSecs++;
+      const el = document.getElementById('chrono-disp');
+      if (el) {
+        const m = String(Math.floor(chronoSecs/60)).padStart(2,'0');
+        const s = String(chronoSecs%60).padStart(2,'0');
+        el.textContent = m + ':' + s;
+      }
+    }, 1000);
+  }
+}
+function resetChrono() {
+  clearInterval(chronoInterval); chronoRunning = false; chronoSecs = 0;
+  const el = document.getElementById('chrono-disp');
+  if (el) el.textContent = '00:00';
+}
+function stopChrono() { clearInterval(chronoInterval); chronoRunning = false; chronoSecs = 0; }
+
+// â”€â”€â”€ NEG TIMER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function updateNegDisp() {
+  const el = document.getElementById('neg-disp');
+  if (el) el.textContent = negLeft;
+}
+function startNeg() {
+  if (negRunning) return;
+  negLeft = negDur;
+  updateNegDisp();
+  negRunning = true;
+  negInterval = setInterval(() => {
+    negLeft--;
+    updateNegDisp();
+    if (negLeft <= 0) {
+      stopNeg();
+      buzzVibrate();
+    }
+  }, 1000);
+}
+function stopNeg() {
+  clearInterval(negInterval); negRunning = false; negLeft = negDur; updateNegDisp();
+}
+
+// â”€â”€â”€ REST TIMER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+const CIRC = 515;
+function openTimer() {
+  timerLeft = timerTotal;
+  updateTimerDisplay();
+  document.getElementById('timer-ov').classList.add('show');
+  startTimer();
+}
+function closeTimer() {
+  document.getElementById('timer-ov').classList.remove('show');
+  stopTimer();
+}
+function setDur(secs, btn) {
+  document.querySelectorAll('.t-dur-btn').forEach(b => b.classList.remove('on'));
+  if (btn) btn.classList.add('on');
+  timerTotal = secs; timerLeft = secs;
+  updateTimerDisplay();
+  if (timerRunning) { clearInterval(timerInterval); startTimer(); }
+}
+function startTimer() {
+  clearInterval(timerInterval);
+  timerRunning = true;
+  document.getElementById('t-pause-btn').textContent = 'Pausa';
+  timerInterval = setInterval(() => {
+    timerLeft--;
+    updateTimerDisplay();
+    if (timerLeft <= 0) { stopTimer(); buzzVibrate(); document.getElementById('t-sub').textContent = 'PRONTI!'; }
+  }, 1000);
+}
+function stopTimer() {
+  clearInterval(timerInterval); timerRunning = false;
+  document.getElementById('t-pause-btn').textContent = 'Riprendi';
+}
+function toggleTimer() {
+  if (timerRunning) stopTimer();
+  else { if (timerLeft <= 0) { timerLeft = timerTotal; } startTimer(); }
+}
+function updateTimerDisplay() {
+  document.getElementById('t-num').textContent = timerLeft;
+  document.getElementById('t-sub').textContent = timerLeft > 0 ? 'secondi' : 'PRONTI!';
+  const pct = timerLeft / timerTotal;
+  document.getElementById('t-circle').style.strokeDashoffset = CIRC * (1 - pct);
+}
+
+// â”€â”€â”€ BUZZ / VIBRATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function buzzVibrate() {
+  if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    [0, 0.3, 0.6].forEach(t => {
+      const o = ctx.createOscillator();
+      const g = ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value = 880;
+      g.gain.setValueAtTime(0.4, ctx.currentTime + t);
+      g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.25);
+      o.start(ctx.currentTime + t);
+      o.stop(ctx.currentTime + t + 0.25);
+    });
+  } catch(e) {}
+}
+
+// â”€â”€â”€ FINISH SESSION â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function finishSession() {
+  const di = currentDay;
+  const days = getDays();
+  const hist = getHistory();
+  const entry = {
+    date: new Date().toLocaleString('it-IT'),
+    program: currentProgram ? currentProgram.title : '',
+    day: days[di].name + ' - ' + (days[di].label || ''),
+    exercises: []
+  };
+  days[di].exercises.forEach((ex, ei) => {
+    const sd = getSD(di, ei);
+    const kgStr = sd.kg.filter(k=>k).map((k,i)=>'S'+(i+1)+': '+k+'kg').join(', ');
+    entry.exercises.push({
+      name: ex.name,
+      done: sd.exDone,
+      kg: kgStr,
+      note: sd.note
+    });
+  });
+  hist.unshift(entry);
+  saveHistory(hist);
+  setDayDone(di, true);
+  const pid = getCurrentProgramId();
+  if (sessionData[pid]) delete sessionData[pid][di];
+  renderPrograms();
+  goHome();
+}
+
+// â”€â”€â”€ HISTORY MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function openHist() {
+  const hist = getHistory();
+  const el = document.getElementById('hist-content');
+  const title = document.querySelector('#hist-modal h2');
+  title.textContent = currentProgram ? 'Storico - ' + currentProgram.title : 'Storico';
+  if (hist.length === 0) {
+    el.innerHTML = '<div class="hist-empty">Nessun allenamento salvato ancora.<br>Completa una sessione per vederla qui!</div>';
+  } else {
+    el.innerHTML = hist.map(h => `
+      <div class="hist-entry">
+        <div class="he-date">${h.date}</div>
+        <div class="he-day">${h.day}</div>
+        ${h.exercises.map(e => `
+          <div class="he-ex">
+            ${e.done ? '&#10003;' : '&#9711;'} <b>${e.name}</b>
+            ${e.kg ? ' - ' + e.kg : ''}
+            ${e.note ? '<br>Note: ' + e.note : ''}
+          </div>`).join('')}
+      </div>`).join('');
+  }
+  document.getElementById('hist-modal').classList.add('show');
+}
+function closeHist() { document.getElementById('hist-modal').classList.remove('show'); }
+function clearHist() {
+  if (confirm('Cancellare tutto lo storico?')) {
+    saveHistory([]);
+    try { localStorage.removeItem(getDoneKey()); } catch(e) {}
+    closeHist();
+    renderHome();
+    renderPrograms();
+  }
+}
+
+// INIT
+initPwa();
+showPrograms();
+loadPrograms();
+</script>
+</body>
+</html>
+
+

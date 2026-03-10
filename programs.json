@@ -1,0 +1,290 @@
+{
+  "programs": [
+    {
+      "id": "recomp-5w",
+      "title": "Recomp 5 Weeks",
+      "subtitle": "Protocollo Luca Biolo · scheda attuale",
+      "weeks": "5 settimane",
+      "days": [
+        {
+          "name": "Day 1",
+          "label": "Petto & Spalle",
+          "exercises": [
+            {
+              "name": "Distensioni inclinata bilanciere multipower",
+              "series": 4,
+              "reps": "8",
+              "note": "Negativa lenta, fermo 1\" a 2cm dal petto, esplodi su"
+            },
+            {
+              "name": "Chest Press",
+              "series": 3,
+              "reps": "8-10",
+              "note": "Ultima serie: 1 rest pause 15\""
+            },
+            {
+              "name": "Croci cavi bassi / Pectoral",
+              "series": 3,
+              "reps": "20",
+              "note": "Tensione lenta e continua, enfatizza lo stretch"
+            },
+            {
+              "name": "Distensioni piana manubri / macchina",
+              "series": 3,
+              "reps": "8-12",
+              "note": "3-5\" pausa in stretch su ogni rep"
+            },
+            {
+              "name": "Alzate laterali",
+              "series": 3,
+              "reps": "20/15/10",
+              "note": "2 rest pause 20\", parziali ad esaurimento"
+            },
+            {
+              "name": "Alzate laterali singole al cavo",
+              "series": 3,
+              "reps": "12",
+              "note": "Ultima serie: 2 drop set"
+            },
+            {
+              "name": "Leg Raises",
+              "series": 3,
+              "reps": "10-15",
+              "note": "Ultimo con 2 rest pause 15\""
+            },
+            {
+              "name": "Crunches",
+              "series": 3,
+              "reps": "30",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "name": "Day 2",
+          "label": "Back & Biceps",
+          "exercises": [
+            {
+              "name": "Pulley",
+              "series": 3,
+              "reps": "8-12",
+              "note": "1 rep+1/4 in contrazione"
+            },
+            {
+              "name": "Lat presa inversa",
+              "series": 4,
+              "reps": "8-10",
+              "note": "Negativa 4\", ultima serie 2 rest pause 20\""
+            },
+            {
+              "name": "Curl bilanciere Scott",
+              "series": 3,
+              "reps": "8 / 8 / 8-12",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Curl manubri su inclinata",
+              "series": 3,
+              "reps": "8-10",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Curl alla fune",
+              "series": 4,
+              "reps": "15",
+              "note": "20\" rest tra le serie"
+            },
+            {
+              "name": "Alzate busto flesso su panca 30°",
+              "series": 2,
+              "reps": "20",
+              "note": ""
+            },
+            {
+              "name": "Calf seduto",
+              "series": 3,
+              "reps": "20/15/10",
+              "note": "Pausa 5\" in stretch"
+            }
+          ]
+        },
+        {
+          "name": "Day 3",
+          "label": "Legs",
+          "exercises": [
+            {
+              "name": "Leg Curl sdraiato",
+              "series": 4,
+              "reps": "8 / 6-10",
+              "note": "Contrazione picco 2\", ultima 2 rest pause 20\""
+            },
+            {
+              "name": "Stacchi gambe semitese singole",
+              "series": 3,
+              "reps": "12",
+              "note": ""
+            },
+            {
+              "name": "Leg Extensions",
+              "series": 4,
+              "reps": "30/20/15/10",
+              "note": "2 rest pause 20\", parziali a cedimento"
+            },
+            {
+              "name": "Hack Squat",
+              "series": 4,
+              "reps": "10",
+              "note": "Negativa controllata 4\", ultima 2 rest pause 20\""
+            },
+            {
+              "name": "Leg Press",
+              "series": 4,
+              "reps": "8/20/20/30",
+              "note": ""
+            },
+            {
+              "name": "Stretch quadricipiti",
+              "series": 1,
+              "reps": "60\"",
+              "note": "Continuati"
+            },
+            {
+              "name": "Calf in piedi",
+              "series": 3,
+              "reps": "15",
+              "note": ""
+            },
+            {
+              "name": "Calf seduto",
+              "series": 3,
+              "reps": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "name": "Day 4",
+          "label": "Spalle & Tricipiti",
+          "exercises": [
+            {
+              "name": "Distensioni verticali multipower",
+              "series": 3,
+              "reps": "6-8",
+              "note": "2 rest pause 15\""
+            },
+            {
+              "name": "Alzate laterali",
+              "series": 3,
+              "reps": "12/10/8",
+              "note": "2 rest pause 15\""
+            },
+            {
+              "name": "Tirate al petto presa larga",
+              "series": 3,
+              "reps": "15",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Distensioni panca stretta Smith",
+              "series": 4,
+              "reps": "15/10/8/6-8",
+              "note": "2 rest pause 15\""
+            },
+            {
+              "name": "French Press manubri",
+              "series": 3,
+              "reps": "10",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Estensioni dietro testa fune",
+              "series": 3,
+              "reps": "15",
+              "note": "+20\" in stretch"
+            },
+            {
+              "name": "Crunches al cavo",
+              "series": 3,
+              "reps": "8-12",
+              "note": "Ultimo: 2 rest pause 15\""
+            }
+          ]
+        },
+        {
+          "name": "Day 5",
+          "label": "Dorso",
+          "exercises": [
+            {
+              "name": "Rematore bilanciere presa inversa",
+              "series": 4,
+              "reps": "10/8/6/20",
+              "note": ""
+            },
+            {
+              "name": "Rack Chins presa larga",
+              "series": 3,
+              "reps": "10/10/10-12",
+              "note": "Ultima: 2 rest pause 20\""
+            },
+            {
+              "name": "Pulley presa medio larga",
+              "series": 4,
+              "reps": "10/10/10/8",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Shrugs manubri",
+              "series": 3,
+              "reps": "12",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Calf in piedi",
+              "series": 4,
+              "reps": "10",
+              "note": "3-5\" pausa in stretch"
+            },
+            {
+              "name": "Appeso (stretch dorso)",
+              "series": 1,
+              "reps": "60\"",
+              "note": "Stretch sul dorso"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "nuova-scheda",
+      "title": "Nuova Scheda PT",
+      "subtitle": "Template pronto per il prossimo ciclo",
+      "weeks": "da aggiornare",
+      "days": [
+        {
+          "name": "Day 1",
+          "label": "Da compilare",
+          "exercises": [
+            {
+              "name": "Nuovo esercizio 1",
+              "series": 3,
+              "reps": "8-12",
+              "note": "Sostituisci questa scheda quando il PT ti manda il nuovo programma."
+            }
+          ]
+        },
+        {
+          "name": "Day 2",
+          "label": "Da compilare",
+          "exercises": [
+            {
+              "name": "Nuovo esercizio 2",
+              "series": 3,
+              "reps": "8-12",
+              "note": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
