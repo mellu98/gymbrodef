@@ -44,6 +44,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 /* HOME */
 #programs{padding:20px 16px 40px}
 #home{padding:20px 16px 40px}
+.programs-intro{max-width:960px;margin:0 auto;text-align:center}
+.programs-intro .home-sub{margin-bottom:20px}
+.programs-intro .section-label{text-align:center}
 .home-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px;flex-wrap:wrap}
 .home-top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
 .program-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -299,9 +302,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 
 <!-- PROGRAMS -->
 <div id="programs">
-  <div style="padding:20px 16px 0">
+  <div class="programs-intro" style="padding:20px 16px 0">
     <div class="home-greeting">Le tue <span>schede</span></div>
-    <div class="home-sub" style="margin-bottom:20px">Scegli il programma da aprire</div>
+    <div class="home-sub">Scegli il programma da aprire</div>
     <div class="section-label">Programmi disponibili</div>
     <div class="program-grid" id="program-grid"></div>
   </div>
