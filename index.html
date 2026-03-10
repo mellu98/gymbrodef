@@ -30,12 +30,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
   padding:12px 18px;display:flex;align-items:center;justify-content:space-between;
   flex-shrink:0;
 }
-.hdr-brand{display:flex;align-items:center;gap:12px;min-width:0}
-.hdr-copy{min-width:0}
+.hdr-spacer{flex:0 0 auto;min-width:0;visibility:hidden;pointer-events:none}
+.hdr-brand{display:flex;align-items:center;justify-content:center;min-width:0;flex:0 0 auto}
 .hdr-logo{display:block;height:clamp(42px,6vw,54px);width:auto;max-width:min(58vw,280px);object-fit:contain;filter:drop-shadow(0 8px 18px rgba(0,0,0,.28))}
 .hdr-actions{display:flex;align-items:center;gap:8px}
 .hdr-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--g)}
-.hdr-sub{font-size:10px;color:var(--tm);letter-spacing:1px;text-transform:uppercase;margin-top:1px}
 .hdr-btn{background:var(--s2);border:1px solid var(--td);color:var(--tm);border-radius:8px;padding:7px 12px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
 .hdr-btn:hover{color:var(--g);border-color:var(--gdim)}
 .hdr-btn.danger{background:rgba(255,23,68,.08);border-color:rgba(255,23,68,.28);color:var(--red)}
@@ -271,6 +270,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 @media (max-width: 760px){
   .program-grid,.day-grid,.imp-grid,.imp-day-grid,.imp-ex-grid{grid-template-columns:1fr}
   .hdr{padding:12px 14px}
+  .hdr-logo{max-width:min(52vw,230px)}
   .hdr-actions{gap:6px;flex-wrap:wrap;justify-content:flex-end}
   .hdr-btn{padding:7px 10px}
 }
@@ -283,11 +283,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 
 <!-- HEADER -->
 <div class="hdr" id="main-hdr">
+  <div class="hdr-spacer" id="hdr-spacer" aria-hidden="true"></div>
   <div class="hdr-brand">
     <img class="hdr-logo" src="./icons/logo-header-v2.png" alt="Massi Gym logo">
-    <div class="hdr-copy">
-      <div class="hdr-sub" id="hdr-sub">Schede modulari interattive</div>
-    </div>
   </div>
   <div class="hdr-actions">
     <button class="hdr-btn" id="history-btn" onclick="openHist()" style="display:none">Storico</button>
@@ -891,18 +889,24 @@ function saveHistory(h) { try { localStorage.setItem(getHistoryKey(), JSON.strin
 function getDayDone(di) { try { const d=JSON.parse(localStorage.getItem(getDoneKey())||'{}'); return d[di]||false; } catch(e){return false;} }
 function setDayDone(di, v) { try { const d=JSON.parse(localStorage.getItem(getDoneKey())||'{}'); d[di]=v; localStorage.setItem(getDoneKey(),JSON.stringify(d)); } catch(e){} }
 
+function syncHeaderBalance() {
+  const spacer = document.getElementById('hdr-spacer');
+  const actions = document.querySelector('.hdr-actions');
+  if (!spacer || !actions) return;
+  spacer.style.width = actions.offsetWidth + 'px';
+}
+
 function updateHeader() {
-  const sub = document.getElementById('hdr-sub');
   const historyBtn = document.getElementById('history-btn');
   const importBtn = document.getElementById('importBtn');
   importBtn.style.display = currentDay === null ? 'inline-block' : 'none';
   if (!currentProgram) {
-    sub.textContent = 'Schede modulari interattive';
     historyBtn.style.display = 'none';
+    syncHeaderBalance();
     return;
   }
-  sub.textContent = currentProgram.subtitle || currentProgram.title;
   historyBtn.style.display = 'inline-block';
+  syncHeaderBalance();
 }
 
 function renderPrograms() {
@@ -1005,10 +1009,12 @@ function initPwa() {
     e.preventDefault();
     deferredPrompt = e;
     document.getElementById('installBtn').style.display = 'inline-block';
+    syncHeaderBalance();
   });
   window.addEventListener('appinstalled', () => {
     deferredPrompt = null;
     document.getElementById('installBtn').style.display = 'none';
+    syncHeaderBalance();
   });
   document.getElementById('installBtn').addEventListener('click', async () => {
     if (!deferredPrompt) return;
@@ -1016,7 +1022,9 @@ function initPwa() {
     await deferredPrompt.userChoice;
     deferredPrompt = null;
     document.getElementById('installBtn').style.display = 'none';
+    syncHeaderBalance();
   });
+  window.addEventListener('resize', syncHeaderBalance);
 }
 
 
