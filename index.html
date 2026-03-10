@@ -808,14 +808,23 @@ function getUserPrograms() {
   try {
     return normalizePrograms(JSON.parse(localStorage.getItem(USER_PROGRAMS_KEY) || '[]'), 'imported');
   } catch (e) {
+    console.error('Errore lettura schede importate da localStorage', e);
     return [];
   }
 }
 
 function saveUserPrograms(programs) {
   try {
-    localStorage.setItem(USER_PROGRAMS_KEY, JSON.stringify(normalizePrograms(programs, 'imported')));
-  } catch (e) {}
+    const normalized = normalizePrograms(programs, 'imported');
+    localStorage.setItem(USER_PROGRAMS_KEY, JSON.stringify(normalized));
+    const raw = localStorage.getItem(USER_PROGRAMS_KEY);
+    if (!raw) return false;
+    JSON.parse(raw);
+    return true;
+  } catch (e) {
+    console.error('Errore salvataggio schede importate su localStorage', e);
+    return false;
+  }
 }
 
 function syncCurrentProgram() {
@@ -1740,7 +1749,16 @@ function saveImportedProgram() {
 
   const userPrograms = getUserPrograms();
   userPrograms.unshift(finalProgram);
-  saveUserPrograms(userPrograms);
+  const stored = saveUserPrograms(userPrograms);
+  if (!stored) {
+    renderImportError('Non riesco a salvare le schede sul dispositivo. Disattiva la modalita` privata o libera spazio locale e riprova.');
+    return;
+  }
+  const persisted = getUserPrograms().some((program) => program.id === finalProgram.id);
+  if (!persisted) {
+    renderImportError('La scheda non risulta salvata in memoria locale. Riprova e controlla i permessi storage del browser.');
+    return;
+  }
   mergePrograms();
   closeImportModal(true);
   showPrograms();
@@ -1752,7 +1770,11 @@ function deleteImportedProgram(programId) {
   if (!confirm('Eliminare la scheda importata "' + program.title + '"?')) return;
 
   const userPrograms = getUserPrograms().filter((item) => item.id !== programId);
-  saveUserPrograms(userPrograms);
+  const stored = saveUserPrograms(userPrograms);
+  if (!stored) {
+    alert('Impossibile aggiornare le schede salvate in locale. Riprova.');
+    return;
+  }
   try { localStorage.removeItem('massi_hist_' + programId); } catch(e) {}
   try { localStorage.removeItem('massi_done_' + programId); } catch(e) {}
   try { delete sessionData[programId]; } catch(e) {}
