@@ -18,12 +18,15 @@ Variabili ambiente backend:
 - OPENAI_API_KEY -> obbligatoria per l'import PDF
 - CORS_ALLOWED_ORIGIN -> opzionale, utile se frontend e backend non sono sullo stesso dominio
 - OPENAI_MODEL -> opzionale, default gpt-4.1
+- MUSCLEWIKI_API_KEY -> opzionale, abilita match guida avanzato e dettagli esercizio
+- MUSCLEWIKI_API_BASE_URL -> opzionale, default https://api.musclewiki.com
 
 Avvio locale:
 1. npm install
 2. imposta OPENAI_API_KEY
-3. npm start
-4. apri http://localhost:3000
+3. opzionale: imposta MUSCLEWIKI_API_KEY
+4. npm start
+5. apri http://localhost:3000
 
 Deploy su Render:
 - deploy come Web Service Node, non piu` come semplice static site
@@ -34,3 +37,5 @@ Deploy su Render:
 Endpoint:
 - POST /api/import-pdf -> riceve multipart/form-data con file PDF
 - GET /healthz -> healthcheck semplice
+- GET /api/guide/search?q=... -> cerca un esercizio su MuscleWiki
+- GET /api/guide/exercise/:id -> dettagli guida per l'esercizio selezionato

@@ -292,13 +292,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 .guide-thumb-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
 .guide-thumb-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
 .guide-thumb-card{background:var(--s1);border:1px solid var(--td);border-radius:16px;overflow:hidden;min-height:180px;display:flex;flex-direction:column}
-.guide-thumb-card img{display:block;width:100%;height:190px;object-fit:cover;background:#0a0a0a}
+.guide-thumb-card img,.guide-thumb-card video{display:block;width:100%;height:190px;object-fit:cover;background:#0a0a0a}
 .guide-thumb-grid.compact .guide-thumb-card img{height:122px}
+.guide-thumb-grid.compact .guide-thumb-card video{height:122px}
 .guide-thumb-card figcaption{padding:10px 12px;font-size:11px;color:var(--tm);line-height:1.45}
 .guide-fallback{display:none;align-items:center;justify-content:center;text-align:center;padding:24px 18px;font-size:12px;color:var(--tm);line-height:1.6;min-height:190px;background:linear-gradient(180deg,#111,#0b0b0b)}
 .guide-thumb-grid.compact .guide-fallback{min-height:122px}
 .guide-thumb-card.broken img{display:none}
 .guide-thumb-card.broken .guide-fallback{display:flex}
+.guide-meta-row{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}
+.guide-meta-pill{display:inline-flex;align-items:center;gap:6px;font-size:10px;letter-spacing:1px;text-transform:uppercase;padding:6px 10px;border-radius:999px;border:1px solid var(--td);background:var(--s2);color:var(--tm)}
+.guide-steps{margin:0;padding-left:18px;color:var(--tm);line-height:1.6;font-size:13px}
+.guide-steps li+li{margin-top:8px}
+.guide-provider-note{font-size:11px;color:var(--tm);margin-top:12px}
 .guide-actions{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;justify-content:flex-end;padding:14px calc(18px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(18px + var(--safe-left));background:linear-gradient(180deg,rgba(8,8,8,0),rgba(8,8,8,.96) 24%,rgba(8,8,8,1))}
 
 /* IMPORT MODAL */
@@ -340,6 +346,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 .imp-guide-meta{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--tm)}
 .imp-guide-select{width:100%;background:var(--s2);border:1px solid var(--td);color:var(--t);border-radius:10px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none}
 .imp-guide-select:focus{border-color:var(--g)}
+.imp-guide-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.imp-guide-status{font-size:11px;line-height:1.5;color:var(--tm);margin-top:10px}
+.imp-guide-status.good{color:var(--g)}
+.imp-guide-status.warn{color:var(--amber)}
+.imp-guide-status.error{color:var(--red)}
 .imp-mini-btn{background:var(--s2);border:1px solid var(--td);color:var(--tm);border-radius:9px;padding:8px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
 .imp-mini-btn:hover{border-color:var(--g);color:var(--g)}
 .imp-mini-btn.danger{background:rgba(255,23,68,.08);border-color:rgba(255,23,68,.22);color:var(--red)}
@@ -836,6 +847,8 @@ let importBusy = false;
 let exerciseMediaCatalog = { entries: [], fallbacks: {} };
 let mediaEntriesByKey = {};
 let mediaCatalogPromise = null;
+let guideDetailCache = {};
+let guideModalRequestId = 0;
 // Timer state
 let timerInterval = null;
 let timerTotal = 90;
@@ -1012,8 +1025,75 @@ function scoreAliasMatch(name, alias) {
   return overlap >= 2 ? overlap * 18 : overlap === 1 ? 8 : 0;
 }
 
+function buildApiUrl(path) {
+  return (IMPORT_API_BASE_URL || '') + path;
+}
+
+function getGuideSearchEndpoint(query) {
+  return buildApiUrl('/api/guide/search?q=' + encodeURIComponent(cleanText(query)));
+}
+
+function getGuideExerciseEndpoint(exerciseId) {
+  return buildApiUrl('/api/guide/exercise/' + encodeURIComponent(cleanText(exerciseId)));
+}
+
+function getGuideMediaUrl(url) {
+  const cleanUrl = cleanText(url);
+  if (!cleanUrl) return '';
+  return cleanUrl.startsWith('/api/') ? buildApiUrl(cleanUrl) : cleanUrl;
+}
+
+function normalizeGuideAlternative(entry) {
+  const id = cleanText(entry?.id || entry?.exerciseId || '');
+  if (!id) return null;
+  return {
+    id,
+    label: cleanText(entry?.label || entry?.name || 'Guida esercizio'),
+    category: cleanText(entry?.category || ''),
+    difficulty: cleanText(entry?.difficulty || ''),
+    force: cleanText(entry?.force || ''),
+    muscles: (Array.isArray(entry?.muscles) ? entry.muscles : []).map(cleanText).filter(Boolean),
+    confidence: Math.max(0, Math.min(1, Number(entry?.confidence) || 0))
+  };
+}
+
+function normalizeGuideAlternatives(entries) {
+  const bestById = {};
+  (Array.isArray(entries) ? entries : []).forEach((entry) => {
+    const normalized = normalizeGuideAlternative(entry);
+    if (!normalized) return;
+    if (!bestById[normalized.id] || normalized.confidence > bestById[normalized.id].confidence) {
+      bestById[normalized.id] = normalized;
+    }
+  });
+  return Object.values(bestById).sort((left, right) => right.confidence - left.confidence).slice(0, 4);
+}
+
+function hasAdvancedGuide(exercise) {
+  return cleanText(exercise?.guideProvider || '') === 'musclewiki' && cleanText(exercise?.guideExerciseId || '');
+}
+
+function clearGuideChoice(exercise) {
+  exercise.guideProvider = '';
+  exercise.guideExerciseId = '';
+  exercise.guideLabel = '';
+  exercise.guideConfidence = 0;
+}
+
+function applyGuideChoice(exercise, alternative) {
+  if (!exercise) return;
+  if (!alternative) {
+    clearGuideChoice(exercise);
+    return;
+  }
+  exercise.guideProvider = 'musclewiki';
+  exercise.guideExerciseId = cleanText(alternative.id || '');
+  exercise.guideLabel = cleanText(alternative.label || '');
+  exercise.guideConfidence = Math.max(0, Math.min(1, Number(alternative.confidence) || 0));
+}
+
 function findSuggestedMediaKey(exercise, context = {}) {
-  const normalizedName = normalizeMatchText(exercise?.name || '');
+  const normalizedName = normalizeMatchText(exercise?.guideLabel || exercise?.name || '');
   let bestKey = '';
   let bestScore = 0;
 
@@ -1029,7 +1109,7 @@ function findSuggestedMediaKey(exercise, context = {}) {
   });
 
   if (bestScore >= 55 && bestKey) return bestKey;
-  const category = inferExerciseCategory(exercise?.name || '', exercise?.note || '', context.dayLabel || '');
+  const category = inferExerciseCategory(exercise?.guideLabel || exercise?.name || '', exercise?.note || '', context.dayLabel || '');
   return exerciseMediaCatalog.fallbacks[category] || exerciseMediaCatalog.fallbacks.generic || 'generic-generic';
 }
 
@@ -1047,7 +1127,7 @@ function resolveExerciseMedia(exercise, context = {}) {
   return {
     entry,
     source,
-    category: entry?.category || inferExerciseCategory(exercise?.name || '', exercise?.note || '', context.dayLabel || ''),
+    category: entry?.category || inferExerciseCategory(exercise?.guideLabel || exercise?.name || '', exercise?.note || '', context.dayLabel || ''),
     images: Array.isArray(entry?.images) ? entry.images.slice(0, 2) : []
   };
 }
@@ -1065,7 +1145,7 @@ function renderGuideThumbsHtml(images, compact = false) {
   return `<div class="guide-thumb-grid${compact ? ' compact' : ''}">
     ${images.map((image) => `
       <figure class="guide-thumb-card">
-        <img src="${escapeHtml(image.url)}" alt="${escapeHtml(image.alt)}" loading="lazy" onerror="handleGuideImageError(this)">
+        <img src="${escapeHtml(getGuideMediaUrl(image.url))}" alt="${escapeHtml(image.alt)}" loading="lazy" onerror="handleGuideImageError(this)">
         <div class="guide-fallback">Immagine non disponibile offline. Usa il riferimento tecnico sotto.</div>
         <figcaption>${escapeHtml(image.alt)}</figcaption>
       </figure>
@@ -1073,13 +1153,65 @@ function renderGuideThumbsHtml(images, compact = false) {
   </div>`;
 }
 
+function renderGuideAlternativeOptions(exercise) {
+  const alternatives = normalizeGuideAlternatives(exercise?.guideAlternatives);
+  const selectedId = cleanText(exercise?.guideExerciseId || '');
+  const dynamicOption = selectedId && !alternatives.some((entry) => entry.id === selectedId) ? [{
+    id: selectedId,
+    label: cleanText(exercise?.guideLabel || 'Guida MuscleWiki'),
+    confidence: Math.max(0, Math.min(1, Number(exercise?.guideConfidence) || 0)),
+    category: '',
+    difficulty: '',
+    force: '',
+    muscles: []
+  }] : [];
+  const merged = [...dynamicOption, ...alternatives];
+  return ['<option value="">Solo fallback locale</option>'].concat(
+    merged.map((entry) => `<option value="${escapeHtml(entry.id)}"${entry.id === selectedId ? ' selected' : ''}>${escapeHtml(entry.label)}${entry.confidence ? ' · ' + Math.round(entry.confidence * 100) + '%' : ''}</option>`)
+  ).join('');
+}
+
+function getAdvancedGuideStatus(exercise) {
+  if (exercise?.guideBusy) {
+    return { tone: 'warn', text: 'Sto cercando un match MuscleWiki per questo esercizio...' };
+  }
+  if (cleanText(exercise?.guideError || '')) {
+    return { tone: 'error', text: cleanText(exercise.guideError) };
+  }
+  if (hasAdvancedGuide(exercise)) {
+    return {
+      tone: 'good',
+      text: cleanText(exercise.guideLabel || 'Match MuscleWiki trovato') + (exercise.guideConfidence ? ' · Confidenza ' + Math.round(exercise.guideConfidence * 100) + '%' : '')
+    };
+  }
+  const alternatives = normalizeGuideAlternatives(exercise?.guideAlternatives);
+  if (alternatives.length) {
+    return { tone: 'warn', text: 'Ho trovato alternative MuscleWiki, ma nessuna e` stata salvata come guida principale.' };
+  }
+  return { tone: 'warn', text: 'Nessun match avanzato salvato. Resta attivo il fallback locale.' };
+}
+
 function renderGuidePreviewHtml(exercise, context = {}) {
   const resolved = resolveExerciseMedia(exercise, context);
+  const status = getAdvancedGuideStatus(exercise);
   return `
     <div class="imp-guide-box">
       <div class="imp-guide-top">
         <div class="imp-field">
-          <label>Guida visiva</label>
+          <label>Guida avanzata</label>
+          <select class="imp-guide-select" onchange="updateImportExerciseGuide(${context.dayIndex}, ${context.exerciseIndex}, this.value)">
+            ${renderGuideAlternativeOptions(exercise)}
+          </select>
+        </div>
+        <div class="imp-guide-meta">${hasAdvancedGuide(exercise) ? 'Powered by MuscleWiki' : 'Fallback locale'}</div>
+      </div>
+      <div class="imp-guide-actions">
+        <button class="imp-mini-btn" type="button" onclick="searchImportExerciseGuide(${context.dayIndex}, ${context.exerciseIndex}, true)">Cerca su MuscleWiki</button>
+      </div>
+      <div class="imp-guide-status ${status.tone}">${escapeHtml(status.text)}</div>
+      <div class="imp-guide-top" style="margin-top:12px">
+        <div class="imp-field">
+          <label>Fallback visivo</label>
           <select class="imp-guide-select" onchange="updateImportExerciseMedia(${context.dayIndex}, ${context.exerciseIndex}, this.value)">
             ${renderMediaOptionsHtml(cleanText(exercise?.mediaKey || resolved.entry?.key || ''))}
           </select>
@@ -1115,6 +1247,85 @@ function refreshImportExerciseMedia(dayIndex, exerciseIndex) {
   renderImportReview();
 }
 
+async function searchImportExerciseGuide(dayIndex, exerciseIndex, markManual = false) {
+  const exercise = importDraft?.days?.[dayIndex]?.exercises?.[exerciseIndex];
+  const day = importDraft?.days?.[dayIndex];
+  if (!exercise || !day) return;
+
+  const query = cleanText(exercise.name || exercise.guideLabel || '');
+  if (!query) {
+    exercise.guideError = 'Inserisci prima il nome dell\'esercizio.';
+    renderImportReview();
+    return;
+  }
+
+  if (window.location.protocol === 'file:' && !IMPORT_API_BASE_URL) {
+    exercise.guideError = 'Ricerca MuscleWiki disponibile solo nella versione pubblicata dell\'app.';
+    renderImportReview();
+    return;
+  }
+
+  exercise.guideBusy = true;
+  exercise.guideError = '';
+  renderImportReview();
+
+  try {
+    const response = await fetch(getGuideSearchEndpoint(query));
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || 'Ricerca MuscleWiki non riuscita.');
+
+    const alternatives = normalizeGuideAlternatives(payload.results);
+    exercise.guideAlternatives = alternatives;
+    if (alternatives.length) {
+      applyGuideChoice(exercise, alternatives[0]);
+      if (!exercise.mediaManual) {
+        exercise.mediaKey = findSuggestedMediaKey(exercise, { dayLabel: day.label || day.name });
+      }
+      if (markManual) exercise.guideManual = true;
+    } else {
+      clearGuideChoice(exercise);
+      exercise.guideError = 'Nessun match MuscleWiki trovato per questo nome.';
+    }
+  } catch (error) {
+    exercise.guideError = error.message || 'Ricerca MuscleWiki non disponibile.';
+  } finally {
+    exercise.guideBusy = false;
+    renderImportReview();
+  }
+}
+
+function refreshImportExerciseGuidance(dayIndex, exerciseIndex) {
+  refreshImportExerciseMedia(dayIndex, exerciseIndex);
+  const exercise = importDraft?.days?.[dayIndex]?.exercises?.[exerciseIndex];
+  if (!exercise?.guideManual) {
+    searchImportExerciseGuide(dayIndex, exerciseIndex, false);
+  }
+}
+
+function updateImportExerciseGuide(dayIndex, exerciseIndex, value) {
+  const exercise = importDraft?.days?.[dayIndex]?.exercises?.[exerciseIndex];
+  const day = importDraft?.days?.[dayIndex];
+  if (!exercise) return;
+  const selectedId = cleanText(value || '');
+  if (!selectedId) {
+    clearGuideChoice(exercise);
+    exercise.guideManual = true;
+    renderImportReview();
+    return;
+  }
+
+  const alternative = normalizeGuideAlternatives(exercise.guideAlternatives).find((entry) => entry.id === selectedId);
+  if (alternative) {
+    applyGuideChoice(exercise, alternative);
+    if (!exercise.mediaManual) {
+      exercise.mediaKey = findSuggestedMediaKey(exercise, { dayLabel: day?.label || day?.name || '' });
+    }
+  }
+  exercise.guideManual = true;
+  exercise.guideError = '';
+  renderImportReview();
+}
+
 function updateImportExerciseMedia(dayIndex, exerciseIndex, value) {
   const exercise = importDraft?.days?.[dayIndex]?.exercises?.[exerciseIndex];
   if (!exercise) return;
@@ -1128,6 +1339,98 @@ function handleGuideImageError(image) {
   if (card) card.classList.add('broken');
 }
 
+function renderGuideRemoteMediaHtml(detail) {
+  const videos = Array.isArray(detail?.videos) ? detail.videos : [];
+  const images = Array.isArray(detail?.images) ? detail.images : [];
+  const media = [];
+
+  videos.slice(0, 2).forEach((video) => {
+    const src = getGuideMediaUrl(video.path || video.url || '');
+    if (!src) return;
+    media.push(`
+      <figure class="guide-thumb-card">
+        <video src="${escapeHtml(src)}" autoplay muted loop playsinline controls preload="metadata"></video>
+        <figcaption>${escapeHtml(video.label || 'Demo movimento')}</figcaption>
+      </figure>
+    `);
+  });
+
+  images.slice(0, 2).forEach((image) => {
+    const src = getGuideMediaUrl(image.path || image.url || '');
+    if (!src) return;
+    media.push(`
+      <figure class="guide-thumb-card">
+        <img src="${escapeHtml(src)}" alt="${escapeHtml(image.label || image.alt || 'Riferimento visivo')}" loading="lazy" onerror="handleGuideImageError(this)">
+        <div class="guide-fallback">Immagine non disponibile in questo momento.</div>
+        <figcaption>${escapeHtml(image.label || image.alt || 'Riferimento visivo')}</figcaption>
+      </figure>
+    `);
+  });
+
+  return media.length ? `<div class="guide-thumb-grid">${media.join('')}</div>` : '';
+}
+
+function renderGuideMetaHtml(detail) {
+  const pills = [];
+  if (cleanText(detail?.category || '')) pills.push(`<span class="guide-meta-pill">${escapeHtml(detail.category)}</span>`);
+  if (cleanText(detail?.difficulty || '')) pills.push(`<span class="guide-meta-pill">${escapeHtml(detail.difficulty)}</span>`);
+  if (cleanText(detail?.force || '')) pills.push(`<span class="guide-meta-pill">${escapeHtml(detail.force)}</span>`);
+  (Array.isArray(detail?.primaryMuscles) ? detail.primaryMuscles : []).slice(0, 3).forEach((muscle) => {
+    pills.push(`<span class="guide-meta-pill">${escapeHtml(muscle)}</span>`);
+  });
+  return pills.length ? `<div class="guide-meta-row">${pills.join('')}</div>` : '';
+}
+
+function renderGuideStepsHtml(detail) {
+  const steps = Array.isArray(detail?.steps) ? detail.steps.map(cleanText).filter(Boolean) : [];
+  if (!steps.length) return '';
+  return `<div class="guide-modal-copy"><strong>Setup e movimento</strong><ol class="guide-steps">${steps.map((step) => `<li>${escapeHtml(step)}</li>`).join('')}</ol></div>`;
+}
+
+function renderGuideModalBody(exercise, resolved, detail = null, state = {}) {
+  const intro = state.error
+    ? `<div class="guide-modal-copy">${escapeHtml(state.error)}</div>`
+    : state.loading
+      ? `<div class="guide-modal-copy">Sto recuperando i dettagli della guida avanzata per questo esercizio...</div>`
+      : '';
+  const providerChip = detail
+    ? `<div class="guide-chip">${escapeHtml(detail.attribution || 'Powered by MuscleWiki')}</div>`
+    : hasAdvancedGuide(exercise)
+      ? `<div class="guide-chip">Powered by MuscleWiki</div>`
+      : `<div class="guide-chip">${escapeHtml(getGuideSourceLabel(resolved.source))}</div>`;
+  const providerNote = detail?.attribution ? `<div class="guide-provider-note">${escapeHtml(detail.attribution)}</div>` : '';
+
+  return `
+    ${providerChip}
+    <div class="guide-modal-copy">
+      Usa questa guida come promemoria rapido. Se qualcosa non ti e' chiaro, resta meglio ridurre il carico e chiedere conferma al PT.
+    </div>
+    ${renderGuideMetaHtml(detail)}
+    ${intro}
+    ${renderGuideRemoteMediaHtml(detail)}
+    ${renderGuideStepsHtml(detail)}
+    ${renderGuideThumbsHtml(resolved.images, false)}
+    ${providerNote}
+  `;
+}
+
+async function loadAdvancedGuideDetail(exercise) {
+  const cacheKey = cleanText((exercise?.guideProvider || '') + ':' + (exercise?.guideExerciseId || ''));
+  if (!cacheKey) return null;
+  if (!guideDetailCache[cacheKey]) {
+    guideDetailCache[cacheKey] = fetch(getGuideExerciseEndpoint(exercise.guideExerciseId))
+      .then((response) => response.json().catch(() => ({})).then((payload) => {
+        if (!response.ok) throw new Error(payload.error || 'Dettagli guida non disponibili.');
+        return payload;
+      }))
+      .catch((error) => {
+        delete guideDetailCache[cacheKey];
+        throw error;
+      });
+  }
+  return guideDetailCache[cacheKey];
+}
+
 async function openGuideModalForExercise(dayIndex, exerciseIndex) {
   await ensureMediaCatalogLoaded();
   const day = getDays()[dayIndex];
@@ -1135,18 +1438,29 @@ async function openGuideModalForExercise(dayIndex, exerciseIndex) {
   if (!exercise) return;
   const resolved = resolveExerciseMedia(exercise, { dayLabel: day.label || day.name });
   document.getElementById('guide-title').textContent = exercise.name;
-  document.getElementById('guide-subtitle').textContent = resolved.entry?.label || 'Riferimento visivo per capire setup e movimento.';
-  document.getElementById('guide-content').innerHTML = `
-    <div class="guide-chip">${escapeHtml(getGuideSourceLabel(resolved.source))}</div>
-    <div class="guide-modal-copy">
-      Usa queste immagini come promemoria rapido. Se qualcosa non ti e' chiaro, resta sempre meglio ridurre il carico e chiedere conferma al PT.
-    </div>
-    ${renderGuideThumbsHtml(resolved.images, false)}
-  `;
+  document.getElementById('guide-subtitle').textContent = cleanText(exercise.guideLabel || resolved.entry?.label || 'Riferimento visivo per capire setup e movimento.');
+  document.getElementById('guide-content').innerHTML = renderGuideModalBody(exercise, resolved, null, {
+    loading: hasAdvancedGuide(exercise) && navigator.onLine
+  });
   document.getElementById('guide-modal').classList.add('show');
+
+  if (!hasAdvancedGuide(exercise) || !navigator.onLine) return;
+
+  const requestId = ++guideModalRequestId;
+  try {
+    const detail = await loadAdvancedGuideDetail(exercise);
+    if (guideModalRequestId !== requestId) return;
+    document.getElementById('guide-content').innerHTML = renderGuideModalBody(exercise, resolved, detail, {});
+  } catch (error) {
+    if (guideModalRequestId !== requestId) return;
+    document.getElementById('guide-content').innerHTML = renderGuideModalBody(exercise, resolved, null, {
+      error: error.message || 'Dettagli guida non disponibili. Resta attivo il fallback locale.'
+    });
+  }
 }
 
 function closeGuideModal() {
+  guideModalRequestId++;
   document.getElementById('guide-modal').classList.remove('show');
 }
 
@@ -1173,7 +1487,13 @@ function normalizePrograms(programs, sourceFallback = 'bundled') {
         series: Math.max(0, parseInt(ex?.series, 10) || 0),
         reps: cleanText(String(ex?.reps ?? '-')),
         note: cleanText(ex?.note || ''),
-        mediaKey: cleanText(ex?.mediaKey || '').toLowerCase()
+        mediaKey: cleanText(ex?.mediaKey || '').toLowerCase(),
+        guideProvider: cleanText(ex?.guideProvider || ''),
+        guideExerciseId: cleanText(ex?.guideExerciseId || ''),
+        guideLabel: cleanText(ex?.guideLabel || ''),
+        guideConfidence: Math.max(0, Math.min(1, Number(ex?.guideConfidence) || 0)),
+        guideAlternatives: normalizeGuideAlternatives(ex?.guideAlternatives),
+        guideManual: Boolean(ex?.guideManual)
       }))
     }))
   }));
@@ -2334,7 +2654,7 @@ function clearHist() {
 
 // IMPORT PDF
 function getImportEndpoint() {
-  return (IMPORT_API_BASE_URL || '') + '/api/import-pdf';
+  return buildApiUrl('/api/import-pdf');
 }
 
 function openImportModal() {
@@ -2516,7 +2836,7 @@ function renderImportReview(validationError = '') {
             <div class="imp-ex-grid">
               <div class="imp-field">
                 <label>Nome</label>
-                <input type="text" value="${escapeHtml(exercise.name)}" oninput="updateImportExerciseField(${di}, ${ei}, 'name', this.value)" onchange="refreshImportExerciseMedia(${di}, ${ei})">
+                <input type="text" value="${escapeHtml(exercise.name)}" oninput="updateImportExerciseField(${di}, ${ei}, 'name', this.value)" onchange="refreshImportExerciseGuidance(${di}, ${ei})">
               </div>
               <div class="imp-field">
                 <label>Serie</label>
@@ -2601,6 +2921,10 @@ function updateImportExerciseField(dayIndex, exerciseIndex, field, value) {
     const day = importDraft?.days?.[dayIndex];
     exercise.mediaKey = findSuggestedMediaKey(exercise, { dayLabel: day?.label || day?.name || '' });
   }
+  if (field === 'name' && !exercise.guideManual) {
+    clearGuideChoice(exercise);
+    exercise.guideError = '';
+  }
 }
 
 function addImportDay() {
@@ -2608,7 +2932,18 @@ function addImportDay() {
   importDraft.days.push({
     name: 'Day ' + (importDraft.days.length + 1),
     label: '',
-    exercises: [{ name: '', series: 3, reps: '', note: '', mediaKey: findSuggestedMediaKey({ name: '' }) }]
+    exercises: [{
+      name: '',
+      series: 3,
+      reps: '',
+      note: '',
+      mediaKey: findSuggestedMediaKey({ name: '' }),
+      guideProvider: '',
+      guideExerciseId: '',
+      guideLabel: '',
+      guideConfidence: 0,
+      guideAlternatives: []
+    }]
   });
   renderImportReview();
 }
@@ -2626,7 +2961,12 @@ function addImportExercise(dayIndex) {
     series: 3,
     reps: '',
     note: '',
-    mediaKey: findSuggestedMediaKey({ name: '' }, { dayLabel: importDraft.days[dayIndex].label || importDraft.days[dayIndex].name })
+    mediaKey: findSuggestedMediaKey({ name: '' }, { dayLabel: importDraft.days[dayIndex].label || importDraft.days[dayIndex].name }),
+    guideProvider: '',
+    guideExerciseId: '',
+    guideLabel: '',
+    guideConfidence: 0,
+    guideAlternatives: []
   });
   renderImportReview();
 }
