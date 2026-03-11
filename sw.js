@@ -1,25 +1,13 @@
-const CACHE_NAME = 'gym-bro-massi-v9';
+const CACHE_NAME = 'gym-bro-massi-v7';
 const APP_SHELL = [
   './',
   './index.html',
   './programs.json',
-  './exercise-media.json',
   './app.webmanifest',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
-  './icons/logo-header-v2.png',
-  './guide-media/petto.svg',
-  './guide-media/dorso.svg',
-  './guide-media/gambe.svg',
-  './guide-media/spalle.svg',
-  './guide-media/bicipiti.svg',
-  './guide-media/tricipiti.svg',
-  './guide-media/addome.svg',
-  './guide-media/polpacci.svg',
-  './guide-media/stretch.svg',
-  './guide-media/generic.svg',
-  './guide-media/generic-movement.svg'
+  './icons/logo-header-v2.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -37,7 +25,6 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
-  if (url.pathname.startsWith('/api/')) return;
 
   if (event.request.mode === 'navigate') {
     event.respondWith(
@@ -46,7 +33,7 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  if (url.pathname.endsWith('/programs.json') || url.pathname.endsWith('/exercise-media.json')) {
+  if (url.pathname.endsWith('/programs.json')) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
