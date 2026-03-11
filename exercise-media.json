@@ -1,0 +1,437 @@
+{
+  "entries": [
+    {
+      "key": "generic-petto",
+      "label": "Guida petto",
+      "category": "petto",
+      "aliases": [],
+      "images": [
+        { "url": "./guide-media/petto.svg", "alt": "Guida visiva per esercizi petto" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "generic-dorso",
+      "label": "Guida dorso",
+      "category": "dorso",
+      "aliases": [],
+      "images": [
+        { "url": "./guide-media/dorso.svg", "alt": "Guida visiva per esercizi dorso" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "generic-gambe",
+      "label": "Guida gambe",
+      "category": "gambe",
+      "aliases": [],
+      "images": [
+        { "url": "./guide-media/gambe.svg", "alt": "Guida visiva per esercizi gambe" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "generic-spalle",
+      "label": "Guida spalle",
+      "category": "spalle",
+      "aliases": [],
+      "images": [
+        { "url": "./guide-media/spalle.svg", "alt": "Guida visiva per esercizi spalle" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "generic-bicipiti",
+      "label": "Guida bicipiti",
+      "category": "bicipiti",
+      "aliases": [],
+      "images": [
+        { "url": "./guide-media/bicipiti.svg", "alt": "Guida visiva per esercizi bicipiti" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "generic-tricipiti",
+      "label": "Guida tricipiti",
+      "category": "tricipiti",
+      "aliases": [],
+      "images": [
+        { "url": "./guide-media/tricipiti.svg", "alt": "Guida visiva per esercizi tricipiti" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "generic-addome",
+      "label": "Guida addome",
+      "category": "addome",
+      "aliases": [],
+      "images": [
+        { "url": "./guide-media/addome.svg", "alt": "Guida visiva per esercizi addome" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "generic-polpacci",
+      "label": "Guida polpacci",
+      "category": "polpacci",
+      "aliases": [],
+      "images": [
+        { "url": "./guide-media/polpacci.svg", "alt": "Guida visiva per esercizi polpacci" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "generic-stretch",
+      "label": "Guida stretch",
+      "category": "stretch",
+      "aliases": [],
+      "images": [
+        { "url": "./guide-media/stretch.svg", "alt": "Guida visiva per stretch e mobilita" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "generic-generic",
+      "label": "Guida generica",
+      "category": "generic",
+      "aliases": [],
+      "images": [
+        { "url": "./guide-media/generic.svg", "alt": "Guida visiva generica esercizio" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "chest-press",
+      "label": "Chest Press / Panca",
+      "category": "petto",
+      "aliases": [
+        "chest press",
+        "bench press",
+        "panca piana",
+        "distensioni piana",
+        "distensioni panca",
+        "panca stretta smith",
+        "smith press petto",
+        "multipower petto"
+      ],
+      "images": [
+        { "url": "./guide-media/petto.svg", "alt": "Spinta per petto su panca o macchina" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "incline-press",
+      "label": "Panca inclinata",
+      "category": "petto",
+      "aliases": [
+        "distensioni inclinata",
+        "panca inclinata",
+        "incline press",
+        "incline bench",
+        "inclinata bilanciere multipower",
+        "inclinata manubri"
+      ],
+      "images": [
+        { "url": "./guide-media/petto.svg", "alt": "Spinta inclinata per il petto" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "cable-fly",
+      "label": "Croci / Pectoral",
+      "category": "petto",
+      "aliases": [
+        "croci cavi",
+        "croci cavi bassi",
+        "pectoral",
+        "pec deck",
+        "pec fly",
+        "cable fly",
+        "croci"
+      ],
+      "images": [
+        { "url": "./guide-media/petto.svg", "alt": "Apertura per il petto" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "shoulder-press",
+      "label": "Shoulder Press",
+      "category": "spalle",
+      "aliases": [
+        "shoulder press",
+        "military press",
+        "distensioni verticali",
+        "overhead press",
+        "verticali multipower",
+        "press spalle"
+      ],
+      "images": [
+        { "url": "./guide-media/spalle.svg", "alt": "Press verticale per le spalle" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "lateral-raise",
+      "label": "Alzate laterali",
+      "category": "spalle",
+      "aliases": [
+        "alzate laterali",
+        "lateral raise",
+        "laterali al cavo",
+        "alzate laterali singole al cavo"
+      ],
+      "images": [
+        { "url": "./guide-media/spalle.svg", "alt": "Apertura laterale per le spalle" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "rear-delt",
+      "label": "Rear Delt / Tirata alta",
+      "category": "spalle",
+      "aliases": [
+        "alzate busto flesso",
+        "tirate al petto presa larga",
+        "rear delt",
+        "reverse fly",
+        "tirata alta"
+      ],
+      "images": [
+        { "url": "./guide-media/spalle.svg", "alt": "Movimento per deltoide posteriore" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "lat-pulldown",
+      "label": "Lat Machine",
+      "category": "dorso",
+      "aliases": [
+        "lat machine",
+        "lat pulldown",
+        "lat presa inversa",
+        "lat presa larga",
+        "pulldown",
+        "pull down"
+      ],
+      "images": [
+        { "url": "./guide-media/dorso.svg", "alt": "Tirata verticale per il dorso" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "seated-row",
+      "label": "Pulley / Row machine",
+      "category": "dorso",
+      "aliases": [
+        "pulley",
+        "seated row",
+        "row machine",
+        "low row",
+        "rematore macchina"
+      ],
+      "images": [
+        { "url": "./guide-media/dorso.svg", "alt": "Remata su pulley o macchina" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "barbell-row",
+      "label": "Rematore",
+      "category": "dorso",
+      "aliases": [
+        "rematore bilanciere",
+        "rematore presa inversa",
+        "barbell row",
+        "bent over row",
+        "rematore"
+      ],
+      "images": [
+        { "url": "./guide-media/dorso.svg", "alt": "Rematore per il dorso" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "biceps-curl",
+      "label": "Curl bicipiti",
+      "category": "bicipiti",
+      "aliases": [
+        "curl bilanciere",
+        "curl manubri",
+        "curl alla fune",
+        "curl scott",
+        "preacher curl",
+        "incline curl",
+        "curl"
+      ],
+      "images": [
+        { "url": "./guide-media/bicipiti.svg", "alt": "Curl per i bicipiti" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "triceps-pushdown",
+      "label": "Pushdown tricipiti",
+      "category": "tricipiti",
+      "aliases": [
+        "pushdown",
+        "press down",
+        "estensioni fune",
+        "tricipiti cavo",
+        "triceps pushdown"
+      ],
+      "images": [
+        { "url": "./guide-media/tricipiti.svg", "alt": "Pushdown per i tricipiti" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "overhead-triceps",
+      "label": "French Press / Overhead",
+      "category": "tricipiti",
+      "aliases": [
+        "french press",
+        "estensioni dietro testa",
+        "overhead extension",
+        "estensioni sopra testa",
+        "tricipiti overhead"
+      ],
+      "images": [
+        { "url": "./guide-media/tricipiti.svg", "alt": "Estensione sopra testa per i tricipiti" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "leg-curl",
+      "label": "Leg curl",
+      "category": "gambe",
+      "aliases": [
+        "leg curl",
+        "leg curl sdraiato",
+        "leg curl seated",
+        "femorali macchina"
+      ],
+      "images": [
+        { "url": "./guide-media/gambe.svg", "alt": "Leg curl per femorali" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "leg-extension",
+      "label": "Leg extension",
+      "category": "gambe",
+      "aliases": [
+        "leg extension",
+        "leg extensions",
+        "extension quadricipiti"
+      ],
+      "images": [
+        { "url": "./guide-media/gambe.svg", "alt": "Leg extension per quadricipiti" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "hack-squat",
+      "label": "Hack squat",
+      "category": "gambe",
+      "aliases": [
+        "hack squat",
+        "hack",
+        "squat machine"
+      ],
+      "images": [
+        { "url": "./guide-media/gambe.svg", "alt": "Hack squat o squat machine" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "leg-press",
+      "label": "Leg press",
+      "category": "gambe",
+      "aliases": [
+        "leg press",
+        "pressa",
+        "45 leg press"
+      ],
+      "images": [
+        { "url": "./guide-media/gambe.svg", "alt": "Leg press" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "calf-raise",
+      "label": "Calf raise",
+      "category": "polpacci",
+      "aliases": [
+        "calf",
+        "calf in piedi",
+        "calf seduto",
+        "standing calf",
+        "seated calf",
+        "polpacci"
+      ],
+      "images": [
+        { "url": "./guide-media/polpacci.svg", "alt": "Calf raise per i polpacci" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "crunch",
+      "label": "Crunch",
+      "category": "addome",
+      "aliases": [
+        "crunch",
+        "crunches",
+        "cable crunch",
+        "crunch al cavo"
+      ],
+      "images": [
+        { "url": "./guide-media/addome.svg", "alt": "Crunch per l'addome" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "leg-raise",
+      "label": "Leg raise",
+      "category": "addome",
+      "aliases": [
+        "leg raise",
+        "leg raises",
+        "hanging leg raise",
+        "sollevamento gambe"
+      ],
+      "images": [
+        { "url": "./guide-media/addome.svg", "alt": "Leg raise per l'addome" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    },
+    {
+      "key": "stretch-hang",
+      "label": "Stretch / Appeso",
+      "category": "stretch",
+      "aliases": [
+        "stretch",
+        "appeso",
+        "stretch quadricipiti",
+        "hanging stretch",
+        "appeso dorso"
+      ],
+      "images": [
+        { "url": "./guide-media/stretch.svg", "alt": "Stretch e mobilita finale" },
+        { "url": "./guide-media/generic-movement.svg", "alt": "Promemoria tecnico generale" }
+      ]
+    }
+  ],
+  "fallbacks": {
+    "petto": "generic-petto",
+    "dorso": "generic-dorso",
+    "gambe": "generic-gambe",
+    "spalle": "generic-spalle",
+    "bicipiti": "generic-bicipiti",
+    "tricipiti": "generic-tricipiti",
+    "addome": "generic-addome",
+    "polpacci": "generic-polpacci",
+    "stretch": "generic-stretch",
+    "generic": "generic-generic"
+  }
+}

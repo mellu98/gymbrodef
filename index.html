@@ -140,6 +140,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 .ex-chk.on .chk-icon{opacity:1}
 .ex-body{padding:0 14px 14px;border-top:1px solid #1a1a1a}
 .ex-note-box{background:rgba(255,193,7,.07);border-left:2px solid var(--amber);padding:8px 10px;border-radius:6px;margin:10px 0;font-size:12px;color:var(--amber);line-height:1.5}
+.ex-tools{display:flex;align-items:center;gap:8px;flex-shrink:0}
+.guide-btn{background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.22);color:var(--g);border-radius:999px;padding:6px 10px;font-size:10px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.guide-btn:hover{border-color:var(--g);color:#fff}
+.guide-btn.secondary{background:var(--s2);border-color:var(--td);color:var(--tm)}
+.guide-btn.secondary:hover{border-color:var(--g);color:var(--g)}
 .series-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;margin:8px 0}
 .serie-box{background:var(--s2);border:1px solid var(--td);border-radius:10px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .2s}
 .serie-box.done{background:rgba(0,230,118,.1);border-color:var(--g)}
@@ -175,6 +180,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 .fsr-chk span{opacity:0;font-size:13px;font-weight:700;transition:opacity .15s}
 .fc-textnote{width:100%;background:var(--s2);border:1px solid var(--td);color:var(--t);border-radius:10px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:12px;outline:none;resize:none;margin-top:14px;line-height:1.4}
 .fc-textnote:focus{border-color:var(--g)}
+.focus-guide-row{display:flex;justify-content:flex-start;margin:14px 0 4px}
 
 /* TIMER FLOAT BTN */
 #fab{
@@ -273,6 +279,28 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 .week-report-delta.new{color:#fff;background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14)}
 .week-report-actions{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;justify-content:flex-end;padding:14px calc(18px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(18px + var(--safe-left));background:linear-gradient(180deg,rgba(8,8,8,0),rgba(8,8,8,.96) 24%,rgba(8,8,8,1))}
 
+/* GUIDE MODAL */
+#guide-modal{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:330;display:none;flex-direction:column}
+#guide-modal.show{display:flex}
+.guide-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:calc(18px + var(--safe-top)) calc(18px + var(--safe-right)) 18px calc(18px + var(--safe-left));border-bottom:1px solid #1a1a1a;flex-shrink:0}
+.guide-hdr h2{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--g)}
+.guide-sub{font-size:12px;color:var(--tm);margin-top:4px;line-height:1.5}
+.guide-close{background:none;border:none;color:var(--tm);font-size:20px;cursor:pointer}
+.guide-scroll{flex:1;overflow-y:auto;padding:18px 18px 120px}
+.guide-chip{display:inline-flex;align-items:center;gap:8px;font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:6px 10px;border-radius:999px;border:1px solid rgba(0,230,118,.2);background:rgba(0,230,118,.08);color:var(--g);margin-bottom:14px}
+.guide-modal-copy{background:var(--s1);border:1px solid var(--td);border-radius:16px;padding:16px;margin-bottom:14px;font-size:13px;line-height:1.6;color:var(--tm)}
+.guide-thumb-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.guide-thumb-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+.guide-thumb-card{background:var(--s1);border:1px solid var(--td);border-radius:16px;overflow:hidden;min-height:180px;display:flex;flex-direction:column}
+.guide-thumb-card img{display:block;width:100%;height:190px;object-fit:cover;background:#0a0a0a}
+.guide-thumb-grid.compact .guide-thumb-card img{height:122px}
+.guide-thumb-card figcaption{padding:10px 12px;font-size:11px;color:var(--tm);line-height:1.45}
+.guide-fallback{display:none;align-items:center;justify-content:center;text-align:center;padding:24px 18px;font-size:12px;color:var(--tm);line-height:1.6;min-height:190px;background:linear-gradient(180deg,#111,#0b0b0b)}
+.guide-thumb-grid.compact .guide-fallback{min-height:122px}
+.guide-thumb-card.broken img{display:none}
+.guide-thumb-card.broken .guide-fallback{display:flex}
+.guide-actions{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;justify-content:flex-end;padding:14px calc(18px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(18px + var(--safe-left));background:linear-gradient(180deg,rgba(8,8,8,0),rgba(8,8,8,.96) 24%,rgba(8,8,8,1))}
+
 /* IMPORT MODAL */
 #import-modal{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:340;display:none;flex-direction:column}
 #import-modal.show{display:flex}
@@ -306,6 +334,12 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 .imp-ex-grid{grid-template-columns:minmax(0,1.8fr) 110px 130px}
 .imp-ex{background:var(--s2);border:1px solid #232323;border-radius:14px;padding:12px;margin-top:10px}
 .imp-ex-title{font-size:12px;font-weight:700;color:var(--t)}
+.imp-guide-box{margin-top:10px;background:#151515;border:1px solid #272727;border-radius:14px;padding:12px}
+.imp-guide-top{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.imp-guide-top .imp-field{flex:1;min-width:220px}
+.imp-guide-meta{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--tm)}
+.imp-guide-select{width:100%;background:var(--s2);border:1px solid var(--td);color:var(--t);border-radius:10px;padding:10px 12px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none}
+.imp-guide-select:focus{border-color:var(--g)}
 .imp-mini-btn{background:var(--s2);border:1px solid var(--td);color:var(--tm);border-radius:9px;padding:8px 12px;font-size:11px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
 .imp-mini-btn:hover{border-color:var(--g);color:var(--g)}
 .imp-mini-btn.danger{background:rgba(255,23,68,.08);border-color:rgba(255,23,68,.22);color:var(--red)}
@@ -314,6 +348,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 
 @media (max-width: 760px){
   .program-grid,.day-grid,.imp-grid,.imp-day-grid,.imp-ex-grid{grid-template-columns:1fr}
+  .guide-thumb-grid,.guide-thumb-grid.compact{grid-template-columns:1fr}
   .hdr{padding:calc(12px + var(--safe-top)) calc(14px + var(--safe-right)) 12px calc(14px + var(--safe-left))}
   .hdr-logo{max-width:min(52vw,230px)}
   .hdr-actions{gap:6px;flex-wrap:wrap;justify-content:flex-end}
@@ -448,6 +483,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
   <div class="week-report-actions">
     <button class="t-btn" onclick="closeWeekReport()">Chiudi</button>
     <button class="t-btn" id="week-report-next-btn" style="display:none" onclick="goToNextWeek()">Vai alla settimana successiva</button>
+  </div>
+</div>
+
+<!-- GUIDE MODAL -->
+<div id="guide-modal">
+  <div class="guide-hdr">
+    <div>
+      <h2 id="guide-title">Guida esercizio</h2>
+      <div class="guide-sub" id="guide-subtitle">Riferimento visivo per capire al volo setup e movimento.</div>
+    </div>
+    <button class="guide-close" onclick="closeGuideModal()">X</button>
+  </div>
+  <div class="guide-scroll" id="guide-content"></div>
+  <div class="guide-actions">
+    <button class="t-btn" onclick="closeGuideModal()">Chiudi</button>
   </div>
 </div>
 
@@ -765,6 +815,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 
 <script>
 const PROGRAMS_URL = './programs.json';
+const MEDIA_CATALOG_URL = './exercise-media.json';
 const IMPORT_API_BASE_URL = String(window.MASSI_CONFIG?.importApiBaseUrl || '').replace(/\/$/, '');
 const USER_PROGRAMS_KEY = 'massi_user_programs';
 const PROGRAM_STATE_PREFIX = 'massi_state_';
@@ -782,6 +833,9 @@ let deferredPrompt = null;
 let importDraft = null;
 let importMeta = null;
 let importBusy = false;
+let exerciseMediaCatalog = { entries: [], fallbacks: {} };
+let mediaEntriesByKey = {};
+let mediaCatalogPromise = null;
 // Timer state
 let timerInterval = null;
 let timerTotal = 90;
@@ -838,6 +892,266 @@ function cloneValue(value) {
   return JSON.parse(JSON.stringify(value));
 }
 
+function buildDefaultMediaCatalog() {
+  return {
+    entries: [
+      {
+        key: 'generic-generic',
+        label: 'Guida generica',
+        category: 'generic',
+        aliases: [],
+        images: [
+          { url: './guide-media/generic.svg', alt: 'Guida esercizio generica' },
+          { url: './guide-media/generic-movement.svg', alt: 'Promemoria tecnico generale' }
+        ]
+      }
+    ],
+    fallbacks: {
+      petto: 'generic-generic',
+      dorso: 'generic-generic',
+      gambe: 'generic-generic',
+      spalle: 'generic-generic',
+      bicipiti: 'generic-generic',
+      tricipiti: 'generic-generic',
+      addome: 'generic-generic',
+      polpacci: 'generic-generic',
+      stretch: 'generic-generic',
+      generic: 'generic-generic'
+    }
+  };
+}
+
+function sanitizeMediaCatalog(raw) {
+  const defaults = buildDefaultMediaCatalog();
+  const entries = (Array.isArray(raw?.entries) && raw.entries.length ? raw.entries : defaults.entries)
+    .map((entry, index) => ({
+      key: cleanText(entry?.key || 'media-' + (index + 1)).replace(/[^a-z0-9_-]/gi, '-').toLowerCase(),
+      label: cleanText(entry?.label || 'Guida esercizio'),
+      category: cleanText(entry?.category || 'generic').toLowerCase() || 'generic',
+      aliases: (Array.isArray(entry?.aliases) ? entry.aliases : []).map(cleanText).filter(Boolean),
+      images: (Array.isArray(entry?.images) ? entry.images : []).map((image) => ({
+        url: cleanText(image?.url || ''),
+        alt: cleanText(image?.alt || 'Guida esercizio')
+      })).filter((image) => image.url)
+    }))
+    .filter((entry) => entry.key);
+
+  const fallbacks = { ...defaults.fallbacks };
+  const rawFallbacks = raw?.fallbacks && typeof raw.fallbacks === 'object' ? raw.fallbacks : {};
+  Object.keys(rawFallbacks).forEach((category) => {
+    fallbacks[cleanText(category).toLowerCase()] = cleanText(rawFallbacks[category]).toLowerCase();
+  });
+
+  return { entries, fallbacks };
+}
+
+function setExerciseMediaCatalog(raw) {
+  exerciseMediaCatalog = sanitizeMediaCatalog(raw);
+  mediaEntriesByKey = {};
+  exerciseMediaCatalog.entries.forEach((entry) => {
+    mediaEntriesByKey[entry.key] = entry;
+  });
+}
+
+async function loadExerciseMediaCatalog() {
+  try {
+    if (window.location.protocol === 'file:') throw new Error('file-protocol');
+    const response = await fetch(MEDIA_CATALOG_URL, { cache: 'no-store' });
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const payload = await response.json();
+    setExerciseMediaCatalog(payload);
+  } catch (error) {
+    console.warn('Catalogo guide esercizi non caricato, uso fallback locale.', error);
+    setExerciseMediaCatalog(buildDefaultMediaCatalog());
+  }
+}
+
+function ensureMediaCatalogLoaded() {
+  if (!mediaCatalogPromise) mediaCatalogPromise = loadExerciseMediaCatalog();
+  return mediaCatalogPromise;
+}
+
+function normalizeMatchText(value) {
+  return cleanText(value)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function inferExerciseCategory(name = '', note = '', dayLabel = '') {
+  const haystack = normalizeMatchText([name, note, dayLabel].filter(Boolean).join(' '));
+  const rules = [
+    ['polpacci', ['calf', 'polpacci']],
+    ['addome', ['crunch', 'leg raise', 'leg raises', 'addome', 'abs', 'sit up']],
+    ['tricipiti', ['tricipiti', 'triceps', 'pushdown', 'press down', 'french press', 'dietro testa', 'overhead']],
+    ['bicipiti', ['bicipiti', 'biceps', 'curl', 'scott', 'hammer']],
+    ['spalle', ['spalle', 'shoulder', 'laterali', 'lateral raise', 'verticali', 'rear delt', 'tirate al petto']],
+    ['dorso', ['dorso', 'back', 'lat', 'pulley', 'rematore', 'row', 'pulldown', 'trazioni']],
+    ['petto', ['petto', 'chest', 'panca', 'pectoral', 'croci', 'press petto', 'inclinata']],
+    ['gambe', ['gambe', 'legs', 'leg press', 'leg extension', 'leg curl', 'hack squat', 'squat', 'quadricipiti', 'femorali']],
+    ['stretch', ['stretch', 'appeso', 'mobilita', 'allungamento']]
+  ];
+  for (const [category, keywords] of rules) {
+    if (keywords.some((keyword) => haystack.includes(normalizeMatchText(keyword)))) return category;
+  }
+  return 'generic';
+}
+
+function scoreAliasMatch(name, alias) {
+  if (!name || !alias) return 0;
+  if (name === alias) return 120;
+  if (name.includes(alias)) return 90 + Math.min(alias.length, 20);
+  if (alias.includes(name) && name.length > 5) return 70 + Math.min(name.length, 20);
+  const nameTokens = new Set(name.split(' ').filter(Boolean));
+  const aliasTokens = alias.split(' ').filter(Boolean);
+  let overlap = 0;
+  aliasTokens.forEach((token) => { if (nameTokens.has(token)) overlap++; });
+  return overlap >= 2 ? overlap * 18 : overlap === 1 ? 8 : 0;
+}
+
+function findSuggestedMediaKey(exercise, context = {}) {
+  const normalizedName = normalizeMatchText(exercise?.name || '');
+  let bestKey = '';
+  let bestScore = 0;
+
+  exerciseMediaCatalog.entries.forEach((entry) => {
+    if (entry.key.startsWith('generic-')) return;
+    [entry.label, ...entry.aliases].forEach((alias) => {
+      const score = scoreAliasMatch(normalizedName, normalizeMatchText(alias));
+      if (score > bestScore) {
+        bestScore = score;
+        bestKey = entry.key;
+      }
+    });
+  });
+
+  if (bestScore >= 55 && bestKey) return bestKey;
+  const category = inferExerciseCategory(exercise?.name || '', exercise?.note || '', context.dayLabel || '');
+  return exerciseMediaCatalog.fallbacks[category] || exerciseMediaCatalog.fallbacks.generic || 'generic-generic';
+}
+
+function resolveExerciseMedia(exercise, context = {}) {
+  const explicitKey = cleanText(exercise?.mediaKey || '').toLowerCase();
+  let entry = explicitKey ? mediaEntriesByKey[explicitKey] : null;
+  let source = explicitKey && entry ? 'stored' : 'fallback';
+
+  if (!entry) {
+    const suggestedKey = findSuggestedMediaKey(exercise, context);
+    entry = mediaEntriesByKey[suggestedKey] || mediaEntriesByKey[exerciseMediaCatalog.fallbacks.generic] || exerciseMediaCatalog.entries[0] || null;
+    source = entry && !entry.key.startsWith('generic-') ? 'match' : 'fallback';
+  }
+
+  return {
+    entry,
+    source,
+    category: entry?.category || inferExerciseCategory(exercise?.name || '', exercise?.note || '', context.dayLabel || ''),
+    images: Array.isArray(entry?.images) ? entry.images.slice(0, 2) : []
+  };
+}
+
+function getGuideSourceLabel(source) {
+  if (source === 'stored') return 'Guida scelta';
+  if (source === 'match') return 'Match automatico';
+  return 'Fallback categoria';
+}
+
+function renderGuideThumbsHtml(images, compact = false) {
+  if (!images.length) {
+    return `<div class="guide-thumb-card broken"><div class="guide-fallback" style="display:flex">Nessuna immagine guida disponibile.</div></div>`;
+  }
+  return `<div class="guide-thumb-grid${compact ? ' compact' : ''}">
+    ${images.map((image) => `
+      <figure class="guide-thumb-card">
+        <img src="${escapeHtml(image.url)}" alt="${escapeHtml(image.alt)}" loading="lazy" onerror="handleGuideImageError(this)">
+        <div class="guide-fallback">Immagine non disponibile offline. Usa il riferimento tecnico sotto.</div>
+        <figcaption>${escapeHtml(image.alt)}</figcaption>
+      </figure>
+    `).join('')}
+  </div>`;
+}
+
+function renderGuidePreviewHtml(exercise, context = {}) {
+  const resolved = resolveExerciseMedia(exercise, context);
+  return `
+    <div class="imp-guide-box">
+      <div class="imp-guide-top">
+        <div class="imp-field">
+          <label>Guida visiva</label>
+          <select class="imp-guide-select" onchange="updateImportExerciseMedia(${context.dayIndex}, ${context.exerciseIndex}, this.value)">
+            ${renderMediaOptionsHtml(cleanText(exercise?.mediaKey || resolved.entry?.key || ''))}
+          </select>
+        </div>
+        <div class="imp-guide-meta">${escapeHtml(getGuideSourceLabel(resolved.source))}</div>
+      </div>
+      ${renderGuideThumbsHtml(resolved.images, true)}
+    </div>
+  `;
+}
+
+function renderMediaOptionsHtml(selectedKey) {
+  const sortedEntries = [...exerciseMediaCatalog.entries].sort((left, right) => left.label.localeCompare(right.label, 'it'));
+  return sortedEntries.map((entry) => `<option value="${escapeHtml(entry.key)}"${entry.key === selectedKey ? ' selected' : ''}>${escapeHtml(entry.label)}</option>`).join('');
+}
+
+function applyAutoMediaKeysToDraft(program) {
+  if (!program?.days) return;
+  program.days.forEach((day) => {
+    day.exercises.forEach((exercise) => {
+      if (!cleanText(exercise.mediaKey)) exercise.mediaKey = findSuggestedMediaKey(exercise, { dayLabel: day.label || day.name });
+    });
+  });
+}
+
+function refreshImportExerciseMedia(dayIndex, exerciseIndex) {
+  const exercise = importDraft?.days?.[dayIndex]?.exercises?.[exerciseIndex];
+  const day = importDraft?.days?.[dayIndex];
+  if (!exercise || !day) return;
+  if (!exercise.mediaManual) {
+    exercise.mediaKey = findSuggestedMediaKey(exercise, { dayLabel: day.label || day.name });
+  }
+  renderImportReview();
+}
+
+function updateImportExerciseMedia(dayIndex, exerciseIndex, value) {
+  const exercise = importDraft?.days?.[dayIndex]?.exercises?.[exerciseIndex];
+  if (!exercise) return;
+  exercise.mediaKey = cleanText(value).toLowerCase();
+  exercise.mediaManual = true;
+  renderImportReview();
+}
+
+function handleGuideImageError(image) {
+  const card = image.closest('.guide-thumb-card');
+  if (card) card.classList.add('broken');
+}
+
+async function openGuideModalForExercise(dayIndex, exerciseIndex) {
+  await ensureMediaCatalogLoaded();
+  const day = getDays()[dayIndex];
+  const exercise = day?.exercises?.[exerciseIndex];
+  if (!exercise) return;
+  const resolved = resolveExerciseMedia(exercise, { dayLabel: day.label || day.name });
+  document.getElementById('guide-title').textContent = exercise.name;
+  document.getElementById('guide-subtitle').textContent = resolved.entry?.label || 'Riferimento visivo per capire setup e movimento.';
+  document.getElementById('guide-content').innerHTML = `
+    <div class="guide-chip">${escapeHtml(getGuideSourceLabel(resolved.source))}</div>
+    <div class="guide-modal-copy">
+      Usa queste immagini come promemoria rapido. Se qualcosa non ti e' chiaro, resta sempre meglio ridurre il carico e chiedere conferma al PT.
+    </div>
+    ${renderGuideThumbsHtml(resolved.images, false)}
+  `;
+  document.getElementById('guide-modal').classList.add('show');
+}
+
+function closeGuideModal() {
+  document.getElementById('guide-modal').classList.remove('show');
+}
+
+setExerciseMediaCatalog(buildDefaultMediaCatalog());
+
 function normalizePrograms(programs, sourceFallback = 'bundled') {
   return (Array.isArray(programs) ? programs : []).map((program, pi) => ({
     id: String(program?.id || 'program-' + (pi + 1)).replace(/[^a-zA-Z0-9_-]/g, '_'),
@@ -858,7 +1172,8 @@ function normalizePrograms(programs, sourceFallback = 'bundled') {
         name: cleanText(ex?.name || 'Esercizio ' + (ei + 1)),
         series: Math.max(0, parseInt(ex?.series, 10) || 0),
         reps: cleanText(String(ex?.reps ?? '-')),
-        note: cleanText(ex?.note || '')
+        note: cleanText(ex?.note || ''),
+        mediaKey: cleanText(ex?.mediaKey || '').toLowerCase()
       }))
     }))
   }));
@@ -1388,6 +1703,7 @@ function showPrograms() {
   currentDay = null;
   currentWeek = 1;
   closeWeekReport();
+  closeGuideModal();
   document.getElementById('programs').style.display = 'block';
   document.getElementById('home').style.display = 'none';
   document.getElementById('session').style.display = 'none';
@@ -1566,6 +1882,7 @@ function startSession(di) {
 
 function goHome() {
   currentDay = null;
+  closeGuideModal();
   document.getElementById('programs').style.display = 'none';
   document.getElementById('home').style.display = 'block';
   document.getElementById('session').style.display = 'none';
@@ -1630,8 +1947,11 @@ function renderListView(di) {
           <div class="ex-name">${ex.name}</div>
           <div class="ex-meta">${ex.series} serie - ${ex.reps} reps</div>
         </div>
-        <div class="ex-chk${sd.exDone?' on':''}" id="echk-${ei}" onclick="event.stopPropagation();toggleExDone(${di},${ei})">
-          <span class="chk-icon">&#10003;</span>
+        <div class="ex-tools">
+          <button class="guide-btn" type="button" onclick="event.stopPropagation();openGuideModalForExercise(${di},${ei})">Guida</button>
+          <div class="ex-chk${sd.exDone?' on':''}" id="echk-${ei}" onclick="event.stopPropagation();toggleExDone(${di},${ei})">
+            <span class="chk-icon">&#10003;</span>
+          </div>
         </div>
       </div>
       <div class="ex-body" id="ex-body-${ei}" style="display:none">
@@ -1722,6 +2042,7 @@ function renderFocusView(di, ei) {
   document.getElementById('focus-card').innerHTML = `
     <div class="fc-name">${ex.name}</div>
     <div class="fc-meta">${ex.series} serie - ${ex.reps} reps</div>
+    <div class="focus-guide-row"><button class="guide-btn secondary" type="button" onclick="openGuideModalForExercise(${di},${ei})">Guida esercizio</button></div>
     ${ex.note ? `<div class="fc-note">${ex.note}</div>` : ''}
     <div class="chrono-row">
       <span class="chrono-lbl">Cronometro serie:</span>
@@ -2080,6 +2401,7 @@ function buildImportDraft(candidateProgram, payload) {
       confidence: Number(payload.confidence) || 0
     }
   }], 'imported')[0];
+  applyAutoMediaKeysToDraft(normalized);
   normalized.id = '';
   return normalized;
 }
@@ -2125,6 +2447,7 @@ async function handlePdfInputChange(event) {
       confidence: Math.max(0, Math.min(1, Number(payload.confidence) || 0)),
       warnings: Array.isArray(payload.warnings) ? payload.warnings.map(cleanText).filter(Boolean) : []
     };
+    await ensureMediaCatalogLoaded();
     importDraft = buildImportDraft(payload.candidateProgram || {}, payload);
     renderImportReview();
   } catch (error) {
@@ -2193,7 +2516,7 @@ function renderImportReview(validationError = '') {
             <div class="imp-ex-grid">
               <div class="imp-field">
                 <label>Nome</label>
-                <input type="text" value="${escapeHtml(exercise.name)}" oninput="updateImportExerciseField(${di}, ${ei}, 'name', this.value)">
+                <input type="text" value="${escapeHtml(exercise.name)}" oninput="updateImportExerciseField(${di}, ${ei}, 'name', this.value)" onchange="refreshImportExerciseMedia(${di}, ${ei})">
               </div>
               <div class="imp-field">
                 <label>Serie</label>
@@ -2208,6 +2531,7 @@ function renderImportReview(validationError = '') {
               <label>Note</label>
               <textarea oninput="updateImportExerciseField(${di}, ${ei}, 'note', this.value)">${escapeHtml(exercise.note)}</textarea>
             </div>
+            ${renderGuidePreviewHtml(exercise, { dayIndex: di, exerciseIndex: ei, dayLabel: day.label || day.name })}
           </div>
         `).join('') : '<div class="imp-empty">Nessun esercizio in questo giorno.</div>'}
         <button class="imp-mini-btn" type="button" onclick="addImportExercise(${di})">+ Aggiungi esercizio</button>
@@ -2273,6 +2597,10 @@ function updateImportExerciseField(dayIndex, exerciseIndex, field, value) {
   } else {
     exercise[field] = field === 'note' ? String(value || '') : cleanText(value);
   }
+  if (field === 'name' && !exercise.mediaManual) {
+    const day = importDraft?.days?.[dayIndex];
+    exercise.mediaKey = findSuggestedMediaKey(exercise, { dayLabel: day?.label || day?.name || '' });
+  }
 }
 
 function addImportDay() {
@@ -2280,7 +2608,7 @@ function addImportDay() {
   importDraft.days.push({
     name: 'Day ' + (importDraft.days.length + 1),
     label: '',
-    exercises: [{ name: '', series: 3, reps: '', note: '' }]
+    exercises: [{ name: '', series: 3, reps: '', note: '', mediaKey: findSuggestedMediaKey({ name: '' }) }]
   });
   renderImportReview();
 }
@@ -2293,7 +2621,13 @@ function removeImportDay(dayIndex) {
 
 function addImportExercise(dayIndex) {
   if (!importDraft?.days[dayIndex]) return;
-  importDraft.days[dayIndex].exercises.push({ name: '', series: 3, reps: '', note: '' });
+  importDraft.days[dayIndex].exercises.push({
+    name: '',
+    series: 3,
+    reps: '',
+    note: '',
+    mediaKey: findSuggestedMediaKey({ name: '' }, { dayLabel: importDraft.days[dayIndex].label || importDraft.days[dayIndex].name })
+  });
   renderImportReview();
 }
 
@@ -2368,6 +2702,7 @@ function deleteImportedProgram(programId) {
 
 // INIT
 initPwa();
+ensureMediaCatalogLoaded();
 document.getElementById('pdf-file-input').addEventListener('change', handlePdfInputChange);
 showPrograms();
 loadPrograms();

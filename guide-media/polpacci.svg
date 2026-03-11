@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#120f09"/>
+  <rect x="56" y="56" width="1088" height="688" rx="42" fill="#1e1a11" stroke="#584827" stroke-width="4"/>
+  <text x="112" y="156" fill="#ffe082" font-family="Arial,sans-serif" font-size="70" font-weight="700">POLPACCI</text>
+  <text x="112" y="212" fill="#fff9e8" font-family="Arial,sans-serif" font-size="30">Calf raise in piedi o seduto</text>
+  <rect x="360" y="596" width="490" height="24" rx="12" fill="#3a2f1d"/>
+  <circle cx="600" cy="224" r="50" fill="#eef4f0"/>
+  <line x1="600" y1="274" x2="600" y2="472" stroke="#eef4f0" stroke-width="24" stroke-linecap="round"/>
+  <line x1="600" y1="336" x2="520" y2="422" stroke="#eef4f0" stroke-width="24" stroke-linecap="round"/>
+  <line x1="600" y1="336" x2="680" y2="422" stroke="#eef4f0" stroke-width="24" stroke-linecap="round"/>
+  <line x1="600" y1="472" x2="546" y2="602" stroke="#eef4f0" stroke-width="24" stroke-linecap="round"/>
+  <line x1="600" y1="472" x2="654" y2="602" stroke="#eef4f0" stroke-width="24" stroke-linecap="round"/>
+  <rect x="518" y="482" width="48" height="122" rx="22" fill="#ffe082" opacity=".22"/>
+  <rect x="634" y="482" width="48" height="122" rx="22" fill="#ffe082" opacity=".22"/>
+  <text x="112" y="654" fill="#d6c49c" font-family="Arial,sans-serif" font-size="28">Cerca ampiezza completa e una pausa in alto prima della discesa.</text>
+</svg>

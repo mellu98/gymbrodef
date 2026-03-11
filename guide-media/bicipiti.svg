@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#09100b"/>
+  <rect x="56" y="56" width="1088" height="688" rx="42" fill="#101a13" stroke="#34513b" stroke-width="4"/>
+  <text x="112" y="156" fill="#7cffc1" font-family="Arial,sans-serif" font-size="70" font-weight="700">BICIPITI</text>
+  <text x="112" y="212" fill="#effff6" font-family="Arial,sans-serif" font-size="30">Curl con bilanciere, manubri o fune</text>
+  <circle cx="600" cy="220" r="50" fill="#eef4f0"/>
+  <rect x="540" y="278" width="120" height="200" rx="58" fill="#eef4f0"/>
+  <line x1="555" y1="330" x2="500" y2="422" stroke="#eef4f0" stroke-width="24" stroke-linecap="round"/>
+  <line x1="645" y1="330" x2="700" y2="422" stroke="#eef4f0" stroke-width="24" stroke-linecap="round"/>
+  <line x1="500" y1="422" x2="500" y2="314" stroke="#ffd166" stroke-width="18" stroke-linecap="round"/>
+  <line x1="700" y1="422" x2="700" y2="314" stroke="#ffd166" stroke-width="18" stroke-linecap="round"/>
+  <line x1="568" y1="478" x2="520" y2="640" stroke="#eef4f0" stroke-width="24" stroke-linecap="round"/>
+  <line x1="632" y1="478" x2="680" y2="640" stroke="#eef4f0" stroke-width="24" stroke-linecap="round"/>
+  <rect x="500" y="330" width="54" height="108" rx="26" fill="#7cffc1" opacity=".24"/>
+  <rect x="646" y="330" width="54" height="108" rx="26" fill="#7cffc1" opacity=".24"/>
+  <text x="112" y="654" fill="#a8ceb4" font-family="Arial,sans-serif" font-size="28">Gomiti fermi, salita pulita e discesa lenta senza oscillare.</text>
+</svg>

@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800">
+  <rect width="1200" height="800" fill="#0d1114"/>
+  <rect x="56" y="56" width="1088" height="688" rx="42" fill="#141b21" stroke="#35505c" stroke-width="4"/>
+  <text x="112" y="156" fill="#6df0ff" font-family="Arial,sans-serif" font-size="70" font-weight="700">STRETCH</text>
+  <text x="112" y="212" fill="#eefeff" font-family="Arial,sans-serif" font-size="30">Mobilita finale e allungamento</text>
+  <line x1="364" y1="184" x2="836" y2="184" stroke="#ffd166" stroke-width="18" stroke-linecap="round"/>
+  <circle cx="600" cy="262" r="48" fill="#eef4f0"/>
+  <line x1="600" y1="310" x2="600" y2="522" stroke="#eef4f0" stroke-width="24" stroke-linecap="round"/>
+  <line x1="600" y1="336" x2="444" y2="184" stroke="#eef4f0" stroke-width="24" stroke-linecap="round"/>
+  <line x1="600" y1="336" x2="756" y2="184" stroke="#eef4f0" stroke-width="24" stroke-linecap="round"/>
+  <line x1="600" y1="522" x2="538" y2="648" stroke="#eef4f0" stroke-width="24" stroke-linecap="round"/>
+  <line x1="600" y1="522" x2="662" y2="648" stroke="#eef4f0" stroke-width="24" stroke-linecap="round"/>
+  <path d="M444 184 C486 246 536 300 600 336" fill="none" stroke="#6df0ff" stroke-width="8" stroke-dasharray="18 12" stroke-linecap="round"/>
+  <path d="M756 184 C714 246 664 300 600 336" fill="none" stroke="#6df0ff" stroke-width="8" stroke-dasharray="18 12" stroke-linecap="round"/>
+  <text x="112" y="654" fill="#afd0d4" font-family="Arial,sans-serif" font-size="28">Resta morbido nella posizione e cerca un allungamento progressivo, non forzato.</text>
+</svg>
