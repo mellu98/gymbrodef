@@ -57,6 +57,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 .program-empty p{max-width:320px;margin:0 auto 16px}
 .home-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:18px;flex-wrap:wrap}
 .home-top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.week-panel{margin-bottom:20px}
+.week-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.week-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tm)}
+.week-status{font-size:11px;color:var(--tm)}
+.week-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:10px}
+.week-card{background:var(--s1);border:1px solid var(--td);border-radius:16px;padding:14px 12px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;width:100%;text-align:left;color:var(--t);font-family:'DM Sans',sans-serif}
+.week-card:hover{border-color:var(--gdim);transform:translateY(-2px)}
+.week-card.on{border-color:var(--g);box-shadow:0 0 0 1px rgba(0,230,118,.2) inset}
+.week-card.done{background:linear-gradient(180deg,rgba(0,230,118,.08),rgba(0,0,0,.04))}
+.week-card.add{display:flex;align-items:center;justify-content:center;text-align:center;border-style:dashed}
+.week-card-num{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;color:var(--g);line-height:1}
+.week-card-meta{font-size:11px;color:var(--tm);margin-top:4px;line-height:1.5}
+.week-card-badge{display:inline-block;margin-top:8px;font-size:9px;letter-spacing:1px;text-transform:uppercase;background:var(--s2);border:1px solid var(--td);border-radius:999px;padding:5px 8px;color:var(--tm)}
+.week-card.done .week-card-badge{border-color:rgba(0,230,118,.24);color:var(--g)}
+.week-help{font-size:12px;color:var(--tm);line-height:1.6;background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.12);border-radius:14px;padding:12px 14px;margin-top:12px}
 .program-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .program-card{
   background:linear-gradient(180deg,var(--s1),#0b0b0b);border:1px solid var(--td);border-radius:16px;
@@ -239,6 +254,25 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 .hist-empty{text-align:center;color:var(--tm);font-size:13px;margin-top:60px}
 .hist-clear{margin:0 18px 18px;background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.25);color:var(--red);border-radius:10px;padding:12px;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;cursor:pointer;width:calc(100%-36px);display:block}
 
+/* WEEK REPORT MODAL */
+#week-modal{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:320;display:none;flex-direction:column}
+#week-modal.show{display:flex}
+.week-hdr{display:flex;align-items:center;justify-content:space-between;padding:calc(18px + var(--safe-top)) calc(18px + var(--safe-right)) 18px calc(18px + var(--safe-left));border-bottom:1px solid #1a1a1a;flex-shrink:0}
+.week-hdr h2{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:2px;color:var(--g)}
+.week-close{background:none;border:none;color:var(--tm);font-size:20px;cursor:pointer}
+.week-scroll{flex:1;overflow-y:auto;padding:16px 18px 120px}
+.week-report-summary{background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.16);border-radius:14px;padding:14px 16px;font-size:13px;line-height:1.6;color:var(--t);margin-bottom:12px}
+.week-report-empty{background:var(--s1);border:1px solid var(--td);border-radius:14px;padding:16px;color:var(--tm);font-size:12px;line-height:1.6}
+.week-report-item{background:var(--s1);border:1px solid var(--td);border-radius:14px;padding:14px 16px;margin-bottom:10px}
+.week-report-item h3{font-size:13px;font-weight:700;margin-bottom:6px}
+.week-report-item p{font-size:12px;color:var(--tm);line-height:1.5}
+.week-report-delta{display:inline-block;margin-top:8px;font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--g);background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.18);border-radius:999px;padding:5px 9px}
+.week-report-delta.up{color:var(--g);background:rgba(0,230,118,.08);border-color:rgba(0,230,118,.18)}
+.week-report-delta.same{color:var(--blue);background:rgba(41,182,246,.08);border-color:rgba(41,182,246,.2)}
+.week-report-delta.down{color:var(--amber);background:rgba(255,193,7,.08);border-color:rgba(255,193,7,.24)}
+.week-report-delta.new{color:#fff;background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14)}
+.week-report-actions{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;justify-content:flex-end;padding:14px calc(18px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(18px + var(--safe-left));background:linear-gradient(180deg,rgba(8,8,8,0),rgba(8,8,8,.96) 24%,rgba(8,8,8,1))}
+
 /* IMPORT MODAL */
 #import-modal{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:340;display:none;flex-direction:column}
 #import-modal.show{display:flex}
@@ -327,6 +361,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
       </div>
       <div class="home-top-actions" id="home-top-actions"></div>
     </div>
+    <div class="week-panel" id="week-panel"></div>
     <div class="home-greeting">Ciao, <span>Massi</span></div>
     <div class="home-sub" style="margin-bottom:20px">Scegli l'allenamento di oggi</div>
     <div class="section-label">I tuoi giorni</div>
@@ -401,6 +436,19 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
   </div>
   <div class="hist-scroll" id="hist-content"></div>
   <button class="hist-clear" onclick="clearHist()">Cancella tutto lo storico</button>
+</div>
+
+<!-- WEEK REPORT MODAL -->
+<div id="week-modal">
+  <div class="week-hdr">
+    <h2 id="week-report-title">Report settimana</h2>
+    <button class="week-close" onclick="closeWeekReport()">X</button>
+  </div>
+  <div class="week-scroll" id="week-report-content"></div>
+  <div class="week-report-actions">
+    <button class="t-btn" onclick="closeWeekReport()">Chiudi</button>
+    <button class="t-btn" id="week-report-next-btn" style="display:none" onclick="goToNextWeek()">Vai alla settimana successiva</button>
+  </div>
 </div>
 
 <input id="pdf-file-input" type="file" accept="application/pdf" hidden>
@@ -719,15 +767,17 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 const PROGRAMS_URL = './programs.json';
 const IMPORT_API_BASE_URL = String(window.MASSI_CONFIG?.importApiBaseUrl || '').replace(/\/$/, '');
 const USER_PROGRAMS_KEY = 'massi_user_programs';
+const PROGRAM_STATE_PREFIX = 'massi_state_';
 const SHOW_BUNDLED_PROGRAMS = false;
 let PROGRAMS = [];
 let bundledPrograms = [];
 let currentProgram = null;
 let currentProgramIndex = -1;
 let currentDay = null;
+let currentWeek = 1;
 let currentTab = 'list';
 let focusIdx = 0;
-let sessionData = {};
+let programStateCache = {};
 let deferredPrompt = null;
 let importDraft = null;
 let importMeta = null;
@@ -861,45 +911,403 @@ function makeImportedProgramId(title) {
 
 function getDays() { return currentProgram ? currentProgram.days : []; }
 function getCurrentProgramId() { return currentProgram ? currentProgram.id : 'default'; }
-function getHistoryKey() { return 'massi_hist_' + getCurrentProgramId(); }
-function getDoneKey() { return 'massi_done_' + getCurrentProgramId(); }
+function getHistoryKey(programId = getCurrentProgramId()) { return 'massi_hist_' + programId; }
+function getDoneKey(programId = getCurrentProgramId()) { return 'massi_done_' + programId; }
+function getProgramStateKey(programId = getCurrentProgramId()) { return PROGRAM_STATE_PREFIX + programId; }
+
+function parseConfiguredWeeks(program = currentProgram) {
+  const raw = cleanText(program?.weeks || '');
+  const match = raw.match(/(\d{1,2})/);
+  const value = match ? parseInt(match[1], 10) : 0;
+  return value > 0 ? value : 0;
+}
+
+function createExerciseState(exercise, seedKg = []) {
+  return {
+    seriesDone: Array(exercise.series).fill(false),
+    kg: Array.from({ length: exercise.series }, (_, index) => {
+      const seeded = seedKg?.[index];
+      return seeded === 0 ? '0' : String(seeded ?? '').trim();
+    }),
+    note: '',
+    exDone: false
+  };
+}
+
+function normalizeExerciseState(storedExercise, exercise, seedKg = []) {
+  const safe = storedExercise && typeof storedExercise === 'object' ? storedExercise : {};
+  const storedSeriesDone = Array.isArray(safe.seriesDone) ? safe.seriesDone : [];
+  const storedKg = Array.isArray(safe.kg) ? safe.kg : [];
+  return {
+    seriesDone: Array.from({ length: exercise.series }, (_, index) => Boolean(storedSeriesDone[index])),
+    kg: Array.from({ length: exercise.series }, (_, index) => {
+      const current = storedKg[index];
+      if (current === 0 || String(current ?? '').trim() !== '') return String(current ?? '').trim();
+      const seeded = seedKg?.[index];
+      return seeded === 0 ? '0' : String(seeded ?? '').trim();
+    }),
+    note: String(safe.note || ''),
+    exDone: Boolean(safe.exDone)
+  };
+}
+
+function buildEmptyProgramState() {
+  return { currentWeek: 1, weeks: {} };
+}
+
+function getLegacyDoneMap(programId = getCurrentProgramId()) {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(getDoneKey(programId)) || '{}');
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch (error) {
+    return {};
+  }
+}
+
+function normalizeWeekReport(report, weekNumber) {
+  const safe = report && typeof report === 'object' ? report : null;
+  if (!safe) return null;
+  return {
+    week: Math.max(1, parseInt(safe.week, 10) || weekNumber || 1),
+    generatedAt: cleanText(safe.generatedAt || ''),
+    summary: cleanText(safe.summary || ''),
+    improvedCount: Math.max(0, parseInt(safe.improvedCount, 10) || 0),
+    maintainedCount: Math.max(0, parseInt(safe.maintainedCount, 10) || 0),
+    firstTrackedCount: Math.max(0, parseInt(safe.firstTrackedCount, 10) || 0),
+    items: (Array.isArray(safe.items) ? safe.items : []).map((item) => ({
+      day: cleanText(item?.day || ''),
+      exercise: cleanText(item?.exercise || ''),
+      prevMax: Number.isFinite(Number(item?.prevMax)) ? Number(item.prevMax) : null,
+      currentMax: Number.isFinite(Number(item?.currentMax)) ? Number(item.currentMax) : null,
+      deltaMax: Number.isFinite(Number(item?.deltaMax)) ? Number(item.deltaMax) : null,
+      trend: ['up', 'same', 'down', 'new'].includes(item?.trend) ? item.trend : 'same',
+      summary: cleanText(item?.summary || '')
+    })).filter((item) => item.exercise)
+  };
+}
+
+function createWeekState(weekNumber, seedWeek = null) {
+  const exerciseData = {};
+  getDays().forEach((day, di) => {
+    exerciseData[di] = {};
+    day.exercises.forEach((exercise, ei) => {
+      const seedKg = seedWeek?.exerciseData?.[di]?.[ei]?.kg || [];
+      exerciseData[di][ei] = createExerciseState(exercise, seedKg);
+    });
+  });
+  return {
+    daysDone: {},
+    exerciseData,
+    report: null,
+    completedAt: '',
+    reportSeen: false
+  };
+}
+
+function normalizeWeekState(rawWeek, weekNumber) {
+  const safeWeek = rawWeek && typeof rawWeek === 'object' ? rawWeek : {};
+  const exerciseData = safeWeek.exerciseData && typeof safeWeek.exerciseData === 'object' ? safeWeek.exerciseData : {};
+  const daysDone = safeWeek.daysDone && typeof safeWeek.daysDone === 'object' ? safeWeek.daysDone : {};
+  const normalizedWeek = {
+    daysDone: {},
+    exerciseData: {},
+    report: normalizeWeekReport(safeWeek.report, weekNumber),
+    completedAt: cleanText(safeWeek.completedAt || ''),
+    reportSeen: Boolean(safeWeek.reportSeen)
+  };
+  getDays().forEach((day, di) => {
+    normalizedWeek.daysDone[di] = Boolean(daysDone[di]);
+    normalizedWeek.exerciseData[di] = {};
+    day.exercises.forEach((exercise, ei) => {
+      normalizedWeek.exerciseData[di][ei] = normalizeExerciseState(exerciseData?.[di]?.[ei], exercise);
+    });
+  });
+  return normalizedWeek;
+}
+
+function readProgramState(programId = getCurrentProgramId()) {
+  if (!currentProgram) return buildEmptyProgramState();
+  if (programStateCache[programId]) return programStateCache[programId];
+
+  let raw = null;
+  try {
+    raw = JSON.parse(localStorage.getItem(getProgramStateKey(programId)) || 'null');
+  } catch (error) {
+    console.error('Errore lettura stato programma', error);
+  }
+
+  const normalized = {
+    currentWeek: Math.max(1, parseInt(raw?.currentWeek, 10) || 1),
+    weeks: {}
+  };
+  const availableWeeks = raw?.weeks && typeof raw.weeks === 'object'
+    ? Object.keys(raw.weeks).map((value) => parseInt(value, 10)).filter((value) => value > 0).sort((a, b) => a - b)
+    : [];
+
+  if (!availableWeeks.length) availableWeeks.push(1);
+  availableWeeks.forEach((weekNumber) => {
+    normalized.weeks[String(weekNumber)] = normalizeWeekState(raw?.weeks?.[String(weekNumber)], weekNumber);
+  });
+
+  if (!raw) {
+    const legacyDone = getLegacyDoneMap(programId);
+    Object.keys(legacyDone).forEach((dayIndex) => {
+      normalized.weeks['1'].daysDone[dayIndex] = Boolean(legacyDone[dayIndex]);
+    });
+  }
+
+  if (!normalized.weeks[String(normalized.currentWeek)]) {
+    normalized.weeks[String(normalized.currentWeek)] = createWeekState(normalized.currentWeek, normalized.weeks[String(normalized.currentWeek - 1)] || null);
+  }
+
+  programStateCache[programId] = normalized;
+  return normalized;
+}
+
+function persistProgramState(programId = getCurrentProgramId()) {
+  if (!currentProgram) return true;
+  try {
+    localStorage.setItem(getProgramStateKey(programId), JSON.stringify(programStateCache[programId] || buildEmptyProgramState()));
+    return true;
+  } catch (error) {
+    console.error('Errore salvataggio stato programma', error);
+    return false;
+  }
+}
+
+function ensureWeekState(weekNumber = currentWeek) {
+  const state = readProgramState();
+  const targetWeek = Math.max(1, parseInt(weekNumber, 10) || 1);
+  for (let index = 1; index <= targetWeek; index++) {
+    const key = String(index);
+    if (!state.weeks[key]) {
+      state.weeks[key] = createWeekState(index, state.weeks[String(index - 1)] || null);
+    } else {
+      state.weeks[key] = normalizeWeekState(state.weeks[key], index);
+    }
+  }
+  if (!state.currentWeek) state.currentWeek = 1;
+  persistProgramState();
+  return state.weeks[String(targetWeek)];
+}
+
+function getCurrentWeekState() {
+  return ensureWeekState(currentWeek);
+}
+
+function getExistingWeekNumbers() {
+  const state = readProgramState();
+  const weeks = Object.keys(state.weeks).map((value) => parseInt(value, 10)).filter((value) => value > 0).sort((a, b) => a - b);
+  return weeks.length ? weeks : [1];
+}
+
+function getHighestWeekNumber() {
+  return Math.max(...getExistingWeekNumbers());
+}
+
+function getCompletedDaysCount(weekNumber = currentWeek) {
+  const weekState = ensureWeekState(weekNumber);
+  return getDays().reduce((total, _, dayIndex) => total + (weekState.daysDone?.[dayIndex] ? 1 : 0), 0);
+}
+
+function isWeekComplete(weekNumber = currentWeek) {
+  const days = getDays();
+  return days.length > 0 && getCompletedDaysCount(weekNumber) === days.length;
+}
+
+function canAdvanceToWeek(weekNumber = currentWeek) {
+  const configuredWeeks = parseConfiguredWeeks();
+  return !configuredWeeks || weekNumber < configuredWeeks;
+}
+
+function getVisibleWeekNumbers() {
+  const existingMax = getHighestWeekNumber();
+  const unlockedMax = existingMax + (isWeekComplete(existingMax) && canAdvanceToWeek(existingMax) ? 1 : 0);
+  let limit = Math.max(existingMax, unlockedMax, currentWeek);
+  const configuredWeeks = parseConfiguredWeeks();
+  if (configuredWeeks) limit = Math.min(limit, configuredWeeks);
+  return Array.from({ length: Math.max(1, limit) }, (_, index) => index + 1);
+}
+
+function setCurrentWeek(weekNumber, options = {}) {
+  if (!currentProgram) return;
+  const targetWeek = Math.max(1, parseInt(weekNumber, 10) || 1);
+  ensureWeekState(targetWeek);
+  currentWeek = targetWeek;
+  const state = readProgramState();
+  state.currentWeek = targetWeek;
+  persistProgramState();
+  if (document.getElementById('home').style.display !== 'none') renderHome();
+  if (options.openReport) openWeekReport(targetWeek);
+}
+
+function formatKg(value) {
+  const number = Number(value);
+  if (!Number.isFinite(number)) return '-';
+  return (Math.abs(number % 1) < 0.001 ? String(Math.round(number)) : number.toFixed(1).replace(/\.0$/, '')).replace('.', ',');
+}
+
+function parseKgNumber(value) {
+  const cleaned = String(value ?? '').replace(',', '.').replace(/[^\d.-]/g, '');
+  const parsed = parseFloat(cleaned);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function summarizeKg(kgArray) {
+  const values = (Array.isArray(kgArray) ? kgArray : []).map(parseKgNumber).filter((value) => value !== null);
+  if (!values.length) return null;
+  const total = values.reduce((sum, value) => sum + value, 0);
+  return {
+    max: Math.max(...values),
+    avg: total / values.length,
+    last: values[values.length - 1],
+    count: values.length
+  };
+}
+
+function buildWeekReport(weekNumber = currentWeek) {
+  const weekState = ensureWeekState(weekNumber);
+  const previousWeekState = weekNumber > 1 ? ensureWeekState(weekNumber - 1) : null;
+  const items = [];
+  let improvedCount = 0;
+  let maintainedCount = 0;
+  let firstTrackedCount = 0;
+
+  getDays().forEach((day, di) => {
+    day.exercises.forEach((exercise, ei) => {
+      const currentStats = summarizeKg(weekState.exerciseData?.[di]?.[ei]?.kg || []);
+      if (!currentStats) return;
+
+      const previousStats = previousWeekState ? summarizeKg(previousWeekState.exerciseData?.[di]?.[ei]?.kg || []) : null;
+      let trend = 'new';
+      let deltaMax = null;
+      let summary = 'Primo riferimento salvato per questo esercizio.';
+
+      if (previousStats) {
+        deltaMax = Number((currentStats.max - previousStats.max).toFixed(1));
+        if (deltaMax > 0) {
+          trend = 'up';
+          improvedCount++;
+          summary = 'Picco da ' + formatKg(previousStats.max) + 'kg a ' + formatKg(currentStats.max) + 'kg.';
+        } else if (deltaMax < 0) {
+          trend = 'down';
+          summary = 'Picco da ' + formatKg(previousStats.max) + 'kg a ' + formatKg(currentStats.max) + 'kg.';
+        } else {
+          trend = 'same';
+          maintainedCount++;
+          summary = 'Carico massimo stabile rispetto alla settimana ' + (weekNumber - 1) + '.';
+        }
+      } else {
+        firstTrackedCount++;
+      }
+
+      items.push({
+        day: cleanText(day.label || day.name),
+        exercise: cleanText(exercise.name),
+        prevMax: previousStats ? Number(previousStats.max.toFixed(1)) : null,
+        currentMax: Number(currentStats.max.toFixed(1)),
+        deltaMax,
+        trend,
+        summary
+      });
+    });
+  });
+
+  items.sort((left, right) => {
+    const order = { up: 0, same: 1, new: 2, down: 3 };
+    return (order[left.trend] ?? 9) - (order[right.trend] ?? 9) || left.exercise.localeCompare(right.exercise);
+  });
+
+  let summary = 'Settimana salvata.';
+  if (!items.length) {
+    summary = 'Hai chiuso la settimana, ma non hai ancora salvato pesi utili per confrontare i progressi.';
+  } else if (weekNumber === 1) {
+    summary = 'Questa settimana diventa la tua baseline iniziale per confrontare i carichi futuri.';
+  } else if (improvedCount > 0) {
+    summary = 'Hai migliorato ' + improvedCount + ' esercizi rispetto alla settimana ' + (weekNumber - 1) + '.';
+  } else if (maintainedCount > 0) {
+    summary = 'Carichi stabili rispetto alla settimana ' + (weekNumber - 1) + ': ottima base su cui progredire.';
+  } else {
+    summary = 'Settimana ' + weekNumber + ' completata: controlla i carichi per capire dove spingere nel prossimo giro.';
+  }
+
+  return {
+    week: weekNumber,
+    generatedAt: new Date().toISOString(),
+    summary,
+    improvedCount,
+    maintainedCount,
+    firstTrackedCount,
+    items
+  };
+}
+
+function resetWeekProgress(weekState) {
+  weekState.daysDone = {};
+  weekState.report = null;
+  weekState.reportSeen = false;
+  weekState.completedAt = '';
+  Object.keys(weekState.exerciseData || {}).forEach((dayIndex) => {
+    Object.keys(weekState.exerciseData[dayIndex] || {}).forEach((exerciseIndex) => {
+      const exerciseState = weekState.exerciseData[dayIndex][exerciseIndex];
+      if (!exerciseState) return;
+      exerciseState.seriesDone = Array.isArray(exerciseState.seriesDone) ? exerciseState.seriesDone.map(() => false) : [];
+      exerciseState.exDone = false;
+    });
+  });
+}
 
 function getProgramStats(program) {
   try {
-    const hist = JSON.parse(localStorage.getItem('massi_hist_' + program.id) || '[]');
-    const done = JSON.parse(localStorage.getItem('massi_done_' + program.id) || '{}');
-    return { hist: hist.length, done: Object.values(done).filter(Boolean).length };
+    const hist = JSON.parse(localStorage.getItem(getHistoryKey(program.id)) || '[]');
+    const rawState = JSON.parse(localStorage.getItem(getProgramStateKey(program.id)) || 'null');
+    let done = 0;
+    if (rawState?.weeks && typeof rawState.weeks === 'object') {
+      Object.values(rawState.weeks).forEach((weekState) => {
+        const daysDone = weekState?.daysDone && typeof weekState.daysDone === 'object' ? weekState.daysDone : {};
+        done += Object.values(daysDone).filter(Boolean).length;
+      });
+    } else {
+      const legacyDone = JSON.parse(localStorage.getItem(getDoneKey(program.id)) || '{}');
+      done = Object.values(legacyDone).filter(Boolean).length;
+    }
+    return { hist: hist.length, done };
   } catch(e) {
     return { hist: 0, done: 0 };
   }
 }
 
 function getProgramSession() {
-  const pid = getCurrentProgramId();
-  if (!sessionData[pid]) sessionData[pid] = {};
-  return sessionData[pid];
+  return getCurrentWeekState().exerciseData;
 }
 
 function getSD(di, ei) {
   const days = getDays();
   const programSession = getProgramSession();
   if (!programSession[di]) programSession[di] = {};
-  if (!programSession[di][ei]) {
-    const ex = days[di].exercises[ei];
-    programSession[di][ei] = {
-      seriesDone: Array(ex.series).fill(false),
-      kg: Array(ex.series).fill(''),
-      note: '',
-      exDone: false
-    };
-  }
+  const exercise = days[di].exercises[ei];
+  const previousKg = currentWeek > 1 ? readProgramState().weeks?.[String(currentWeek - 1)]?.exerciseData?.[di]?.[ei]?.kg || [] : [];
+  programSession[di][ei] = normalizeExerciseState(programSession[di]?.[ei], exercise, previousKg);
+  persistProgramState();
   return programSession[di][ei];
 }
 
 function getHistory() { try { return JSON.parse(localStorage.getItem(getHistoryKey())||'[]'); } catch(e){return [];} }
 function saveHistory(h) { try { localStorage.setItem(getHistoryKey(), JSON.stringify(h)); } catch(e){} }
-function getDayDone(di) { try { const d=JSON.parse(localStorage.getItem(getDoneKey())||'{}'); return d[di]||false; } catch(e){return false;} }
-function setDayDone(di, v) { try { const d=JSON.parse(localStorage.getItem(getDoneKey())||'{}'); d[di]=v; localStorage.setItem(getDoneKey(),JSON.stringify(d)); } catch(e){} }
+function getDayDone(di) {
+  try {
+    return Boolean(getCurrentWeekState().daysDone?.[di]);
+  } catch(e) {
+    return false;
+  }
+}
+function setDayDone(di, value) {
+  try {
+    const weekState = getCurrentWeekState();
+    weekState.daysDone[di] = Boolean(value);
+    persistProgramState();
+  } catch(e) {}
+}
 
 function syncHeaderBalance() {
   const spacer = document.getElementById('hdr-spacer');
@@ -978,6 +1386,8 @@ function showPrograms() {
   currentProgram = null;
   currentProgramIndex = -1;
   currentDay = null;
+  currentWeek = 1;
+  closeWeekReport();
   document.getElementById('programs').style.display = 'block';
   document.getElementById('home').style.display = 'none';
   document.getElementById('session').style.display = 'none';
@@ -993,6 +1403,8 @@ function openProgram(index) {
   currentProgram = PROGRAMS[index] || null;
   currentDay = null;
   focusIdx = 0;
+  currentWeek = currentProgram ? Math.max(1, parseInt(readProgramState(currentProgram.id).currentWeek, 10) || 1) : 1;
+  ensureWeekState(currentWeek);
   document.getElementById('programs').style.display = 'none';
   document.getElementById('home').style.display = 'block';
   document.getElementById('session').style.display = 'none';
@@ -1056,12 +1468,60 @@ function initPwa() {
 function renderHome() {
   const days = getDays();
   const grid = document.getElementById('day-grid');
+  const weekPanel = document.getElementById('week-panel');
   const greeting = document.querySelector('#home .home-greeting');
   const subtitle = document.querySelector('#home .home-sub');
   const actions = document.getElementById('home-top-actions');
   greeting.innerHTML = currentProgram ? 'Scheda <span>' + escapeHtml(currentProgram.title) + '</span>' : 'Le tue <span>schede</span>';
   subtitle.textContent = currentProgram ? (currentProgram.subtitle || 'Scegli l\'allenamento di oggi') : 'Scegli il programma da aprire';
   actions.innerHTML = '';
+  if (!currentProgram) {
+    weekPanel.innerHTML = '';
+  } else {
+    ensureWeekState(currentWeek);
+    const configuredWeeks = parseConfiguredWeeks();
+    const selectedWeekState = getCurrentWeekState();
+    const completedDays = getCompletedDaysCount(currentWeek);
+    const visibleWeeks = getVisibleWeekNumbers();
+    const existingWeeks = new Set(getExistingWeekNumbers());
+    const selectedStatus = 'Settimana ' + currentWeek + (configuredWeeks ? ' di ' + configuredWeeks : '') + ' · ' + completedDays + '/' + days.length + ' giorni completati';
+    weekPanel.innerHTML = `
+      <div class="week-top">
+        <div>
+          <div class="week-title">Settimane della scheda</div>
+          <div class="week-status">${escapeHtml(selectedStatus)}</div>
+        </div>
+      </div>
+      <div class="week-grid">
+        ${visibleWeeks.map((weekNumber) => {
+          const exists = existingWeeks.has(weekNumber);
+          const complete = exists ? isWeekComplete(weekNumber) : false;
+          const report = exists ? ensureWeekState(weekNumber).report : null;
+          let badge = 'Inizia';
+          if (!exists) badge = 'Nuova';
+          else if (report && !ensureWeekState(weekNumber).reportSeen) badge = 'Report nuovo';
+          else if (report) badge = 'Report pronto';
+          else if (complete) badge = 'Completata';
+          else if (weekNumber === currentWeek) badge = 'In corso';
+          return `
+            <button class="week-card${weekNumber === currentWeek ? ' on' : ''}${complete ? ' done' : ''}" type="button" onclick="setCurrentWeek(${weekNumber})">
+              <div class="week-card-num">W${weekNumber}</div>
+              <div class="week-card-meta">${exists ? getCompletedDaysCount(weekNumber) + '/' + days.length + ' giorni completati' : 'I kg partono dalla settimana precedente'}</div>
+              <span class="week-card-badge">${escapeHtml(badge)}</span>
+            </button>`;
+        }).join('')}
+      </div>
+      <div class="week-help">
+        Completa tutti i giorni della settimana per sbloccare la successiva. Quando apri una nuova settimana, i pesi dell'ultima restano salvati e vengono precaricati automaticamente.
+      </div>`;
+    if (selectedWeekState.report) {
+      const reportBtn = document.createElement('button');
+      reportBtn.className = 'hdr-btn';
+      reportBtn.textContent = 'Report settimana';
+      reportBtn.onclick = () => openWeekReport(currentWeek);
+      actions.appendChild(reportBtn);
+    }
+  }
   if (currentProgram?.source === 'imported') {
     const deleteBtn = document.createElement('button');
     deleteBtn.className = 'hdr-btn danger';
@@ -1090,13 +1550,14 @@ function renderHome() {
 function startSession(di) {
   const days = getDays();
   if (!days[di]) return;
+  ensureWeekState(currentWeek);
   currentDay = di;
   focusIdx = 0;
   document.getElementById('programs').style.display = 'none';
   document.getElementById('home').style.display = 'none';
   document.getElementById('session').style.display = 'block';
   document.getElementById('sess-title').textContent = days[di].name + ' - ' + (days[di].label || '');
-  document.getElementById('sess-info').textContent = days[di].exercises.length + ' esercizi - Recupero 60-120s - ' + (currentProgram?.weeks || 'scheda attiva');
+  document.getElementById('sess-info').textContent = 'Settimana ' + currentWeek + (parseConfiguredWeeks() ? '/' + parseConfiguredWeeks() : '') + ' · ' + days[di].exercises.length + ' esercizi · Recupero 60-120s';
   document.getElementById('fab').classList.add('show');
   document.getElementById('btn-finish').classList.add('show');
   switchTab('list');
@@ -1193,6 +1654,10 @@ function toggleCard(ei) {
 function toggleSerie(di, ei, s) {
   const sd = getSD(di, ei);
   sd.seriesDone[s] = !sd.seriesDone[s];
+  const weekState = getCurrentWeekState();
+  weekState.report = null;
+  weekState.reportSeen = false;
+  persistProgramState();
   const box = document.getElementById('sb-' + ei + '-' + s);
   box.className = 'serie-box' + (sd.seriesDone[s] ? ' done' : '');
   if (sd.seriesDone[s]) openTimer();
@@ -1201,6 +1666,7 @@ function toggleSerie(di, ei, s) {
 function toggleExDone(di, ei) {
   const sd = getSD(di, ei);
   sd.exDone = !sd.exDone;
+  persistProgramState();
   const chk = document.getElementById('echk-' + ei);
   chk.className = 'ex-chk' + (sd.exDone ? ' on' : '');
   const card = document.getElementById('ex-card-' + ei);
@@ -1209,11 +1675,19 @@ function toggleExDone(di, ei) {
 }
 
 function saveKg(di, ei, s, val) {
-  getSD(di, ei).kg[s] = val;
+  const sd = getSD(di, ei);
+  sd.kg[s] = String(val ?? '').trim();
+  const weekState = getCurrentWeekState();
+  weekState.report = null;
+  weekState.reportSeen = false;
+  persistProgramState();
+  const label = document.getElementById('sb-kg-' + ei + '-' + s);
+  if (label) label.textContent = sd.kg[s];
 }
 
 function saveNote(di, ei, val) {
-  getSD(di, ei).note = val;
+  getSD(di, ei).note = String(val || '');
+  persistProgramState();
 }
 
 // â”€â”€â”€ FOCUS VIEW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -1281,6 +1755,10 @@ function renderFocusView(di, ei) {
 function toggleFSerie(di, ei, s) {
   const sd = getSD(di, ei);
   sd.seriesDone[s] = !sd.seriesDone[s];
+  const weekState = getCurrentWeekState();
+  weekState.report = null;
+  weekState.reportSeen = false;
+  persistProgramState();
   const chk = document.getElementById('fchk-' + ei + '-' + s);
   if (chk) chk.className = 'fsr-chk' + (sd.seriesDone[s] ? ' on' : '');
   const box = document.getElementById('sb-' + ei + '-' + s);
@@ -1409,9 +1887,11 @@ function finishSession() {
   const di = currentDay;
   const days = getDays();
   const hist = getHistory();
+  const wasWeekComplete = isWeekComplete(currentWeek);
   const entry = {
     date: new Date().toLocaleString('it-IT'),
     program: currentProgram ? currentProgram.title : '',
+    week: currentWeek,
     day: days[di].name + ' - ' + (days[di].label || ''),
     exercises: []
   };
@@ -1428,13 +1908,72 @@ function finishSession() {
   hist.unshift(entry);
   saveHistory(hist);
   setDayDone(di, true);
-  const pid = getCurrentProgramId();
-  if (sessionData[pid]) delete sessionData[pid][di];
+  const weekState = getCurrentWeekState();
+  const weekJustCompleted = !wasWeekComplete && isWeekComplete(currentWeek);
+  if (isWeekComplete(currentWeek)) {
+    if (!weekState.completedAt) weekState.completedAt = new Date().toISOString();
+    weekState.report = buildWeekReport(currentWeek);
+    if (weekJustCompleted) weekState.reportSeen = false;
+    persistProgramState();
+  }
   renderPrograms();
   goHome();
+  if (weekJustCompleted) openWeekReport(currentWeek);
 }
 
 // â”€â”€â”€ HISTORY MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function openWeekReport(weekNumber = currentWeek) {
+  if (!currentProgram) return;
+  const targetWeek = Math.max(1, parseInt(weekNumber, 10) || currentWeek);
+  const weekState = ensureWeekState(targetWeek);
+  if (isWeekComplete(targetWeek) && !weekState.report) {
+    weekState.report = buildWeekReport(targetWeek);
+  }
+  if (weekState.report) {
+    weekState.reportSeen = true;
+    persistProgramState();
+  }
+
+  const report = weekState.report;
+  const modal = document.getElementById('week-modal');
+  const title = document.getElementById('week-report-title');
+  const content = document.getElementById('week-report-content');
+  const nextBtn = document.getElementById('week-report-next-btn');
+  modal.dataset.week = String(targetWeek);
+  title.textContent = 'Report settimana ' + targetWeek;
+
+  if (!report) {
+    content.innerHTML = '<div class="week-report-empty">Completa tutti i giorni della settimana per generare il report progressi.</div>';
+  } else {
+    content.innerHTML = `
+      <div class="week-report-summary">${escapeHtml(report.summary)}</div>
+      ${report.items.length ? report.items.map((item) => `
+        <div class="week-report-item">
+          <h3>${escapeHtml(item.exercise)}</h3>
+          <p>${escapeHtml(item.day)} · ${escapeHtml(item.summary)}</p>
+          <span class="week-report-delta ${escapeHtml(item.trend)}">
+            ${item.trend === 'up' ? '+' + formatKg(item.deltaMax) + ' kg' : item.trend === 'down' ? formatKg(item.deltaMax) + ' kg' : item.trend === 'same' ? '0 kg' : 'Baseline'}
+          </span>
+        </div>`).join('') : '<div class="week-report-empty">Nessun peso registrato in questa settimana.</div>'}`;
+  }
+
+  nextBtn.style.display = isWeekComplete(targetWeek) && canAdvanceToWeek(targetWeek) ? 'inline-block' : 'none';
+  modal.classList.add('show');
+  renderHome();
+}
+
+function closeWeekReport() {
+  document.getElementById('week-modal').classList.remove('show');
+}
+
+function goToNextWeek() {
+  const modal = document.getElementById('week-modal');
+  const fromWeek = Math.max(1, parseInt(modal.dataset.week, 10) || currentWeek);
+  if (!canAdvanceToWeek(fromWeek)) return;
+  setCurrentWeek(fromWeek + 1);
+  closeWeekReport();
+}
+
 function openHist() {
   const hist = getHistory();
   const el = document.getElementById('hist-content');
@@ -1446,7 +1985,7 @@ function openHist() {
     el.innerHTML = hist.map(h => `
       <div class="hist-entry">
         <div class="he-date">${h.date}</div>
-        <div class="he-day">${h.day}</div>
+        <div class="he-day">${h.day}${h.week ? ' · Settimana ' + h.week : ''}</div>
         ${h.exercises.map(e => `
           <div class="he-ex">
             ${e.done ? '&#10003;' : '&#9711;'} <b>${e.name}</b>
@@ -1461,8 +2000,12 @@ function closeHist() { document.getElementById('hist-modal').classList.remove('s
 function clearHist() {
   if (confirm('Cancellare tutto lo storico?')) {
     saveHistory([]);
+    const state = readProgramState();
+    Object.values(state.weeks || {}).forEach((weekState) => resetWeekProgress(weekState));
+    persistProgramState();
     try { localStorage.removeItem(getDoneKey()); } catch(e) {}
     closeHist();
+    closeWeekReport();
     renderHome();
     renderPrograms();
   }
@@ -1809,7 +2352,8 @@ function deleteImportedProgram(programId) {
   }
   try { localStorage.removeItem('massi_hist_' + programId); } catch(e) {}
   try { localStorage.removeItem('massi_done_' + programId); } catch(e) {}
-  try { delete sessionData[programId]; } catch(e) {}
+  try { localStorage.removeItem(getProgramStateKey(programId)); } catch(e) {}
+  try { delete programStateCache[programId]; } catch(e) {}
 
   const isCurrent = currentProgram && currentProgram.id === programId;
   mergePrograms();
