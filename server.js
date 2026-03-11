@@ -17,7 +17,7 @@ const upload = multer({
 
 const PORT = Number(process.env.PORT || 3000);
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4.1';
-const OPENAI_TIMEOUT_MS = Number(process.env.OPENAI_TIMEOUT_MS || 60000);
+const OPENAI_TIMEOUT_MS = Number(process.env.OPENAI_TIMEOUT_MS || 180000);
 const CORS_ALLOWED_ORIGIN = (process.env.CORS_ALLOWED_ORIGIN || '').trim();
 const MUSCLEWIKI_API_KEY = (process.env.MUSCLEWIKI_API_KEY || '').trim();
 const MUSCLEWIKI_API_BASE_URL = (process.env.MUSCLEWIKI_API_BASE_URL || 'https://api.musclewiki.com').replace(/\/+$/, '');
@@ -756,28 +756,10 @@ async function buildMatchPayload(exercises) {
   }));
 }
 
-async function parseWorkoutPdf(file) {
-  if (!client) {
-    const error = new Error('OPENAI_API_KEY mancante sul server.');
-    error.statusCode = 500;
-    throw error;
-  }
-
-  const base64File = file.buffer.toString('base64');
-  const filename = cleanString(file.originalname) || 'scheda-pt.pdf';
-  const userPrompt = [
-    'Estrai questa scheda PDF in formato compatibile con una app palestra.',
-    'Usa il nome file come contesto: ' + filename + '.',
-    'Restituisci giorni, label dei day, esercizi, serie, reps, note, durata del ciclo e nome atleta se presente.',
-    'Se trovi righe miste nome+serie+note, separale correttamente.',
-    'Se il documento non e` una scheda workout o e` una scansione/foto difficilmente leggibile, rifiuta.',
-    'Ogni day deve avere un name tipo "Day 1" e una label leggibile.'
-  ].join(' ');
-
-  const response = await client.responses.create({
-    model: OPENAI_MODEL,
+function buildPdfImportRequest(model, filename, base64File, userPrompt) {
+  return {
+    model,
     temperature: 0,
-    timeout: OPENAI_TIMEOUT_MS,
     input: [
       {
         role: 'system',
@@ -811,7 +793,71 @@ async function parseWorkoutPdf(file) {
         schema: IMPORT_SCHEMA
       }
     }
-  });
+  };
+}
+
+function normalizeOpenAiError(error) {
+  if (!error) return error;
+  if (!error.statusCode && typeof error.status === 'number') error.statusCode = error.status;
+  if (!error.statusCode && typeof error.code === 'number') error.statusCode = error.code;
+  return error;
+}
+
+function shouldRetryPdfImportOnGpt41(error) {
+  const message = cleanString(error?.message || '').toLowerCase();
+  const statusCode = Number(error?.statusCode || 0);
+  if (!message && !statusCode) return false;
+  if (statusCode >= 500) return true;
+  return [
+    'temperature',
+    'unsupported',
+    'not supported',
+    'input_file',
+    'json_schema',
+    'model',
+    'timeout',
+    'timed out'
+  ].some((needle) => message.includes(needle));
+}
+
+async function parseWorkoutPdf(file) {
+  if (!client) {
+    const error = new Error('OPENAI_API_KEY mancante sul server.');
+    error.statusCode = 500;
+    throw error;
+  }
+
+  const base64File = file.buffer.toString('base64');
+  const filename = cleanString(file.originalname) || 'scheda-pt.pdf';
+  const userPrompt = [
+    'Estrai questa scheda PDF in formato compatibile con una app palestra.',
+    'Usa il nome file come contesto: ' + filename + '.',
+    'Restituisci giorni, label dei day, esercizi, serie, reps, note, durata del ciclo e nome atleta se presente.',
+    'Se trovi righe miste nome+serie+note, separale correttamente.',
+    'Se il documento non e` una scheda workout o e` una scansione/foto difficilmente leggibile, rifiuta.',
+    'Ogni day deve avere un name tipo "Day 1" e una label leggibile.'
+  ].join(' ');
+
+  async function requestParse(model) {
+    return client.responses.create(
+      buildPdfImportRequest(model, filename, base64File, userPrompt),
+      { timeout: OPENAI_TIMEOUT_MS }
+    );
+  }
+
+  let response;
+  try {
+    response = await requestParse(OPENAI_MODEL);
+  } catch (rawError) {
+    const error = normalizeOpenAiError(rawError);
+    const fallbackModel = 'gpt-4.1';
+    if (OPENAI_MODEL !== fallbackModel && shouldRetryPdfImportOnGpt41(error)) {
+      console.warn('PDF import fallback da', OPENAI_MODEL, 'a', fallbackModel, '-', error.message);
+      response = await requestParse(fallbackModel);
+    } else {
+      throw error;
+    }
+  }
 
   if (!response.output_text) {
     const error = new Error('Risposta OpenAI vuota durante il parsing del PDF.');

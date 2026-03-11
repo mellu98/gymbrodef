@@ -18,6 +18,7 @@ Variabili ambiente backend:
 - OPENAI_API_KEY -> obbligatoria per l'import PDF
 - CORS_ALLOWED_ORIGIN -> opzionale, utile se frontend e backend non sono sullo stesso dominio
 - OPENAI_MODEL -> opzionale, default gpt-4.1
+- OPENAI_TIMEOUT_MS -> opzionale, default 180000
 - MUSCLEWIKI_API_KEY -> opzionale, abilita match guida avanzato e dettagli esercizio
 - MUSCLEWIKI_API_BASE_URL -> opzionale, default https://api.musclewiki.com
 
