@@ -33,4 +33,5 @@ Deploy su Render:
 
 Endpoint:
 - POST /api/import-pdf -> riceve multipart/form-data con file PDF
+- POST /api/chat -> riceve JSON con messaggi e contesto scheda attiva
 - GET /healthz -> healthcheck semplice

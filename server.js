@@ -4,6 +4,7 @@ const path = require('path');
 const OpenAI = require('openai');
 
 const app = express();
+app.use(express.json({ limit: '1mb' }));
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
@@ -93,6 +94,16 @@ const SYSTEM_PROMPT = [
   'Non inventare giorni o esercizi mancanti: se qualcosa e` ambiguo, fai la miglior stima ma aggiungi un warning.'
 ].join(' ');
 
+const CHAT_SYSTEM_PROMPT = [
+  'Sei il coach AI interno di una app palestra chiamata Massi Gym.',
+  'Rispondi sempre in italiano, con tono pratico, chiaro e motivante.',
+  'Aiuta su lettura schede, gestione settimane, progressione dei carichi, organizzazione allenamenti e dubbi fitness generali.',
+  'Non inventare dati personali o risultati di salute non forniti.',
+  'Se la domanda tocca temi medici, infortuni, farmaci o dolore, invita con calma a sentire un medico o professionista qualificato.',
+  'Mantieni risposte brevi ma utili: massimo 6-8 frasi salvo richiesta esplicita di approfondimento.',
+  'Quando hai contesto sulla scheda attiva, usalo in modo naturale senza elencarlo tutto ogni volta.'
+].join(' ');
+
 function applyCors(req, res) {
   if (!CORS_ALLOWED_ORIGIN) return;
   const origin = req.headers.origin;
@@ -135,6 +146,32 @@ function slugify(value) {
 
 function filenameWithoutExt(filename) {
   return String(filename || 'scheda-importata').replace(/\.pdf$/i, '').trim();
+}
+
+function normalizeChatMessages(rawMessages) {
+  return (Array.isArray(rawMessages) ? rawMessages : [])
+    .map((message) => ({
+      role: message?.role === 'assistant' ? 'assistant' : 'user',
+      content: cleanString(message?.content || '')
+    }))
+    .filter((message) => message.content)
+    .slice(-12);
+}
+
+function buildChatContextText(context) {
+  if (!context || typeof context !== 'object') return '';
+  const lines = [];
+  if (cleanString(context.programTitle)) lines.push('Scheda attiva: ' + cleanString(context.programTitle));
+  if (cleanString(context.programSubtitle)) lines.push('Sottotitolo: ' + cleanString(context.programSubtitle));
+  if (cleanString(context.weeksLabel)) lines.push('Durata indicata: ' + cleanString(context.weeksLabel));
+  if (Number(context.currentWeek) > 0) lines.push('Settimana corrente: ' + Number(context.currentWeek));
+  if (Number(context.completedDays) >= 0 && Number(context.totalDays) > 0) {
+    lines.push('Giorni completati: ' + Number(context.completedDays) + '/' + Number(context.totalDays));
+  }
+  if (Array.isArray(context.dayLabels) && context.dayLabels.length) {
+    lines.push('Giorni scheda: ' + context.dayLabels.map(cleanString).filter(Boolean).join(', '));
+  }
+  return lines.join('\n');
 }
 
 function normalizeCandidateProgram(raw, filename) {
@@ -297,6 +334,64 @@ async function parseWorkoutPdf(file) {
   return validateCandidateProgram(parsed, filename);
 }
 
+async function createCoachReply(messages, context) {
+  if (!client) {
+    const error = new Error('OPENAI_API_KEY mancante sul server.');
+    error.statusCode = 500;
+    throw error;
+  }
+
+  const normalizedMessages = normalizeChatMessages(messages);
+  if (!normalizedMessages.length) {
+    const error = new Error('Invia almeno un messaggio al coach AI.');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const input = [
+    {
+      role: 'system',
+      content: [
+        { type: 'input_text', text: CHAT_SYSTEM_PROMPT }
+      ]
+    }
+  ];
+
+  const contextText = buildChatContextText(context);
+  if (contextText) {
+    input.push({
+      role: 'system',
+      content: [
+        { type: 'input_text', text: 'Contesto attuale utente:\n' + contextText }
+      ]
+    });
+  }
+
+  normalizedMessages.forEach((message) => {
+    input.push({
+      role: message.role,
+      content: [
+        { type: 'input_text', text: message.content }
+      ]
+    });
+  });
+
+  const response = await client.responses.create({
+    model: OPENAI_MODEL,
+    input,
+    max_output_tokens: 500
+  });
+
+  const reply = cleanString(response.output_text || '');
+  if (!reply) {
+    const error = new Error('Risposta chat vuota.');
+    error.statusCode = 502;
+    throw error;
+  }
+
+  return reply;
+}
+
 app.use((req, res, next) => {
   applyCors(req, res);
   if (req.method === 'OPTIONS') {
@@ -329,6 +424,23 @@ app.post('/api/import-pdf', upload.single('file'), async (req, res) => {
     const statusCode = error.statusCode || 500;
     const message = statusCode >= 500
       ? 'Import PDF non disponibile in questo momento. Riprova tra poco.'
+      : error.message;
+    sendJsonError(res, statusCode, message);
+  }
+});
+
+app.post('/api/chat', async (req, res) => {
+  try {
+    const reply = await createCoachReply(req.body?.messages, req.body?.context);
+    res.json({
+      reply,
+      model: OPENAI_MODEL
+    });
+  } catch (error) {
+    console.error('Chat error:', error);
+    const statusCode = error.statusCode || 500;
+    const message = statusCode >= 500
+      ? 'Chat non disponibile in questo momento. Riprova tra poco.'
       : error.message;
     sendJsonError(res, statusCode, message);
   }

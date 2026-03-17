@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gym-bro-massi-v7';
+const CACHE_NAME = 'gym-bro-massi-v8';
 const APP_SHELL = [
   './',
   './index.html',

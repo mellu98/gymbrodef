@@ -46,9 +46,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 .hdr-btn.danger:hover{border-color:var(--red);color:#fff}
 #installBtn{display:none}
 
+/* SECTION NAV */
+.section-shell{padding:18px 16px 10px;border-bottom:1px solid #111;background:linear-gradient(180deg,rgba(255,255,255,.02),rgba(255,255,255,0))}
+.section-shell-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin-bottom:12px}
+.section-shell-row{display:flex;align-items:stretch;gap:12px}
+.section-dock{flex:1;display:flex;align-items:center;gap:8px;background:linear-gradient(180deg,#141414,#0c0c0c);border:1px solid rgba(255,255,255,.12);border-radius:999px;padding:8px}
+.section-tab{flex:1;min-width:0;background:transparent;border:none;border-radius:999px;padding:12px 10px 11px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;color:#f2f2f2;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .22s}
+.section-tab:hover{background:rgba(255,255,255,.04)}
+.section-tab.on{background:rgba(255,255,255,.08);box-shadow:inset 0 0 0 1px rgba(255,255,255,.06)}
+.section-tab.on .section-tab-ico{background:rgba(0,230,118,.14);border-color:rgba(0,230,118,.3);color:var(--g)}
+.section-tab.on .section-tab-label{color:var(--g)}
+.section-tab-ico{width:38px;height:38px;border-radius:14px;border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;font-size:18px;font-family:'JetBrains Mono',monospace;color:#d5d5d5;background:rgba(255,255,255,.03);transition:all .22s}
+.section-tab-label{font-size:12px;font-weight:700;line-height:1;color:#f1f1f1;transition:color .22s}
+.section-action{width:76px;flex:0 0 76px;border-radius:999px;border:1px solid rgba(255,255,255,.15);background:linear-gradient(180deg,#161616,#0d0d0d);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .22s}
+.section-action:hover{border-color:rgba(0,230,118,.3);color:var(--g)}
+.section-action-ico{font-size:22px;line-height:1}
+.section-action-label{font-size:10px;letter-spacing:1px;text-transform:uppercase}
+
 /* HOME */
 #programs{padding:20px 16px 40px}
 #home{padding:20px 16px 40px}
+#progress,#coach{padding:20px 16px 40px;display:none}
 .programs-intro{max-width:960px;margin:0 auto;text-align:center}
 .programs-intro .home-sub{margin-bottom:20px}
 .programs-intro .section-label{text-align:center}
@@ -80,6 +98,7 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 .program-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--g);transform:scaleX(0);transform-origin:left;transition:transform .3s}
 .program-card:hover{border-color:var(--gdim);transform:translateY(-2px)}
 .program-card:hover::after{transform:scaleX(1)}
+.program-card.active{border-color:var(--g);box-shadow:0 0 0 1px rgba(0,230,118,.16) inset}
 .program-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .program-card-copy{min-width:0}
 .program-card-actions{display:flex;align-items:flex-end;flex-direction:column;gap:8px;flex-shrink:0}
@@ -107,6 +126,51 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 .dc-name{font-size:13px;font-weight:700;margin-top:4px;line-height:1.3}
 .dc-count{font-size:11px;color:var(--tm);margin-top:3px}
 .dc-done{position:absolute;top:10px;right:10px;background:var(--g);color:#000;font-size:9px;font-weight:700;padding:3px 7px;border-radius:20px;letter-spacing:1px}
+.empty-pane{background:linear-gradient(180deg,var(--s1),#0c0c0c);border:1px solid var(--td);border-radius:18px;padding:24px 18px;text-align:center}
+.empty-pane h3{font-size:18px;margin-bottom:8px}
+.empty-pane p{font-size:13px;color:var(--tm);line-height:1.6;margin:0 auto 16px;max-width:380px}
+
+/* PROGRESS */
+.section-wrap{max-width:1040px;margin:0 auto}
+.section-hero{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:20px}
+.section-copy h2{font-family:'Bebas Neue',sans-serif;font-size:34px;letter-spacing:2px}
+.section-copy p{font-size:13px;color:var(--tm);margin-top:4px;line-height:1.6;max-width:520px}
+.section-badge{display:inline-flex;align-items:center;gap:8px;padding:7px 12px;border-radius:999px;border:1px solid rgba(0,230,118,.18);background:rgba(0,230,118,.06);font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--g)}
+.progress-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.metric-card,.surface-card{background:linear-gradient(180deg,var(--s1),#0d0d0d);border:1px solid var(--td);border-radius:18px;padding:18px}
+.metric-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tm)}
+.metric-value{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:1px;color:var(--g);line-height:1;margin-top:8px}
+.metric-sub{font-size:12px;color:var(--tm);margin-top:6px;line-height:1.5}
+.progress-layout{display:grid;grid-template-columns:1.15fr .85fr;gap:12px;margin-top:12px}
+.surface-title{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin-bottom:12px}
+.surface-stack{display:flex;flex-direction:column;gap:10px}
+.mini-row{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:12px 0;border-bottom:1px solid #171717}
+.mini-row:last-child{border-bottom:none;padding-bottom:0}
+.mini-row:first-child{padding-top:0}
+.mini-copy strong{display:block;font-size:13px}
+.mini-copy span{display:block;font-size:11px;color:var(--tm);margin-top:3px;line-height:1.5}
+.mini-pill{flex:0 0 auto;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--tm);background:var(--s2);border:1px solid var(--td);border-radius:999px;padding:5px 8px}
+.action-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.surface-empty{font-size:12px;color:var(--tm);line-height:1.6}
+
+/* CHAT */
+.chat-layout{display:grid;grid-template-rows:auto 1fr auto;gap:12px;min-height:calc(100vh - 250px)}
+.chat-card{background:linear-gradient(180deg,var(--s1),#0d0d0d);border:1px solid var(--td);border-radius:18px;padding:16px}
+.chat-suggest{display:flex;flex-wrap:wrap;gap:8px}
+.chat-suggest button{background:var(--s2);border:1px solid var(--td);color:var(--tm);border-radius:999px;padding:9px 12px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.chat-suggest button:hover{border-color:var(--g);color:var(--g)}
+.chat-thread{display:flex;flex-direction:column;gap:10px;min-height:280px}
+.chat-empty{display:flex;align-items:center;justify-content:center;text-align:center;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.12);border-radius:16px;padding:24px;color:var(--tm);line-height:1.7;font-size:13px}
+.chat-msg{max-width:min(88%,620px);padding:14px 14px 12px;border-radius:18px;border:1px solid var(--td);line-height:1.65;font-size:13px;white-space:pre-wrap;word-break:break-word}
+.chat-msg.user{align-self:flex-end;background:rgba(0,230,118,.08);border-color:rgba(0,230,118,.22)}
+.chat-msg.assistant{align-self:flex-start;background:var(--s2)}
+.chat-meta{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--tm);margin-bottom:8px}
+.chat-compose{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+.chat-input{width:100%;min-height:96px;max-height:180px;background:var(--s2);border:1px solid var(--td);color:var(--t);border-radius:16px;padding:12px 14px;font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.5;resize:vertical;outline:none}
+.chat-input:focus{border-color:var(--g)}
+.chat-send{min-width:118px}
+.chat-status{font-size:12px;color:var(--tm);line-height:1.5}
+.chat-status.error{color:#ff8a9b}
 
 /* SESSION */
 #session{display:none;flex-direction:column;height:100%}
@@ -313,11 +377,21 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
 .imp-empty{font-size:12px;color:var(--tm);padding:12px 0}
 
 @media (max-width: 760px){
-  .program-grid,.day-grid,.imp-grid,.imp-day-grid,.imp-ex-grid{grid-template-columns:1fr}
+  .program-grid,.day-grid,.imp-grid,.imp-day-grid,.imp-ex-grid,.progress-grid,.progress-layout{grid-template-columns:1fr}
   .hdr{padding:calc(12px + var(--safe-top)) calc(14px + var(--safe-right)) 12px calc(14px + var(--safe-left))}
   .hdr-logo{max-width:min(52vw,230px)}
   .hdr-actions{gap:6px;flex-wrap:wrap;justify-content:flex-end}
   .hdr-btn{padding:7px 10px}
+  .section-shell{padding:16px 14px 10px}
+  .section-shell-row{gap:10px}
+  .section-dock{padding:7px}
+  .section-tab{padding:11px 6px 10px}
+  .section-tab-label{font-size:11px}
+  .section-action{width:68px;flex-basis:68px}
+  .section-copy h2{font-size:30px}
+  .chat-layout{min-height:auto}
+  .chat-compose{grid-template-columns:1fr}
+  .chat-send{width:100%}
 }
 
 @keyframes pop{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
@@ -336,6 +410,34 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
     <button class="hdr-btn" id="history-btn" onclick="openHist()" style="display:none">Storico</button>
     <button class="hdr-btn" id="importBtn" onclick="triggerPdfImport()">Importa PDF</button>
     <button class="hdr-btn" id="installBtn">Installa</button>
+  </div>
+</div>
+
+<div class="section-shell" id="section-shell">
+  <div class="section-shell-title">La tua app fitness</div>
+  <div class="section-shell-row">
+    <div class="section-dock">
+      <button class="section-tab on" id="section-tab-today" type="button" onclick="setAppSection('today')">
+        <span class="section-tab-ico">O</span>
+        <span class="section-tab-label">Oggi</span>
+      </button>
+      <button class="section-tab" id="section-tab-plans" type="button" onclick="setAppSection('plans')">
+        <span class="section-tab-ico">S</span>
+        <span class="section-tab-label">Schede</span>
+      </button>
+      <button class="section-tab" id="section-tab-progress" type="button" onclick="setAppSection('progress')">
+        <span class="section-tab-ico">P</span>
+        <span class="section-tab-label">Progressi</span>
+      </button>
+      <button class="section-tab" id="section-tab-chat" type="button" onclick="setAppSection('chat')">
+        <span class="section-tab-ico">AI</span>
+        <span class="section-tab-label">Coach</span>
+      </button>
+    </div>
+    <button class="section-action" id="section-import-btn" type="button" onclick="triggerPdfImport()">
+      <span class="section-action-ico">+</span>
+      <span class="section-action-label">Importa</span>
+    </button>
   </div>
 </div>
 
@@ -366,6 +468,58 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t);displa
     <div class="home-sub" style="margin-bottom:20px">Scegli l'allenamento di oggi</div>
     <div class="section-label">I tuoi giorni</div>
     <div class="day-grid" id="day-grid"></div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div id="progress">
+  <div class="section-wrap">
+    <div class="section-hero">
+      <div class="section-copy">
+        <div class="section-badge">Progressi e memoria carichi</div>
+        <h2>Progressi</h2>
+        <p>Monitora la settimana corrente, rivedi lo storico e tieni sempre sotto controllo la progressione dei carichi.</p>
+      </div>
+    </div>
+    <div id="progress-content"></div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div id="coach">
+  <div class="section-wrap">
+    <div class="section-hero">
+      <div class="section-copy">
+        <div class="section-badge">Coach AI interno</div>
+        <h2>Chatbot</h2>
+        <p>Qui prepariamo il coach AI interno dell'app. Da ora puoi gia` scrivere messaggi e poi mi spiegherai come vuoi gestirlo.</p>
+      </div>
+    </div>
+    <div class="chat-layout">
+      <div class="chat-card">
+        <div class="surface-title">Prompt rapidi</div>
+        <div class="chat-suggest">
+          <button type="button" onclick="queueChatPrompt('Riassumi il focus della mia settimana attuale.')">Focus settimana</button>
+          <button type="button" onclick="queueChatPrompt('Dammi 3 consigli pratici per aumentare i carichi in sicurezza.')">Aumentare i carichi</button>
+          <button type="button" onclick="queueChatPrompt('Aiutami a leggere una scheda palestra se il PT la scrive in modo sintetico.')">Leggere la scheda</button>
+          <button type="button" onclick="queueChatPrompt('Che differenza c\\'e tra progressione di carico e progressione di volume?')">Progressione</button>
+        </div>
+      </div>
+      <div class="chat-card">
+        <div class="surface-title">Conversazione</div>
+        <div class="chat-thread" id="chat-thread"></div>
+      </div>
+      <div class="chat-card">
+        <div class="chat-compose">
+          <textarea id="chat-input" class="chat-input" placeholder="Scrivi qui la tua domanda al coach AI..."></textarea>
+          <button class="t-btn chat-send" id="chat-send-btn" type="button" onclick="sendChatMessage()">Invia</button>
+        </div>
+        <div class="action-row">
+          <button class="hdr-btn" type="button" onclick="clearChatMessages()">Pulisci chat</button>
+        </div>
+        <div class="chat-status" id="chat-status">Chat pronta. Usera` lo stesso backend OpenAI dell'import PDF.</div>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -768,6 +922,7 @@ const PROGRAMS_URL = './programs.json';
 const IMPORT_API_BASE_URL = String(window.MASSI_CONFIG?.importApiBaseUrl || '').replace(/\/$/, '');
 const USER_PROGRAMS_KEY = 'massi_user_programs';
 const PROGRAM_STATE_PREFIX = 'massi_state_';
+const CHAT_STORAGE_KEY = 'massi_chat_messages_v1';
 const SHOW_BUNDLED_PROGRAMS = false;
 let PROGRAMS = [];
 let bundledPrograms = [];
@@ -776,12 +931,14 @@ let currentProgramIndex = -1;
 let currentDay = null;
 let currentWeek = 1;
 let currentTab = 'list';
+let currentSection = 'plans';
 let focusIdx = 0;
 let programStateCache = {};
 let deferredPrompt = null;
 let importDraft = null;
 let importMeta = null;
 let importBusy = false;
+let chatBusy = false;
 // Timer state
 let timerInterval = null;
 let timerTotal = 90;
@@ -836,6 +993,14 @@ function slugify(value) {
 
 function cloneValue(value) {
   return JSON.parse(JSON.stringify(value));
+}
+
+function buildApiUrl(path) {
+  return (IMPORT_API_BASE_URL || '') + path;
+}
+
+function getChatEndpoint() {
+  return buildApiUrl('/api/chat');
 }
 
 function normalizePrograms(programs, sourceFallback = 'bundled') {
@@ -1116,17 +1281,33 @@ function isWeekComplete(weekNumber = currentWeek) {
 }
 
 function canAdvanceToWeek(weekNumber = currentWeek) {
-  const configuredWeeks = parseConfiguredWeeks();
-  return !configuredWeeks || weekNumber < configuredWeeks;
+  return getDays().length > 0 && Math.max(1, parseInt(weekNumber, 10) || 1) >= 1;
 }
 
 function getVisibleWeekNumbers() {
   const existingMax = getHighestWeekNumber();
   const unlockedMax = existingMax + (isWeekComplete(existingMax) && canAdvanceToWeek(existingMax) ? 1 : 0);
   let limit = Math.max(existingMax, unlockedMax, currentWeek);
-  const configuredWeeks = parseConfiguredWeeks();
-  if (configuredWeeks) limit = Math.min(limit, configuredWeeks);
   return Array.from({ length: Math.max(1, limit) }, (_, index) => index + 1);
+}
+
+function getWeekHeadingLabel(weekNumber = currentWeek) {
+  const configuredWeeks = parseConfiguredWeeks();
+  if (configuredWeeks && weekNumber <= configuredWeeks) {
+    return 'Settimana ' + weekNumber + ' di ' + configuredWeeks;
+  }
+  if (configuredWeeks && weekNumber > configuredWeeks) {
+    return 'Settimana ' + weekNumber + ' · oltre il ciclo iniziale di ' + configuredWeeks;
+  }
+  return 'Settimana ' + weekNumber;
+}
+
+function getWeekCompactLabel(weekNumber = currentWeek) {
+  const configuredWeeks = parseConfiguredWeeks();
+  if (configuredWeeks && weekNumber <= configuredWeeks) {
+    return 'Settimana ' + weekNumber + '/' + configuredWeeks;
+  }
+  return 'Settimana ' + weekNumber;
 }
 
 function setCurrentWeek(weekNumber, options = {}) {
@@ -1309,6 +1490,272 @@ function setDayDone(di, value) {
   } catch(e) {}
 }
 
+function getCompletedWeeksCount(program = currentProgram) {
+  if (!program) return 0;
+  try {
+    const state = readProgramState(program.id);
+    return Object.keys(state.weeks || {}).map((value) => parseInt(value, 10)).filter((weekNumber) => weekNumber > 0 && isWeekComplete(weekNumber)).length;
+  } catch (error) {
+    return 0;
+  }
+}
+
+function getCurrentProgramHistoryPreview(limit = 4) {
+  return getHistory().slice(0, limit);
+}
+
+function renderSectionNav() {
+  ['today', 'plans', 'progress', 'chat'].forEach((section) => {
+    const button = document.getElementById('section-tab-' + section);
+    if (!button) return;
+    button.classList.toggle('on', currentSection === section);
+  });
+}
+
+function setSectionShellVisible(visible) {
+  document.getElementById('section-shell').style.display = visible ? 'block' : 'none';
+}
+
+function renderProgressSection() {
+  const container = document.getElementById('progress-content');
+  if (!container) return;
+
+  if (!currentProgram) {
+    container.innerHTML = `
+      <div class="empty-pane">
+        <h3>Nessuna scheda attiva</h3>
+        <p>Seleziona o importa una scheda per vedere progressi, report settimana e storico allenamenti in questa sezione.</p>
+        <button class="hdr-btn" type="button" onclick="setAppSection('plans')">Vai alle schede</button>
+      </div>`;
+    return;
+  }
+
+  const stats = getProgramStats(currentProgram);
+  const completedDays = getCompletedDaysCount(currentWeek);
+  const completedWeeks = getCompletedWeeksCount(currentProgram);
+  const reportReady = getCurrentWeekState()?.report;
+  const historyPreview = getCurrentProgramHistoryPreview(4);
+
+  container.innerHTML = `
+    <div class="progress-grid">
+      <div class="metric-card">
+        <div class="metric-label">Settimana attiva</div>
+        <div class="metric-value">W${currentWeek}</div>
+        <div class="metric-sub">${escapeHtml(getWeekHeadingLabel(currentWeek))}</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Giorni completati</div>
+        <div class="metric-value">${completedDays}/${getDays().length}</div>
+        <div class="metric-sub">Allenamenti chiusi nella settimana corrente.</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label">Sessioni salvate</div>
+        <div class="metric-value">${stats.hist}</div>
+        <div class="metric-sub">${completedWeeks} settimane completate e archiviate per questa scheda.</div>
+      </div>
+    </div>
+    <div class="progress-layout">
+      <div class="surface-card">
+        <div class="surface-title">Scheda attiva</div>
+        <div class="surface-stack">
+          <div class="mini-row">
+            <div class="mini-copy">
+              <strong>${escapeHtml(currentProgram.title)}</strong>
+              <span>${escapeHtml(currentProgram.subtitle || 'Scheda allenamento')}</span>
+            </div>
+            <span class="mini-pill">${escapeHtml(currentProgram.weeks || 'ciclo libero')}</span>
+          </div>
+          <div class="mini-row">
+            <div class="mini-copy">
+              <strong>Memoria carichi attiva</strong>
+              <span>Ogni nuova settimana parte dai pesi salvati nella precedente, anche oltre la durata iniziale della scheda.</span>
+            </div>
+            <span class="mini-pill">W${currentWeek}</span>
+          </div>
+          <div class="mini-row">
+            <div class="mini-copy">
+              <strong>Report settimana</strong>
+              <span>${reportReady ? 'Il report della settimana corrente e` pronto da aprire.' : 'Completa tutti i giorni della settimana per generare il report.'}</span>
+            </div>
+            <span class="mini-pill">${reportReady ? 'Pronto' : 'In attesa'}</span>
+          </div>
+        </div>
+        <div class="action-row">
+          <button class="hdr-btn" type="button" onclick="setAppSection('today')">Apri settimana</button>
+          <button class="hdr-btn" type="button" onclick="openHist()">Apri storico</button>
+          ${reportReady ? '<button class="hdr-btn" type="button" onclick="openWeekReport(currentWeek)">Report settimana</button>' : ''}
+        </div>
+      </div>
+      <div class="surface-card">
+        <div class="surface-title">Ultime sessioni</div>
+        ${historyPreview.length ? `
+          <div class="surface-stack">
+            ${historyPreview.map((entry) => `
+              <div class="mini-row">
+                <div class="mini-copy">
+                  <strong>${escapeHtml(entry.day)}</strong>
+                  <span>${escapeHtml(entry.date)}</span>
+                </div>
+                <span class="mini-pill">${entry.week ? 'W' + entry.week : 'Sessione'}</span>
+              </div>`).join('')}
+          </div>` : '<div class="surface-empty">Nessuna sessione salvata ancora. Quando termini un allenamento, qui vedrai i riferimenti piu` recenti.</div>'}
+      </div>
+    </div>`;
+}
+
+function getChatMessages() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(CHAT_STORAGE_KEY) || '[]');
+    return Array.isArray(parsed) ? parsed.filter((message) => ['user', 'assistant'].includes(message?.role) && cleanText(message?.content || '')).map((message) => ({
+      role: message.role,
+      content: cleanText(message.content),
+      createdAt: cleanText(message.createdAt || '')
+    })) : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveChatMessages(messages) {
+  try {
+    localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages.slice(-30)));
+  } catch (error) {
+    console.error('Errore salvataggio chat', error);
+  }
+}
+
+function setChatStatus(message, tone = '') {
+  const el = document.getElementById('chat-status');
+  if (!el) return;
+  el.textContent = message;
+  el.className = 'chat-status' + (tone ? ' ' + tone : '');
+}
+
+function renderChatThread() {
+  const thread = document.getElementById('chat-thread');
+  if (!thread) return;
+  const messages = getChatMessages();
+  if (!messages.length) {
+    thread.innerHTML = '<div class="chat-empty">Il coach AI e` pronto. Usera` il backend OpenAI dell\'app e potra` anche leggere il contesto della scheda attiva.</div>';
+    return;
+  }
+  thread.innerHTML = messages.map((message) => `
+    <div class="chat-msg ${escapeHtml(message.role)}">
+      <div class="chat-meta">${message.role === 'user' ? 'Tu' : 'Coach AI'}</div>
+      ${escapeHtml(message.content)}
+    </div>`).join('');
+  thread.scrollTop = thread.scrollHeight;
+}
+
+function buildChatContext() {
+  if (!currentProgram) return null;
+  return {
+    programTitle: currentProgram.title,
+    programSubtitle: currentProgram.subtitle || '',
+    currentWeek,
+    weeksLabel: currentProgram.weeks || '',
+    completedDays: getCompletedDaysCount(currentWeek),
+    totalDays: getDays().length,
+    dayLabels: getDays().map((day) => cleanText(day.label || day.name)).filter(Boolean)
+  };
+}
+
+function queueChatPrompt(text) {
+  const input = document.getElementById('chat-input');
+  if (!input) return;
+  input.value = text;
+  input.focus();
+}
+
+async function sendChatMessage() {
+  if (chatBusy) return;
+  const input = document.getElementById('chat-input');
+  const sendBtn = document.getElementById('chat-send-btn');
+  const content = cleanText(input?.value || '');
+  if (!content) {
+    setChatStatus('Scrivi prima un messaggio per il coach AI.', 'error');
+    return;
+  }
+  if (window.location.protocol === 'file:' && !IMPORT_API_BASE_URL) {
+    setChatStatus('La chat funziona nella versione pubblicata dell\'app o con il server locale attivo.', 'error');
+    return;
+  }
+  if (!navigator.onLine) {
+    setChatStatus('Serve connessione internet per parlare con il coach AI.', 'error');
+    return;
+  }
+
+  const messages = getChatMessages();
+  messages.push({ role: 'user', content, createdAt: new Date().toISOString() });
+  saveChatMessages(messages);
+  renderChatThread();
+  input.value = '';
+  chatBusy = true;
+  if (sendBtn) sendBtn.disabled = true;
+  setChatStatus('Il coach AI sta rispondendo...', '');
+
+  try {
+    const response = await fetch(getChatEndpoint(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: messages.slice(-12),
+        context: buildChatContext()
+      })
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || 'Chat non disponibile in questo momento.');
+
+    messages.push({
+      role: 'assistant',
+      content: cleanText(payload.reply || 'Non sono riuscito a generare una risposta utile.'),
+      createdAt: new Date().toISOString()
+    });
+    saveChatMessages(messages);
+    renderChatThread();
+    setChatStatus('Risposta ricevuta. Puoi continuare la conversazione.', '');
+  } catch (error) {
+    console.error('Errore chat coach', error);
+    setChatStatus(error.message || 'Chat non disponibile in questo momento.', 'error');
+  } finally {
+    chatBusy = false;
+    if (sendBtn) sendBtn.disabled = false;
+  }
+}
+
+function clearChatMessages() {
+  if (!confirm('Cancellare tutta la conversazione del coach AI?')) return;
+  try { localStorage.removeItem(CHAT_STORAGE_KEY); } catch (error) {}
+  renderChatThread();
+  setChatStatus('Conversazione pulita. Il coach AI e` pronto per un nuovo contesto.', '');
+}
+
+function setAppSection(section) {
+  currentSection = section;
+  const sectionMap = {
+    today: 'home',
+    plans: 'programs',
+    progress: 'progress',
+    chat: 'coach'
+  };
+  Object.entries(sectionMap).forEach(([key, id]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = key === section ? 'block' : 'none';
+  });
+  document.getElementById('session').style.display = 'none';
+  document.getElementById('fab').classList.remove('show');
+  document.getElementById('btn-finish').classList.remove('show');
+  currentDay = null;
+  stopTimer(); stopChrono(); stopNeg();
+  renderSectionNav();
+  if (section === 'today') renderHome();
+  if (section === 'plans') renderPrograms();
+  if (section === 'progress') renderProgressSection();
+  if (section === 'chat') renderChatThread();
+  updateHeader();
+}
+
 function syncHeaderBalance() {
   const spacer = document.getElementById('hdr-spacer');
   const actions = document.querySelector('.hdr-actions');
@@ -1319,13 +1766,17 @@ function syncHeaderBalance() {
 function updateHeader() {
   const historyBtn = document.getElementById('history-btn');
   const importBtn = document.getElementById('importBtn');
-  importBtn.style.display = currentDay === null ? 'inline-block' : 'none';
-  if (!currentProgram) {
+  const sectionImportBtn = document.getElementById('section-import-btn');
+  const isSession = currentDay !== null;
+  setSectionShellVisible(!isSession);
+  importBtn.style.display = 'none';
+  if (sectionImportBtn) sectionImportBtn.style.display = !isSession ? 'flex' : 'none';
+  if (!currentProgram || isSession || currentSection === 'chat') {
     historyBtn.style.display = 'none';
     syncHeaderBalance();
     return;
   }
-  historyBtn.style.display = 'inline-block';
+  historyBtn.style.display = currentSection === 'progress' || currentSection === 'today' ? 'inline-block' : 'none';
   syncHeaderBalance();
 }
 
@@ -1351,7 +1802,7 @@ function renderPrograms() {
   PROGRAMS.forEach((program, i) => {
     const stats = getProgramStats(program);
     const card = document.createElement('div');
-    card.className = 'program-card pop';
+    card.className = 'program-card pop' + (currentProgram && currentProgram.id === program.id ? ' active' : '');
     card.style.animationDelay = (i * 0.05) + 's';
     card.innerHTML = `
       <div class="program-card-top">
@@ -1360,7 +1811,7 @@ function renderPrograms() {
           <p>${escapeHtml(program.subtitle || 'Scheda allenamento')}</p>
         </div>
         <div class="program-card-actions">
-          ${program.source === 'imported' ? '<span class="program-pill">Importata</span><button class="program-delete" type="button">Elimina</button>' : ''}
+          ${(currentProgram && currentProgram.id === program.id ? '<span class="program-pill">Attiva</span>' : '') + (program.source === 'imported' ? '<button class="program-delete" type="button">Elimina</button>' : '')}
         </div>
       </div>
       <div class="program-meta">
@@ -1383,19 +1834,8 @@ function renderPrograms() {
 }
 
 function showPrograms() {
-  currentProgram = null;
-  currentProgramIndex = -1;
-  currentDay = null;
-  currentWeek = 1;
   closeWeekReport();
-  document.getElementById('programs').style.display = 'block';
-  document.getElementById('home').style.display = 'none';
-  document.getElementById('session').style.display = 'none';
-  document.getElementById('fab').classList.remove('show');
-  document.getElementById('btn-finish').classList.remove('show');
-  stopTimer(); stopChrono(); stopNeg();
-  renderPrograms();
-  updateHeader();
+  setAppSection('plans');
 }
 
 function openProgram(index) {
@@ -1405,11 +1845,7 @@ function openProgram(index) {
   focusIdx = 0;
   currentWeek = currentProgram ? Math.max(1, parseInt(readProgramState(currentProgram.id).currentWeek, 10) || 1) : 1;
   ensureWeekState(currentWeek);
-  document.getElementById('programs').style.display = 'none';
-  document.getElementById('home').style.display = 'block';
-  document.getElementById('session').style.display = 'none';
-  updateHeader();
-  renderHome();
+  setAppSection('today');
 }
 
 async function loadPrograms() {
@@ -1434,6 +1870,11 @@ async function loadPrograms() {
   }
   mergePrograms();
   renderPrograms();
+  if (!currentProgram && currentSection === 'today') currentSection = 'plans';
+  if (currentSection === 'today') renderHome();
+  if (currentSection === 'progress') renderProgressSection();
+  if (currentSection === 'chat') renderChatThread();
+  renderSectionNav();
   updateHeader();
 }
 
@@ -1477,14 +1918,21 @@ function renderHome() {
   actions.innerHTML = '';
   if (!currentProgram) {
     weekPanel.innerHTML = '';
+    grid.innerHTML = `
+      <div class="empty-pane" style="grid-column:1/-1">
+        <h3>Nessuna scheda attiva</h3>
+        <p>Importa il PDF del PT oppure apri una delle tue schede per trasformare questa sezione nella tua dashboard giornaliera.</p>
+        <button class="hdr-btn" type="button" onclick="setAppSection('plans')">Vai alle schede</button>
+      </div>`;
+    actions.innerHTML = '';
+    return;
   } else {
     ensureWeekState(currentWeek);
-    const configuredWeeks = parseConfiguredWeeks();
     const selectedWeekState = getCurrentWeekState();
     const completedDays = getCompletedDaysCount(currentWeek);
     const visibleWeeks = getVisibleWeekNumbers();
     const existingWeeks = new Set(getExistingWeekNumbers());
-    const selectedStatus = 'Settimana ' + currentWeek + (configuredWeeks ? ' di ' + configuredWeeks : '') + ' · ' + completedDays + '/' + days.length + ' giorni completati';
+    const selectedStatus = getWeekHeadingLabel(currentWeek) + ' · ' + completedDays + '/' + days.length + ' giorni completati';
     weekPanel.innerHTML = `
       <div class="week-top">
         <div>
@@ -1512,7 +1960,7 @@ function renderHome() {
         }).join('')}
       </div>
       <div class="week-help">
-        Completa tutti i giorni della settimana per sbloccare la successiva. Quando apri una nuova settimana, i pesi dell'ultima restano salvati e vengono precaricati automaticamente.
+        Completa tutti i giorni della settimana per sbloccare la successiva. Puoi continuare anche oltre la durata iniziale della scheda: ogni nuova settimana parte con i pesi salvati nella precedente.
       </div>`;
     if (selectedWeekState.report) {
       const reportBtn = document.createElement('button');
@@ -1557,23 +2005,17 @@ function startSession(di) {
   document.getElementById('home').style.display = 'none';
   document.getElementById('session').style.display = 'block';
   document.getElementById('sess-title').textContent = days[di].name + ' - ' + (days[di].label || '');
-  document.getElementById('sess-info').textContent = 'Settimana ' + currentWeek + (parseConfiguredWeeks() ? '/' + parseConfiguredWeeks() : '') + ' · ' + days[di].exercises.length + ' esercizi · Recupero 60-120s';
+  document.getElementById('sess-info').textContent = getWeekCompactLabel(currentWeek) + ' · ' + days[di].exercises.length + ' esercizi · Recupero 60-120s';
   document.getElementById('fab').classList.add('show');
   document.getElementById('btn-finish').classList.add('show');
   switchTab('list');
   updateProgress(di);
+  updateHeader();
 }
 
 function goHome() {
   currentDay = null;
-  document.getElementById('programs').style.display = 'none';
-  document.getElementById('home').style.display = 'block';
-  document.getElementById('session').style.display = 'none';
-  document.getElementById('fab').classList.remove('show');
-  document.getElementById('btn-finish').classList.remove('show');
-  stopTimer(); stopChrono(); stopNeg();
-  renderHome();
-  updateHeader();
+  setAppSection('today');
 }
 
 function updateProgress(di) {
@@ -2008,12 +2450,13 @@ function clearHist() {
     closeWeekReport();
     renderHome();
     renderPrograms();
+    renderProgressSection();
   }
 }
 
 // IMPORT PDF
 function getImportEndpoint() {
-  return (IMPORT_API_BASE_URL || '') + '/api/import-pdf';
+  return buildApiUrl('/api/import-pdf');
 }
 
 function openImportModal() {
@@ -2358,18 +2801,30 @@ function deleteImportedProgram(programId) {
   const isCurrent = currentProgram && currentProgram.id === programId;
   mergePrograms();
   if (isCurrent) {
+    currentProgram = null;
+    currentProgramIndex = -1;
+    currentWeek = 1;
     showPrograms();
     return;
   }
   renderPrograms();
-  if (document.getElementById('home').style.display !== 'none' && currentProgram) renderHome();
+  if (currentSection === 'today') renderHome();
+  if (currentSection === 'progress') renderProgressSection();
   updateHeader();
 }
 
 // INIT
 initPwa();
 document.getElementById('pdf-file-input').addEventListener('change', handlePdfInputChange);
-showPrograms();
+document.getElementById('chat-input').addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    sendChatMessage();
+  }
+});
+renderSectionNav();
+renderChatThread();
+setAppSection('plans');
 loadPrograms();
 </script>
 </body>
