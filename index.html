@@ -56,7 +56,10 @@ body{font-family:'DM Sans',sans-serif;background:
   display:flex;justify-content:center;pointer-events:none;
   transition:opacity .26s ease,transform .26s ease
 }
-.section-shell.hidden{opacity:0;transform:translateY(24px);pointer-events:none}
+.section-shell.hidden{opacity:0;transform:translateY(24px);pointer-events:none;visibility:hidden}
+.section-shell.hidden .section-shell-row,
+.section-shell.hidden .section-dock,
+.section-shell.hidden .section-tab{pointer-events:none !important}
 .section-shell-row{width:100%;max-width:720px;display:flex;align-items:center;justify-content:center;pointer-events:auto}
 .section-dock{
   width:100%;display:flex;align-items:center;gap:8px;padding:9px 10px;
@@ -1648,6 +1651,8 @@ function setSectionShellVisible(visible) {
   const safeFill = document.querySelector('.bottom-safe-fill');
   if (!shell) return;
   shell.classList.toggle('hidden', !visible);
+  shell.inert = !visible;
+  shell.setAttribute('aria-hidden', visible ? 'false' : 'true');
   if (safeFill) safeFill.classList.toggle('hidden', !visible);
 }
 
