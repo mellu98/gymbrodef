@@ -227,6 +227,32 @@ function normalizeChatMessages(rawMessages) {
     .slice(-12);
 }
 
+function extractResponseText(response) {
+  const direct = cleanString(response?.output_text || '');
+  if (direct) return direct;
+
+  const chunks = [];
+  (Array.isArray(response?.output) ? response.output : []).forEach((item) => {
+    if (item?.type !== 'message' || !Array.isArray(item.content)) return;
+    item.content.forEach((part) => {
+      if (part?.type === 'output_text') {
+        const value = typeof part.text === 'string' ? part.text : part?.text?.value;
+        if (typeof value === 'string') chunks.push(value);
+      }
+      if (part?.type === 'text') {
+        const value = typeof part.text === 'string' ? part.text : part?.text?.value;
+        if (typeof value === 'string') chunks.push(value);
+      }
+      if (part?.type === 'refusal') {
+        const value = typeof part.refusal === 'string' ? part.refusal : part?.text;
+        if (typeof value === 'string') chunks.push(value);
+      }
+    });
+  });
+
+  return cleanString(chunks.join('\n').trim());
+}
+
 function buildChatContextText(context) {
   if (!context || typeof context !== 'object') return '';
   const lines = [];
@@ -731,20 +757,32 @@ async function createCoachReply(messages, context) {
     });
   });
 
-  const response = await client.responses.create({
-    model: OPENAI_ASSISTANT_MODEL,
-    input,
-    max_output_tokens: 260
-  });
+  const modelsToTry = Array.from(new Set([
+    OPENAI_ASSISTANT_MODEL,
+    'gpt-4.1-mini'
+  ].filter(Boolean)));
 
-  const reply = cleanString(response.output_text || '');
-  if (!reply) {
-    const error = new Error('Risposta assistente vuota.');
-    error.statusCode = 502;
-    throw error;
+  for (const model of modelsToTry) {
+    const response = await client.responses.create({
+      model,
+      input,
+      max_output_tokens: 260
+    });
+
+    const reply = extractResponseText(response);
+    if (reply) {
+      return { reply, model };
+    }
+
+    console.warn('Assistant returned empty text, trying fallback if available.', {
+      model,
+      outputTypes: (Array.isArray(response?.output) ? response.output : []).map((item) => item?.type).filter(Boolean)
+    });
   }
 
-  return reply;
+  const error = new Error('Risposta assistente vuota.');
+  error.statusCode = 502;
+  throw error;
 }
 
 async function generateAiProgram(profileInput, contextInput, answersInput) {
@@ -863,10 +901,10 @@ app.post('/api/import-pdf', upload.single('file'), async (req, res) => {
 
 app.post('/api/chat', async (req, res) => {
   try {
-    const reply = await createCoachReply(req.body?.messages, req.body?.context);
+    const chat = await createCoachReply(req.body?.messages, req.body?.context);
     res.json({
-      reply,
-      model: OPENAI_ASSISTANT_MODEL
+      reply: chat.reply,
+      model: chat.model
     });
   } catch (error) {
     console.error('Chat error:', error);
