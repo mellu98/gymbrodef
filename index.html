@@ -2412,13 +2412,16 @@ function renderPrograms() {
   const label = document.getElementById('programs-label');
   grid.innerHTML = '';
   if (!PROGRAMS.length) {
-    subtitle.textContent = 'Importa il PDF del PT per vedere qui la tua prima scheda.';
+    subtitle.textContent = 'Importa il PDF del PT oppure crea una nuova scheda con il Coach AI.';
     label.textContent = 'Nessuna scheda ancora';
     grid.innerHTML = `
       <div class="program-card program-empty">
         <h3>Nessuna scheda ancora</h3>
-        <p>Questa schermata resta vuota finche' non importi il PDF del personal trainer.</p>
-        <button class="hdr-btn" type="button" onclick="triggerPdfImport()">Importa PDF del PT</button>
+        <p>Puoi iniziare importando il PDF del personal trainer oppure lasciare che il Coach AI ti prepari una nuova bozza da personalizzare.</p>
+        <div class="action-row" style="justify-content:center">
+          <button class="hdr-btn" type="button" onclick="triggerPdfImport()">Importa PDF del PT</button>
+          <button class="hdr-btn" type="button" onclick="setAppSection('chat')">Crea con Coach AI</button>
+        </div>
       </div>
     `;
     return;
