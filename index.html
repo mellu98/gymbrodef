@@ -353,6 +353,24 @@ body{font-family:'DM Sans',sans-serif;background:
 .fc-meta{font-size:13px;color:var(--tm);margin-top:6px}
 .fc-demo-btn{flex:0 0 auto;min-width:88px}
 .fc-note{background:rgba(255,193,7,.07);border-left:2px solid var(--amber);padding:10px 12px;border-radius:6px;margin:14px 0;font-size:12px;color:var(--amber);line-height:1.5}
+.fc-next{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,.01));
+  border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:14px 15px;margin:14px 0 12px
+}
+.fc-next-copy{min-width:0}
+.fc-next-kicker{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--g);margin-bottom:6px}
+.fc-next-name{font-size:14px;font-weight:700;line-height:1.35}
+.fc-next-meta{font-size:11px;color:var(--tm);line-height:1.6;margin-top:4px}
+.fc-next-btn{
+  flex:0 0 auto;background:rgba(0,230,118,.08);border:1px solid rgba(0,230,118,.18);color:var(--g);
+  border-radius:12px;padding:10px 12px;font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+  font-family:'DM Sans',sans-serif;transition:all .2s
+}
+.fc-next-btn:hover{background:rgba(0,230,118,.12);border-color:rgba(0,230,118,.32)}
+.fc-next.last{border-color:rgba(255,255,255,.12)}
+.fc-next.last .fc-next-kicker{color:var(--amber)}
+.fc-next.last .fc-next-btn{display:none}
 .fc-series-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin-bottom:8px}
 .fc-serie-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #161616}
 .fc-serie-row:last-child{border-bottom:none}
@@ -2732,6 +2750,7 @@ function renderFocusView(di, ei) {
   const days = getDays();
   focusIdx = ei;
   const ex = days[di].exercises[ei];
+  const nextExercise = days[di].exercises[ei + 1] || null;
   const sd = getSD(di, ei);
   document.getElementById('fnav-ctr').textContent = (ei+1) + ' / ' + days[di].exercises.length;
   document.getElementById('fnav-prev').disabled = ei === 0;
@@ -2756,6 +2775,23 @@ function renderFocusView(di, ei) {
       </div>`;
   }
 
+  const nextHtml = nextExercise ? `
+    <div class="fc-next">
+      <div class="fc-next-copy">
+        <div class="fc-next-kicker">Subito dopo</div>
+        <div class="fc-next-name">${escapeHtml(nextExercise.name)}</div>
+        <div class="fc-next-meta">Esercizio ${ei + 2} di ${days[di].exercises.length} · ${escapeHtml(nextExercise.series)} serie · ${escapeHtml(nextExercise.reps)} reps</div>
+      </div>
+      <button class="fc-next-btn" type="button" onclick="focusNav(1)">Vai</button>
+    </div>` : `
+    <div class="fc-next last">
+      <div class="fc-next-copy">
+        <div class="fc-next-kicker">Finale seduta</div>
+        <div class="fc-next-name">Ultimo esercizio del giorno</div>
+        <div class="fc-next-meta">Dopo questo puoi chiudere la sessione oppure tornare alla lista per controllare il riepilogo.</div>
+      </div>
+    </div>`;
+
   document.getElementById('focus-card').innerHTML = `
     <div class="focus-top">
       <div class="fc-head">
@@ -2765,6 +2801,7 @@ function renderFocusView(di, ei) {
       <button class="hdr-btn fc-demo-btn" type="button" onclick="openExerciseDemo(${di},${ei})">DEMO</button>
     </div>
     ${ex.note ? `<div class="fc-note">${ex.note}</div>` : ''}
+    ${nextHtml}
     <div class="chrono-row">
       <span class="chrono-lbl">Cronometro serie:</span>
       <span class="chrono-disp" id="chrono-disp">${String(Math.floor(chronoSecs/60)).padStart(2,'0')}:${String(chronoSecs%60).padStart(2,'0')}</span>
