@@ -37,13 +37,15 @@ Endpoint:
 - POST /api/chat -> mini assistente AI rapido, contestuale alla schermata corrente
 - POST /api/ai/intake -> legge profilo + contesto e restituisce solo le domande mancanti per creare una nuova scheda
 - POST /api/ai/generate-program -> genera una scheda JSON compatibile con l'app partendo da profilo, storico e risposte finali
+- POST /api/ai/refine-program -> modifica una bozza Coach AI esistente in base a richieste testuali dell'utente
 - GET /healthz -> healthcheck semplice
 
 Coach AI fase 1:
 - Il tab Coach non e` una chat libera: e` un wizard PT AI
 - Il profilo utente viene salvato in localStorage con chiave massi_user_profile
 - Il Coach AI legge scheda attiva, settimane, storico e progressi recenti
-- La bozza generata viene aperta nello stesso editor/review usato per l'import PDF
+- La bozza generata resta prima nel tab Coach, dove puo' essere rifinita via chat
+- Quando la bozza convince, si apre nello stesso editor/review usato per l'import PDF
 - Le schede salvate dal Coach AI restano schede utente normali con origin = ai
 
 Assistente AI flottante:

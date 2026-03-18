@@ -386,6 +386,37 @@ body{font-family:'DM Sans',sans-serif;background:
   margin-top:12px;background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.16);
   border-radius:14px;padding:12px 14px;font-size:12px;line-height:1.6;color:var(--t)
 }
+.coach-refine-note{font-size:12px;color:var(--tm);line-height:1.7;margin-bottom:12px}
+.coach-refine-thread{
+  display:flex;flex-direction:column;gap:10px;min-height:180px;max-height:320px;overflow-y:auto;
+  padding:2px 2px 2px 0
+}
+.coach-refine-empty{
+  background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.10);border-radius:16px;
+  padding:16px 14px;text-align:center;font-size:12px;line-height:1.75;color:var(--tm)
+}
+.coach-refine-msg{
+  max-width:92%;padding:12px 14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);
+  font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word
+}
+.coach-refine-msg.user{
+  align-self:flex-end;background:linear-gradient(180deg,rgba(0,230,118,.14),rgba(0,200,83,.08));
+  border-color:rgba(0,230,118,.18)
+}
+.coach-refine-msg.assistant{
+  align-self:flex-start;background:rgba(255,255,255,.03)
+}
+.coach-refine-msg.typing{
+  align-self:flex-start;color:var(--tm);background:rgba(255,255,255,.02);border-style:dashed
+}
+.coach-refine-compose{margin-top:14px}
+.coach-refine-compose textarea{
+  width:100%;min-height:88px;background:var(--s2);border:1px solid var(--td);color:var(--t);border-radius:14px;
+  padding:12px 13px;font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:vertical;outline:none
+}
+.coach-refine-compose textarea:focus{border-color:var(--g)}
+.coach-refine-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.coach-refine-actions .hdr-btn[disabled]{opacity:.5;cursor:not-allowed}
 
 /* SESSION */
 #session{display:none;flex-direction:column;height:100%}
@@ -1195,7 +1226,8 @@ let aiCoachState = {
   rationale: [],
   warnings: [],
   confidence: 0,
-  draftProgram: null
+  draftProgram: null,
+  refineMessages: []
 };
 // Timer state
 let timerInterval = null;
@@ -1263,6 +1295,10 @@ function getAiIntakeEndpoint() {
 
 function getAiGenerateEndpoint() {
   return buildApiUrl('/api/ai/generate-program');
+}
+
+function getAiRefineEndpoint() {
+  return buildApiUrl('/api/ai/refine-program');
 }
 
 function getChatEndpoint() {
@@ -2382,6 +2418,96 @@ function collectAiAnswers() {
   return answers;
 }
 
+function createCoachRefineSeedMessage() {
+  return {
+    role: 'assistant',
+    content: 'Bozza pronta. Dimmi cosa vuoi cambiare e aggiornero` direttamente la scheda, per esempio: piu` focus petto, meno volume spalle, esercizi diversi o sedute piu` corte.'
+  };
+}
+
+function renderCoachRefineMessages() {
+  if (!Array.isArray(aiCoachState.refineMessages) || !aiCoachState.refineMessages.length) {
+    return `
+      <div class="coach-refine-empty">
+        Qui puoi rifinire la bozza in linguaggio naturale prima di aprire l'editor finale e salvarla.
+      </div>`;
+  }
+
+  return aiCoachState.refineMessages.map((message) => `
+    <div class="coach-refine-msg ${message.role === 'assistant' ? 'assistant' : 'user'}">${escapeHtml(message.content)}</div>
+  `).join('') + (aiCoachState.busy && aiCoachState.phase === 'refining' ? '<div class="coach-refine-msg typing">Sto aggiornando la bozza...</div>' : '');
+}
+
+function resetCoachRefinementChat() {
+  if (aiCoachState.busy || !aiCoachState.draftProgram) return;
+  aiCoachState.refineMessages = [createCoachRefineSeedMessage()];
+  aiCoachState.error = '';
+  aiCoachState.status = 'Chat bozza azzerata. Puoi chiedere una nuova modifica.';
+  renderCoachSection();
+}
+
+async function sendCoachRefinement() {
+  if (aiCoachState.busy || !aiCoachState.draftProgram) return;
+  if (!ensureCoachAiAvailable()) return;
+
+  const promptEl = document.getElementById('coach-refine-input');
+  const requestText = cleanText(promptEl?.value || '');
+  if (!requestText) {
+    aiCoachState.error = 'Scrivi prima cosa vuoi cambiare nella bozza.';
+    aiCoachState.status = '';
+    renderCoachSection();
+    return;
+  }
+
+  const profile = saveCoachProfileFromForm(true);
+  const context = buildAiContext();
+  aiCoachState.refineMessages = Array.isArray(aiCoachState.refineMessages) ? aiCoachState.refineMessages.slice(-8) : [];
+  aiCoachState.refineMessages.push({ role: 'user', content: requestText });
+  aiCoachState.busy = true;
+  aiCoachState.phase = 'refining';
+  aiCoachState.error = '';
+  aiCoachState.status = 'Sto aggiornando la bozza in base alla tua richiesta.';
+  renderCoachSection();
+
+  try {
+    const response = await fetch(getAiRefineEndpoint(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        profile,
+        context,
+        candidateProgram: aiCoachState.draftProgram,
+        messages: aiCoachState.refineMessages.slice(0, -1).slice(-7),
+        request: requestText
+      })
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(payload.error || 'Rifinitura bozza non disponibile in questo momento.');
+    }
+
+    aiCoachState.draftProgram = cloneValue(payload.candidateProgram || null);
+    aiCoachState.rationale = Array.isArray(payload.rationale) ? payload.rationale.map(cleanText).filter(Boolean) : [];
+    aiCoachState.warnings = Array.isArray(payload.warnings) ? payload.warnings.map(cleanText).filter(Boolean) : [];
+    aiCoachState.confidence = Math.max(0, Math.min(1, Number(payload.confidence) || 0));
+    aiCoachState.refineMessages.push({
+      role: 'assistant',
+      content: cleanText(payload.summary || 'Bozza aggiornata. Controlla se ora rispecchia meglio quello che vuoi.')
+    });
+    aiCoachState.refineMessages = aiCoachState.refineMessages.slice(-10);
+    aiCoachState.status = 'Bozza aggiornata. Se ti convince, apri l\'editor e salvala.';
+    aiCoachState.error = '';
+  } catch (error) {
+    console.error('Errore rifinitura Coach AI', error);
+    aiCoachState.error = error.message || 'Rifinitura bozza non disponibile in questo momento.';
+    aiCoachState.status = '';
+  } finally {
+    aiCoachState.busy = false;
+    aiCoachState.phase = 'review';
+    renderCoachSection();
+  }
+}
+
 function renderCoachSection() {
   const root = document.getElementById('coach-root');
   if (!root) return;
@@ -2424,6 +2550,21 @@ function renderCoachSection() {
     <div class="coach-draft-banner">
       Ultima bozza pronta: <strong>${escapeHtml(aiCoachState.draftProgram.title || 'Nuova scheda Coach AI')}</strong>
       ${aiCoachState.confidence ? '<br>Confidenza stimata: ' + Math.round(aiCoachState.confidence * 100) + '%' : ''}
+      <br>Prima di salvarla puoi rifinirla qui sotto parlando direttamente con il Coach AI.
+    </div>` : '';
+  const refineCardHtml = aiCoachState.draftProgram ? `
+    <div class="coach-card">
+      <div class="surface-title">Rifinisci la bozza con il Coach AI</div>
+      <div class="coach-refine-note">Scrivi cosa vuoi cambiare nella scheda: piu' petto, meno volume spalle, sostituzioni, giorni piu' brevi o richiami specifici.</div>
+      <div class="coach-refine-thread">${renderCoachRefineMessages()}</div>
+      <div class="coach-refine-compose">
+        <textarea id="coach-refine-input" placeholder="Per esempio: voglio dare piu' priorita' al petto e togliere un po' di volume alle spalle."${aiCoachState.busy ? ' disabled' : ''} onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendCoachRefinement();}"></textarea>
+        <div class="coach-refine-actions">
+          <button class="hdr-btn" type="button" onclick="sendCoachRefinement()"${aiCoachState.busy ? ' disabled' : ''}>Applica modifica</button>
+          <button class="hdr-btn" type="button" onclick="reopenAiDraft()"${aiCoachState.busy ? ' disabled' : ''}>Apri editor scheda</button>
+          <button class="hdr-btn" type="button" onclick="resetCoachRefinementChat()"${aiCoachState.busy ? ' disabled' : ''}>Reset chat bozza</button>
+        </div>
+      </div>
     </div>` : '';
 
   root.innerHTML = `
@@ -2508,10 +2649,11 @@ function renderCoachSection() {
           <button class="hdr-btn" type="button" onclick="saveCoachProfileFromForm()"${aiCoachState.busy ? ' disabled' : ''}>Salva profilo</button>
           <button class="hdr-btn" type="button" onclick="startAiProgramFlow()"${aiCoachState.busy ? ' disabled' : ''}>Analizza profilo</button>
           ${aiCoachState.questions.length ? `<button class="hdr-btn" type="button" onclick="submitAiAnswers()"${aiCoachState.busy ? ' disabled' : ''}>Genera bozza Coach AI</button>` : ''}
-          ${aiCoachState.draftProgram ? `<button class="hdr-btn" type="button" onclick="reopenAiDraft()"${aiCoachState.busy ? ' disabled' : ''}>Riapri bozza</button>` : ''}
+          ${aiCoachState.draftProgram ? `<button class="hdr-btn" type="button" onclick="reopenAiDraft()"${aiCoachState.busy ? ' disabled' : ''}>Apri editor scheda</button>` : ''}
         </div>
         ${(aiCoachState.error || aiCoachState.status) ? `<div class="${statusClass}">${escapeHtml(aiCoachState.error || aiCoachState.status)}</div>` : ''}
         ${draftHtml}
+        ${refineCardHtml}
       </div>
       <div style="display:flex;flex-direction:column;gap:12px">
         <div class="coach-card">
@@ -2607,6 +2749,8 @@ async function startAiProgramFlow() {
   aiCoachState.status = 'Sto analizzando profilo, schede e progressi per capire cosa chiederti.';
   aiCoachState.questions = [];
   aiCoachState.answers = {};
+  aiCoachState.draftProgram = null;
+  aiCoachState.refineMessages = [];
   renderCoachSection();
 
   try {
@@ -2686,9 +2830,9 @@ async function requestAiProgramGeneration() {
     aiCoachState.warnings = Array.isArray(payload.warnings) ? payload.warnings.map(cleanText).filter(Boolean) : [];
     aiCoachState.confidence = Math.max(0, Math.min(1, Number(payload.confidence) || 0));
     aiCoachState.draftProgram = cloneValue(payload.candidateProgram || null);
-    aiCoachState.status = 'Bozza pronta. La trovi gia` nell\'editor della scheda per rifinirla e salvarla.';
+    aiCoachState.refineMessages = [createCoachRefineSeedMessage()];
+    aiCoachState.status = 'Bozza pronta. Puoi rifinirla qui sotto oppure aprire l\'editor finale per salvarla.';
     aiCoachState.error = '';
-    loadAiDraftIntoImportReview(payload);
   } catch (error) {
     console.error('Errore generazione Coach AI', error);
     aiCoachState.error = error.message || 'Generazione scheda non disponibile in questo momento.';

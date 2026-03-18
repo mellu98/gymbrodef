@@ -140,6 +140,19 @@ const COACH_PROGRAM_SCHEMA = {
   }
 };
 
+const COACH_REFINEMENT_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['candidateProgram', 'summary', 'rationale', 'warnings', 'confidence'],
+  properties: {
+    candidateProgram: COACH_PROGRAM_SCHEMA.properties.candidateProgram,
+    summary: { type: 'string' },
+    rationale: COACH_PROGRAM_SCHEMA.properties.rationale,
+    warnings: COACH_PROGRAM_SCHEMA.properties.warnings,
+    confidence: COACH_PROGRAM_SCHEMA.properties.confidence
+  }
+};
+
 const SYSTEM_PROMPT = [
   'Sei un parser di schede allenamento in PDF per una PWA fitness.',
   'Leggi il PDF del personal trainer e restituisci solo i dati workout in JSON conforme allo schema.',
@@ -171,6 +184,18 @@ const COACH_PROGRAM_SYSTEM_PROMPT = [
   'Usa esercizi comprensibili e note brevi, concrete e non prolisse.',
   'Evita programmi estremi, volumi irrealistici o esercizi incompatibili con limitazioni e attrezzatura.',
   'Se alcuni dati sono mancanti, fai assunzioni prudenti e segnala quei punti in warnings.'
+].join(' ');
+
+const COACH_REFINEMENT_SYSTEM_PROMPT = [
+  'Sei il Coach AI di Massi Gym nella fase di rifinitura bozza.',
+  'Ricevi una scheda gia` generata e una richiesta di modifica in linguaggio naturale.',
+  'Non rispondi con spiegazioni libere: restituisci solo JSON valido conforme allo schema.',
+  'Il tuo compito e` aggiornare la bozza esistente nel modo piu` fedele possibile alla richiesta dell\'utente.',
+  'Mantieni il programma realistico, coerente col profilo atleta, con lo storico e con l\'attrezzatura disponibile.',
+  'Non stravolgere la scheda se l\'utente chiede una modifica locale: cambia solo cio` che serve.',
+  'Nel campo summary descrivi in modo breve cosa hai cambiato concretamente.',
+  'Nel campo rationale spiega perche` le modifiche hanno senso.',
+  'Nel campo warnings segnala solo i punti che l\'utente dovrebbe ricontrollare prima di salvare.'
 ].join(' ');
 
 function applyCors(req, res) {
@@ -519,6 +544,37 @@ function createAiIntakeQuestions(profile, context) {
   return questions.slice(0, 6);
 }
 
+function normalizeDraftProgramForAi(rawProgram) {
+  const normalized = normalizeCandidateProgram({
+    athleteName: '',
+    title: rawProgram?.title || '',
+    subtitle: rawProgram?.subtitle || '',
+    weeks: rawProgram?.weeks || '',
+    confidence: 0.8,
+    warnings: [],
+    days: Array.isArray(rawProgram?.days) ? rawProgram.days : []
+  }, 'coach-ai-draft');
+
+  if (!normalized.days.length) {
+    const error = new Error('Bozza Coach AI non valida o vuota.');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  return {
+    title: cleanString(rawProgram?.title || normalized.title || 'Coach AI · Nuova scheda'),
+    subtitle: cleanString(rawProgram?.subtitle || normalized.subtitle || 'Scheda generata dal Coach AI'),
+    weeks: cleanString(rawProgram?.weeks || normalized.weeks || '5 settimane'),
+    days: normalized.days
+  };
+}
+
+function buildCoachRefinementHistoryText(messages) {
+  return normalizeChatMessages(messages).map((message) => {
+    return (message.role === 'assistant' ? 'Coach AI' : 'Utente') + ': ' + cleanString(message.content);
+  }).join('\n');
+}
+
 function validateAiGeneratedProgram(result, profile) {
   const safe = result && typeof result === 'object' ? result : {};
   const normalized = normalizeCandidateProgram({
@@ -552,6 +608,14 @@ function validateAiGeneratedProgram(result, profile) {
     rationale: (Array.isArray(safe.rationale) ? safe.rationale : []).map(cleanString).filter(Boolean).slice(0, 6),
     warnings: normalized.warnings,
     confidence: Math.max(0, Math.min(1, Number(safe.confidence) || 0))
+  };
+}
+
+function validateAiRefinedProgram(result, profile) {
+  const validated = validateAiGeneratedProgram(result, profile);
+  return {
+    ...validated,
+    summary: cleanString(result?.summary || 'Bozza aggiornata.')
   };
 }
 
@@ -858,6 +922,86 @@ async function generateAiProgram(profileInput, contextInput, answersInput) {
   return validateAiGeneratedProgram(parsed, profile);
 }
 
+async function refineAiProgram(profileInput, contextInput, candidateProgramInput, messagesInput, requestInput) {
+  if (!client) {
+    const error = new Error('OPENAI_API_KEY mancante sul server.');
+    error.statusCode = 500;
+    throw error;
+  }
+
+  const requestText = cleanString(requestInput || '');
+  if (!requestText) {
+    const error = new Error('Scrivi cosa vuoi cambiare nella bozza.');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const context = normalizeAiContext(contextInput);
+  const profile = normalizeAiProfile(profileInput, context);
+  const draftProgram = normalizeDraftProgramForAi(candidateProgramInput);
+  const chatHistory = buildCoachRefinementHistoryText(messagesInput);
+
+  const response = await client.responses.create({
+    model: OPENAI_MODEL,
+    max_output_tokens: 2800,
+    input: [
+      {
+        role: 'system',
+        content: [
+          { type: 'input_text', text: COACH_REFINEMENT_SYSTEM_PROMPT }
+        ]
+      },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'input_text',
+            text: [
+              'Aggiorna la seguente bozza Coach AI senza rompere il formato JSON compatibile con Massi Gym.',
+              '',
+              'Profilo e memoria utente:',
+              buildCoachContextText(profile, context),
+              '',
+              'Bozza attuale:',
+              JSON.stringify(draftProgram, null, 2),
+              '',
+              'Cronologia breve della rifinitura:',
+              chatHistory || 'Nessuna cronologia precedente.',
+              '',
+              'Richiesta finale dell\'utente:',
+              requestText,
+              '',
+              'Regole operative:',
+              '- modifica la bozza esistente, non crearne una totalmente diversa salvo richiesta esplicita',
+              '- mantieni la scheda pratica e coerente con obiettivo, livello, attrezzatura e durata seduta',
+              '- se l\'utente chiede piu` priorita` a un gruppo muscolare, aumenta focus e volume in modo realistico',
+              '- evita spiegazioni prolisse nelle note degli esercizi',
+              '- summary deve dire in breve cosa hai cambiato davvero'
+            ].join('\n')
+          }
+        ]
+      }
+    ],
+    text: {
+      format: {
+        type: 'json_schema',
+        name: 'coach_ai_program_refinement',
+        strict: true,
+        schema: COACH_REFINEMENT_SCHEMA
+      }
+    }
+  });
+
+  if (!response.output_text) {
+    const error = new Error('Risposta Coach AI vuota durante la rifinitura.');
+    error.statusCode = 502;
+    throw error;
+  }
+
+  const parsed = JSON.parse(response.output_text);
+  return validateAiRefinedProgram(parsed, profile);
+}
+
 app.use((req, res, next) => {
   applyCors(req, res);
   if (req.method === 'OPTIONS') {
@@ -950,6 +1094,29 @@ app.post('/api/ai/generate-program', async (req, res) => {
       ? 'Generazione scheda non disponibile in questo momento. Riprova tra poco.'
       : error.message;
     sendJsonError(res, statusCode, message, error.questions ? { questions: error.questions } : {});
+  }
+});
+
+app.post('/api/ai/refine-program', async (req, res) => {
+  try {
+    const refined = await refineAiProgram(
+      req.body?.profile,
+      req.body?.context,
+      req.body?.candidateProgram,
+      req.body?.messages,
+      req.body?.request
+    );
+    res.json({
+      ...refined,
+      parserVersion: COACH_AI_VERSION
+    });
+  } catch (error) {
+    console.error('Coach AI refine error:', error);
+    const statusCode = error.statusCode || 500;
+    const message = statusCode >= 500
+      ? 'Rifinitura bozza non disponibile in questo momento. Riprova tra poco.'
+      : error.message;
+    sendJsonError(res, statusCode, message);
   }
 });
 
