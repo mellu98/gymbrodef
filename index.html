@@ -229,6 +229,73 @@ body{font-family:'DM Sans',sans-serif;background:
 .chat-status{font-size:12px;color:var(--tm);line-height:1.5;padding:8px 4px 0}
 .chat-status.error{color:#ff8a9b}
 
+/* COACH AI */
+.coach-shell{max-width:1040px;margin:0 auto}
+.coach-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:18px}
+.coach-head h2{font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;line-height:1}
+.coach-head p{font-size:13px;color:var(--tm);margin-top:6px;line-height:1.6;max-width:600px}
+.coach-grid{display:grid;grid-template-columns:1.08fr .92fr;gap:12px}
+.coach-card{background:linear-gradient(180deg,var(--s1),#0d0d0d);border:1px solid var(--td);border-radius:20px;padding:18px}
+.coach-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.coach-field{display:flex;flex-direction:column;gap:6px}
+.coach-field.full{grid-column:1/-1}
+.coach-field label{font-size:11px;color:var(--tm);text-transform:uppercase;letter-spacing:1px}
+.coach-field input,.coach-field select,.coach-field textarea{
+  width:100%;background:var(--s2);border:1px solid var(--td);color:var(--t);border-radius:12px;
+  padding:11px 12px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none
+}
+.coach-field textarea{resize:vertical;min-height:92px;line-height:1.5}
+.coach-field input:focus,.coach-field select:focus,.coach-field textarea:focus{border-color:var(--g)}
+.coach-note{margin-top:12px;font-size:12px;color:var(--tm);line-height:1.7}
+.coach-summary{display:flex;flex-direction:column;gap:10px}
+.coach-summary-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #171717}
+.coach-summary-item:first-child{padding-top:0}
+.coach-summary-item:last-child{padding-bottom:0;border-bottom:none}
+.coach-summary-item strong{display:block;font-size:13px}
+.coach-summary-item span{display:block;font-size:11px;color:var(--tm);margin-top:4px;line-height:1.6}
+.coach-pill{flex:0 0 auto;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--tm);background:var(--s2);border:1px solid var(--td);border-radius:999px;padding:5px 8px}
+.coach-questions{display:flex;flex-direction:column;gap:12px}
+.coach-question{background:var(--s2);border:1px solid #242424;border-radius:14px;padding:14px}
+.coach-question-title{font-size:12px;font-weight:700;margin-bottom:4px}
+.coach-question-copy{font-size:12px;color:var(--tm);line-height:1.6;margin-bottom:10px}
+.coach-rationale{display:flex;flex-direction:column;gap:10px}
+.coach-rationale-item{background:var(--s2);border:1px solid #242424;border-radius:14px;padding:12px 14px}
+.coach-rationale-item strong{display:block;font-size:12px;margin-bottom:5px}
+.coach-rationale-item p{font-size:12px;color:var(--tm);line-height:1.6}
+.coach-status{font-size:12px;color:var(--tm);line-height:1.6;margin-top:12px}
+.coach-status.error{color:#ff8a9b}
+.coach-status.good{color:var(--g)}
+.coach-status.warn{color:var(--amber)}
+.coach-empty{font-size:12px;color:var(--tm);line-height:1.7}
+.coach-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.coach-actions .hdr-btn[disabled]{opacity:.5;cursor:not-allowed}
+.coach-stat-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.coach-stat{
+  background:var(--s2);border:1px solid #242424;border-radius:16px;padding:14px
+}
+.coach-stat .metric-label{font-size:10px}
+.coach-stat .metric-value{font-size:32px;margin-top:6px}
+.coach-divider{height:1px;background:#171717;margin:16px 0}
+.coach-inline-list{display:flex;flex-wrap:wrap;gap:6px}
+.coach-inline-list span{
+  font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--tm);
+  background:var(--s2);border:1px solid var(--td);border-radius:999px;padding:5px 8px
+}
+.coach-question-field{margin-top:10px}
+.coach-question-field input,.coach-question-field select,.coach-question-field textarea{
+  width:100%;background:var(--bg);border:1px solid var(--td);color:var(--t);border-radius:10px;
+  padding:10px 11px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none
+}
+.coach-question-field textarea{min-height:88px;resize:vertical;line-height:1.5}
+.coach-question-field input:focus,.coach-question-field select:focus,.coach-question-field textarea:focus{border-color:var(--g)}
+.coach-context-list{display:flex;flex-direction:column;gap:10px}
+.coach-context-list .mini-row{padding:0 0 10px;border-bottom:1px solid #171717}
+.coach-context-list .mini-row:last-child{padding-bottom:0;border-bottom:none}
+.coach-draft-banner{
+  margin-top:12px;background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.16);
+  border-radius:14px;padding:12px 14px;font-size:12px;line-height:1.6;color:var(--t)
+}
+
 /* SESSION */
 #session{display:none;flex-direction:column;height:100%}
 .sess-hdr{padding:12px 16px 0;flex-shrink:0}
@@ -455,6 +522,7 @@ body{font-family:'DM Sans',sans-serif;background:
   .chat-compose-shell{padding:12px 14px 14px}
   .chat-compose{grid-template-columns:1fr}
   .chat-send{width:100%;height:52px}
+  .coach-grid,.coach-form-grid{grid-template-columns:1fr}
   .focus-top{flex-direction:column;align-items:stretch}
   .fc-demo-btn{width:100%}
 }
@@ -542,33 +610,9 @@ body{font-family:'DM Sans',sans-serif;background:
   </div>
 </div>
 
-<!-- CHAT -->
+<!-- COACH -->
 <div id="coach" class="app-section">
-  <div class="chat-shell">
-    <div class="chat-head">
-      <div>
-        <div class="chat-kicker">Coach AI</div>
-        <h2>Parla con il coach</h2>
-        <p>Un'unica chat semplice, diretta e sempre pronta a leggere il contesto della tua scheda attiva.</p>
-      </div>
-      <button class="hdr-btn" type="button" onclick="clearChatMessages()">Nuova chat</button>
-    </div>
-    <div class="chat-panel">
-      <div class="chat-panel-top">
-        <div class="chat-panel-label">Conversazione attiva</div>
-      </div>
-      <div class="chat-thread-wrap">
-        <div class="chat-thread" id="chat-thread"></div>
-      </div>
-      <div class="chat-compose-shell">
-        <div class="chat-compose">
-          <textarea id="chat-input" class="chat-input" placeholder="Scrivi un messaggio al coach AI..."></textarea>
-          <button class="t-btn chat-send" id="chat-send-btn" type="button" onclick="sendChatMessage()">Invia</button>
-        </div>
-        <div class="chat-status" id="chat-status">Chat pronta.</div>
-      </div>
-    </div>
-  </div>
+  <div id="coach-root" class="coach-shell"></div>
 </div>
 
 <!-- SESSION -->
@@ -969,8 +1013,8 @@ body{font-family:'DM Sans',sans-serif;background:
 const PROGRAMS_URL = './programs.json';
 const IMPORT_API_BASE_URL = String(window.MASSI_CONFIG?.importApiBaseUrl || '').replace(/\/$/, '');
 const USER_PROGRAMS_KEY = 'massi_user_programs';
+const USER_PROFILE_KEY = 'massi_user_profile';
 const PROGRAM_STATE_PREFIX = 'massi_state_';
-const CHAT_STORAGE_KEY = 'massi_chat_messages_v1';
 const SHOW_BUNDLED_PROGRAMS = false;
 const MAIN_SECTION_IDS = ['programs', 'home', 'progress', 'coach'];
 const SECTION_TRANSITION_MS = 260;
@@ -988,7 +1032,18 @@ let deferredPrompt = null;
 let importDraft = null;
 let importMeta = null;
 let importBusy = false;
-let chatBusy = false;
+let aiCoachState = {
+  phase: 'idle',
+  busy: false,
+  error: '',
+  status: '',
+  questions: [],
+  answers: {},
+  rationale: [],
+  warnings: [],
+  confidence: 0,
+  draftProgram: null
+};
 // Timer state
 let timerInterval = null;
 let timerTotal = 90;
@@ -1049,8 +1104,12 @@ function buildApiUrl(path) {
   return (IMPORT_API_BASE_URL || '') + path;
 }
 
-function getChatEndpoint() {
-  return buildApiUrl('/api/chat');
+function getAiIntakeEndpoint() {
+  return buildApiUrl('/api/ai/intake');
+}
+
+function getAiGenerateEndpoint() {
+  return buildApiUrl('/api/ai/generate-program');
 }
 
 function normalizePrograms(programs, sourceFallback = 'bundled') {
@@ -1064,7 +1123,10 @@ function normalizePrograms(programs, sourceFallback = 'bundled') {
       filename: cleanText(program?.importMeta?.filename || ''),
       importedAt: cleanText(program?.importMeta?.importedAt || ''),
       parserVersion: cleanText(program?.importMeta?.parserVersion || ''),
-      confidence: Math.max(0, Math.min(1, Number(program?.importMeta?.confidence) || 0))
+      confidence: Math.max(0, Math.min(1, Number(program?.importMeta?.confidence) || 0)),
+      origin: cleanText(program?.importMeta?.origin || 'pdf'),
+      warnings: (Array.isArray(program?.importMeta?.warnings) ? program.importMeta.warnings : []).map(cleanText).filter(Boolean),
+      rationale: (Array.isArray(program?.importMeta?.rationale) ? program.importMeta.rationale : []).map(cleanText).filter(Boolean)
     } : null,
     days: (Array.isArray(program?.days) ? program.days : []).map((day, di) => ({
       name: cleanText(day?.name || 'Day ' + (di + 1)),
@@ -1687,149 +1749,573 @@ function renderProgressSection() {
     </div>`;
 }
 
-function getChatMessages() {
-  try {
-    const parsed = JSON.parse(localStorage.getItem(CHAT_STORAGE_KEY) || '[]');
-    return Array.isArray(parsed) ? parsed.filter((message) => ['user', 'assistant'].includes(message?.role) && cleanText(message?.content || '')).map((message) => ({
-      role: message.role,
-      content: cleanText(message.content),
-      createdAt: cleanText(message.createdAt || '')
-    })) : [];
-  } catch (error) {
-    return [];
-  }
+function normalizeTextList(value) {
+  const source = Array.isArray(value) ? value : String(value || '').split(/[,;\n]+/);
+  return source.map(cleanText).filter(Boolean).slice(0, 10);
 }
 
-function saveChatMessages(messages) {
-  try {
-    localStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(messages.slice(-30)));
-  } catch (error) {
-    console.error('Errore salvataggio chat', error);
-  }
-}
-
-function setChatStatus(message, tone = '') {
-  const el = document.getElementById('chat-status');
-  if (!el) return;
-  el.textContent = message;
-  el.className = 'chat-status' + (tone ? ' ' + tone : '');
-}
-
-function syncChatInputHeight() {
-  const input = document.getElementById('chat-input');
-  if (!input) return;
-  input.style.height = '58px';
-  input.style.height = Math.min(input.scrollHeight, 190) + 'px';
-}
-
-function renderChatThread() {
-  const thread = document.getElementById('chat-thread');
-  if (!thread) return;
-  const messages = getChatMessages();
-  if (!messages.length) {
-    thread.innerHTML = '<div class="chat-empty">Chiedimi della tua scheda, dei carichi, del recupero o di come leggere un allenamento scritto dal PT.</div>';
-    return;
-  }
-  thread.innerHTML = messages.map((message) => `
-    <div class="chat-msg ${escapeHtml(message.role)}">${escapeHtml(message.content)}</div>`).join('');
-  thread.scrollTop = thread.scrollHeight;
-}
-
-function buildChatContext() {
-  if (!currentProgram) return null;
+function getDefaultUserProfile() {
   return {
-    programTitle: currentProgram.title,
-    programSubtitle: currentProgram.subtitle || '',
-    currentWeek,
-    weeksLabel: currentProgram.weeks || '',
-    completedDays: getCompletedDaysCount(currentWeek),
-    totalDays: getDays().length,
-    dayLabels: getDays().map((day) => cleanText(day.label || day.name)).filter(Boolean)
+    name: '',
+    goal: '',
+    experience: '',
+    daysPerWeek: 0,
+    sessionLength: '',
+    equipment: '',
+    focusAreas: [],
+    avoidExercises: [],
+    limitations: '',
+    notes: '',
+    updatedAt: ''
   };
 }
 
-function queueChatPrompt(text) {
-  const input = document.getElementById('chat-input');
-  if (!input) return;
-  input.value = text;
-  syncChatInputHeight();
-  input.focus();
+function normalizeUserProfile(rawProfile = {}) {
+  const safe = rawProfile && typeof rawProfile === 'object' ? rawProfile : {};
+  const inferredDays = currentProgram ? getDays().length : 0;
+  return {
+    name: cleanText(safe.name || ''),
+    goal: cleanText(safe.goal || ''),
+    experience: cleanText(safe.experience || ''),
+    daysPerWeek: Math.max(0, parseInt(safe.daysPerWeek, 10) || inferredDays || 0),
+    sessionLength: cleanText(safe.sessionLength || ''),
+    equipment: cleanText(safe.equipment || ''),
+    focusAreas: normalizeTextList(safe.focusAreas || []),
+    avoidExercises: normalizeTextList(safe.avoidExercises || []),
+    limitations: cleanText(safe.limitations || ''),
+    notes: cleanText(safe.notes || ''),
+    updatedAt: cleanText(safe.updatedAt || '')
+  };
 }
 
-async function sendChatMessage() {
-  if (chatBusy) return;
-  const input = document.getElementById('chat-input');
-  const sendBtn = document.getElementById('chat-send-btn');
-  const content = cleanText(input?.value || '');
-  if (!content) {
-    setChatStatus('Scrivi prima un messaggio per il coach AI.', 'error');
-    return;
+function getUserProfile() {
+  try {
+    return normalizeUserProfile(JSON.parse(localStorage.getItem(USER_PROFILE_KEY) || 'null') || {});
+  } catch (error) {
+    return getDefaultUserProfile();
   }
+}
+
+function saveUserProfile(profile) {
+  try {
+    localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(normalizeUserProfile({
+      ...profile,
+      updatedAt: new Date().toISOString()
+    })));
+    return true;
+  } catch (error) {
+    console.error('Errore salvataggio profilo utente', error);
+    return false;
+  }
+}
+
+function profileListValue(values) {
+  return (Array.isArray(values) ? values : []).map(cleanText).filter(Boolean).join(', ');
+}
+
+function getCoachFieldValue(id) {
+  return document.getElementById(id)?.value || '';
+}
+
+function collectCoachFormProfile() {
+  return normalizeUserProfile({
+    name: getCoachFieldValue('coach-name'),
+    goal: getCoachFieldValue('coach-goal'),
+    experience: getCoachFieldValue('coach-experience'),
+    daysPerWeek: getCoachFieldValue('coach-days'),
+    sessionLength: getCoachFieldValue('coach-duration'),
+    equipment: getCoachFieldValue('coach-equipment'),
+    focusAreas: getCoachFieldValue('coach-focus'),
+    avoidExercises: getCoachFieldValue('coach-avoid'),
+    limitations: getCoachFieldValue('coach-limitations'),
+    notes: getCoachFieldValue('coach-notes')
+  });
+}
+
+function saveCoachProfileFromForm(silent = false) {
+  const profile = collectCoachFormProfile();
+  const stored = saveUserProfile(profile);
+  if (!silent) {
+    aiCoachState.error = stored ? '' : 'Non riesco a salvare il profilo sul dispositivo.';
+    aiCoachState.status = stored ? 'Profilo aggiornato. Il Coach AI usera` questi dati come base.' : '';
+    renderCoachSection();
+  }
+  return profile;
+}
+
+function buildAiProgressionSummary() {
+  if (!currentProgram) return [];
+  const state = readProgramState(currentProgram.id);
+  const weekNumbers = Object.keys(state.weeks || {}).map((value) => parseInt(value, 10)).filter((value) => value > 0).sort((a, b) => a - b);
+  const latestWeek = weekNumbers.length ? weekNumbers[weekNumbers.length - 1] : 1;
+  const currentWeekState = state.weeks?.[String(latestWeek)];
+  const previousWeekState = latestWeek > 1 ? state.weeks?.[String(latestWeek - 1)] : null;
+  if (!currentWeekState) return [];
+
+  const items = [];
+  getDays().forEach((day, di) => {
+    day.exercises.forEach((exercise, ei) => {
+      const currentStats = summarizeKg(currentWeekState.exerciseData?.[di]?.[ei]?.kg || []);
+      if (!currentStats) return;
+      const previousStats = previousWeekState ? summarizeKg(previousWeekState.exerciseData?.[di]?.[ei]?.kg || []) : null;
+      let trend = 'new';
+      if (previousStats) {
+        if (currentStats.max > previousStats.max) trend = 'up';
+        else if (currentStats.max < previousStats.max) trend = 'down';
+        else trend = 'same';
+      }
+      items.push({
+        day: cleanText(day.label || day.name),
+        exercise: cleanText(exercise.name),
+        lastWeight: formatKg(currentStats.max),
+        trend,
+        week: latestWeek
+      });
+    });
+  });
+
+  const order = { up: 0, same: 1, new: 2, down: 3 };
+  return items.sort((left, right) => {
+    return (order[left.trend] ?? 9) - (order[right.trend] ?? 9) || left.exercise.localeCompare(right.exercise);
+  }).slice(0, 10);
+}
+
+function buildAiContext() {
+  const recentPrograms = PROGRAMS.slice(0, 4).map((program) => {
+    const stats = getProgramStats(program);
+    return {
+      id: program.id,
+      title: program.title,
+      subtitle: program.subtitle || '',
+      weeks: program.weeks || '',
+      daysCount: Array.isArray(program.days) ? program.days.length : 0,
+      totalSessions: stats.hist,
+      totalCompletedDays: stats.done,
+      origin: cleanText(program?.importMeta?.origin || program.source || '')
+    };
+  });
+
+  const historySummary = currentProgram ? getHistory().slice(0, 8).map((entry) => ({
+    date: cleanText(entry.date || ''),
+    week: Math.max(0, parseInt(entry.week, 10) || 0),
+    day: cleanText(entry.day || ''),
+    exercisesDone: Array.isArray(entry.exercises) ? entry.exercises.filter((exercise) => exercise?.done).length : 0
+  })) : [];
+
+  return {
+    currentProgram: currentProgram ? {
+      id: currentProgram.id,
+      title: currentProgram.title,
+      subtitle: currentProgram.subtitle || '',
+      weeks: currentProgram.weeks || '',
+      daysCount: getDays().length,
+      currentWeek,
+      completedDaysThisWeek: getCompletedDaysCount(currentWeek),
+      totalDaysThisWeek: getDays().length,
+      dayLabels: getDays().map((day) => cleanText(day.label || day.name)).filter(Boolean)
+    } : null,
+    recentPrograms,
+    historySummary,
+    progressionSummary: buildAiProgressionSummary()
+  };
+}
+
+function ensureCoachAiAvailable() {
   if (window.location.protocol === 'file:' && !IMPORT_API_BASE_URL) {
-    setChatStatus('La chat funziona nella versione pubblicata dell\'app o con il server locale attivo.', 'error');
-    return;
+    aiCoachState.error = 'Il Coach AI funziona nella versione pubblicata dell\'app o con il server locale attivo.';
+    aiCoachState.status = '';
+    renderCoachSection();
+    return false;
   }
   if (!navigator.onLine) {
-    setChatStatus('Serve connessione internet per parlare con il coach AI.', 'error');
-    return;
+    aiCoachState.error = 'Serve connessione internet per creare una scheda con il Coach AI.';
+    aiCoachState.status = '';
+    renderCoachSection();
+    return false;
+  }
+  return true;
+}
+
+function renderAiQuestionField(question) {
+  const fieldId = 'coach-question-' + question.id;
+  const value = String(aiCoachState.answers?.[question.id] || '');
+  const optionsHtml = Array.isArray(question.options) ? question.options.map((option) => `
+    <option value="${escapeHtml(option.value)}"${value === option.value ? ' selected' : ''}>${escapeHtml(option.label)}</option>
+  `).join('') : '';
+
+  let controlHtml = `<input id="${fieldId}" type="text" value="${escapeHtml(value)}" placeholder="${escapeHtml(question.placeholder || '')}">`;
+  if (question.type === 'select') {
+    controlHtml = `
+      <select id="${fieldId}">
+        <option value="">Seleziona</option>
+        ${optionsHtml}
+      </select>`;
+  } else if (question.type === 'textarea') {
+    controlHtml = `<textarea id="${fieldId}" placeholder="${escapeHtml(question.placeholder || '')}">${escapeHtml(value)}</textarea>`;
   }
 
-  const messages = getChatMessages();
-  messages.push({ role: 'user', content, createdAt: new Date().toISOString() });
-  saveChatMessages(messages);
-  renderChatThread();
-  input.value = '';
-  syncChatInputHeight();
-  chatBusy = true;
-  if (sendBtn) {
-    sendBtn.disabled = true;
-    sendBtn.textContent = '...';
-  }
-  setChatStatus('Il coach AI sta rispondendo...', '');
+  return `
+    <div class="coach-question">
+      <div class="coach-question-title">${escapeHtml(question.label || 'Domanda')}</div>
+      <div class="coach-question-copy">${escapeHtml(question.question || '')}</div>
+      <div class="coach-question-field">${controlHtml}</div>
+    </div>
+  `;
+}
+
+function collectAiAnswers() {
+  const answers = {};
+  aiCoachState.questions.forEach((question) => {
+    const value = cleanText(document.getElementById('coach-question-' + question.id)?.value || '');
+    if (value) answers[question.id] = value;
+  });
+  return answers;
+}
+
+function renderCoachSection() {
+  const root = document.getElementById('coach-root');
+  if (!root) return;
+
+  const profile = getUserProfile();
+  const context = buildAiContext();
+  const progressItems = context.progressionSummary || [];
+  const recentPrograms = context.recentPrograms || [];
+  const historyItems = context.historySummary || [];
+  const currentProgramSummary = context.currentProgram;
+  const statusClass = aiCoachState.error ? 'coach-status error' : 'coach-status' + (aiCoachState.status ? ' good' : '');
+  const questionHtml = aiCoachState.questions.length ? aiCoachState.questions.map(renderAiQuestionField).join('') : `
+    <div class="coach-empty">
+      Premi <strong>Analizza profilo</strong> e il Coach AI ti fara' solo le domande che mancano davvero prima di creare la prossima scheda.
+    </div>`;
+  const rationaleHtml = aiCoachState.rationale.length ? `
+    <div class="coach-card">
+      <div class="surface-title">Perche' questa scheda</div>
+      <div class="coach-rationale">
+        ${aiCoachState.rationale.map((item, index) => `
+          <div class="coach-rationale-item">
+            <strong>Scelta ${index + 1}</strong>
+            <p>${escapeHtml(item)}</p>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : '';
+  const warningsHtml = aiCoachState.warnings.length ? `
+    <div class="coach-card">
+      <div class="surface-title">Punti da controllare</div>
+      <div class="coach-rationale">
+        ${aiCoachState.warnings.map((item) => `
+          <div class="coach-rationale-item">
+            <p>${escapeHtml(item)}</p>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : '';
+  const draftHtml = aiCoachState.draftProgram ? `
+    <div class="coach-draft-banner">
+      Ultima bozza pronta: <strong>${escapeHtml(aiCoachState.draftProgram.title || 'Nuova scheda Coach AI')}</strong>
+      ${aiCoachState.confidence ? '<br>Confidenza stimata: ' + Math.round(aiCoachState.confidence * 100) + '%' : ''}
+    </div>` : '';
+
+  root.innerHTML = `
+    <div class="coach-head">
+      <div>
+        <div class="section-badge">Coach AI PT</div>
+        <h2>Crea la prossima scheda</h2>
+        <p>Il Coach AI parte dalle schede che hai importato, dai progressi reali e da poche domande mirate per costruire una nuova bozza pronta da salvare nell'app.</p>
+      </div>
+    </div>
+    <div class="coach-grid">
+      <div class="coach-card">
+        <div class="surface-title">Profilo atleta</div>
+        <div class="coach-form-grid">
+          <div class="coach-field">
+            <label>Nome</label>
+            <input id="coach-name" type="text" value="${escapeHtml(profile.name)}" placeholder="Come vuoi chiamarti nell'app">
+          </div>
+          <div class="coach-field">
+            <label>Obiettivo</label>
+            <select id="coach-goal">
+              <option value="">Seleziona</option>
+              <option value="ipertrofia"${profile.goal === 'ipertrofia' ? ' selected' : ''}>Ipertrofia</option>
+              <option value="ricomposizione"${profile.goal === 'ricomposizione' ? ' selected' : ''}>Ricomposizione</option>
+              <option value="dimagrimento"${profile.goal === 'dimagrimento' ? ' selected' : ''}>Dimagrimento</option>
+              <option value="forza"${profile.goal === 'forza' ? ' selected' : ''}>Forza</option>
+            </select>
+          </div>
+          <div class="coach-field">
+            <label>Esperienza</label>
+            <select id="coach-experience">
+              <option value="">Seleziona</option>
+              <option value="principiante"${profile.experience === 'principiante' ? ' selected' : ''}>Principiante</option>
+              <option value="intermedio"${profile.experience === 'intermedio' ? ' selected' : ''}>Intermedio</option>
+              <option value="avanzato"${profile.experience === 'avanzato' ? ' selected' : ''}>Avanzato</option>
+            </select>
+          </div>
+          <div class="coach-field">
+            <label>Giorni a settimana</label>
+            <select id="coach-days">
+              <option value="">Seleziona</option>
+              ${[2,3,4,5,6].map((value) => `<option value="${value}"${profile.daysPerWeek === value ? ' selected' : ''}>${value}</option>`).join('')}
+            </select>
+          </div>
+          <div class="coach-field">
+            <label>Durata seduta</label>
+            <select id="coach-duration">
+              <option value="">Seleziona</option>
+              <option value="45-60"${profile.sessionLength === '45-60' ? ' selected' : ''}>45-60 min</option>
+              <option value="60-75"${profile.sessionLength === '60-75' ? ' selected' : ''}>60-75 min</option>
+              <option value="75-90"${profile.sessionLength === '75-90' ? ' selected' : ''}>75-90 min</option>
+            </select>
+          </div>
+          <div class="coach-field">
+            <label>Attrezzatura</label>
+            <select id="coach-equipment">
+              <option value="">Seleziona</option>
+              <option value="palestra_completa"${profile.equipment === 'palestra_completa' ? ' selected' : ''}>Palestra completa</option>
+              <option value="basic_gym"${profile.equipment === 'basic_gym' ? ' selected' : ''}>Palestra essenziale</option>
+              <option value="home_gym"${profile.equipment === 'home_gym' ? ' selected' : ''}>Home gym</option>
+            </select>
+          </div>
+          <div class="coach-field full">
+            <label>Gruppi su cui vuoi spingere</label>
+            <input id="coach-focus" type="text" value="${escapeHtml(profileListValue(profile.focusAreas))}" placeholder="Per esempio: petto, dorso, spalle">
+          </div>
+          <div class="coach-field full">
+            <label>Esercizi da evitare</label>
+            <textarea id="coach-avoid" placeholder="Per esempio: squat libero, military press">${escapeHtml(profileListValue(profile.avoidExercises))}</textarea>
+          </div>
+          <div class="coach-field full">
+            <label>Limitazioni o fastidi</label>
+            <textarea id="coach-limitations" placeholder="Per esempio: fastidio alla spalla destra">${escapeHtml(profile.limitations)}</textarea>
+          </div>
+          <div class="coach-field full">
+            <label>Note extra</label>
+            <textarea id="coach-notes" placeholder="Preferenze, macchine che senti meglio, stile di allenamento">${escapeHtml(profile.notes)}</textarea>
+          </div>
+        </div>
+        <div class="coach-note">Il profilo resta salvato sul dispositivo. Il Coach AI lo usera' insieme alle schede importate e ai pesi delle settimane precedenti.</div>
+        <div class="coach-actions">
+          <button class="hdr-btn" type="button" onclick="saveCoachProfileFromForm()"${aiCoachState.busy ? ' disabled' : ''}>Salva profilo</button>
+          <button class="hdr-btn" type="button" onclick="startAiProgramFlow()"${aiCoachState.busy ? ' disabled' : ''}>Analizza profilo</button>
+          ${aiCoachState.questions.length ? `<button class="hdr-btn" type="button" onclick="submitAiAnswers()"${aiCoachState.busy ? ' disabled' : ''}>Genera bozza Coach AI</button>` : ''}
+          ${aiCoachState.draftProgram ? `<button class="hdr-btn" type="button" onclick="reopenAiDraft()"${aiCoachState.busy ? ' disabled' : ''}>Riapri bozza</button>` : ''}
+        </div>
+        ${(aiCoachState.error || aiCoachState.status) ? `<div class="${statusClass}">${escapeHtml(aiCoachState.error || aiCoachState.status)}</div>` : ''}
+        ${draftHtml}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="coach-card">
+          <div class="surface-title">Contesto reale dell'app</div>
+          <div class="coach-stat-grid">
+            <div class="coach-stat">
+              <div class="metric-label">Schede disponibili</div>
+              <div class="metric-value">${recentPrograms.length}</div>
+              <div class="metric-sub">Il Coach AI puo' continuare da cio' che hai gia' fatto.</div>
+            </div>
+            <div class="coach-stat">
+              <div class="metric-label">Settimana attiva</div>
+              <div class="metric-value">${currentProgramSummary ? 'W' + currentProgramSummary.currentWeek : '-'}</div>
+              <div class="metric-sub">${currentProgramSummary ? currentProgramSummary.completedDaysThisWeek + '/' + currentProgramSummary.totalDaysThisWeek + ' giorni completati' : 'Apri una scheda per dare piu\' contesto al Coach AI.'}</div>
+            </div>
+          </div>
+          <div class="coach-divider"></div>
+          ${currentProgramSummary ? `
+            <div class="coach-summary-item">
+              <div>
+                <strong>${escapeHtml(currentProgramSummary.title)}</strong>
+                <span>${escapeHtml(currentProgramSummary.subtitle || 'Scheda attiva')} · ${escapeHtml(currentProgramSummary.weeks || 'ciclo attivo')}</span>
+              </div>
+              <span class="coach-pill">${currentProgramSummary.daysCount} giorni</span>
+            </div>
+            <div class="coach-inline-list" style="margin-top:10px">
+              ${currentProgramSummary.dayLabels.map((label) => `<span>${escapeHtml(label)}</span>`).join('')}
+            </div>
+          ` : '<div class="coach-empty">Nessuna scheda attiva al momento. Il Coach AI funziona lo stesso, ma diventa molto piu\' preciso dopo aver aperto almeno una scheda e salvato qualche settimana.</div>'}
+          <div class="coach-divider"></div>
+          <div class="surface-title">Progressi recenti</div>
+          ${progressItems.length ? `
+            <div class="coach-context-list">
+              ${progressItems.slice(0, 5).map((item) => `
+                <div class="mini-row">
+                  <div class="mini-copy">
+                    <strong>${escapeHtml(item.exercise)}</strong>
+                    <span>${escapeHtml(item.day)} · Ultimo picco: ${escapeHtml(item.lastWeight)} kg</span>
+                  </div>
+                  <span class="mini-pill">${item.trend === 'up' ? 'In salita' : item.trend === 'same' ? 'Stabile' : item.trend === 'down' ? 'In calo' : 'Nuovo'}</span>
+                </div>
+              `).join('')}
+            </div>` : '<div class="coach-empty">Appena inizi a salvare i carichi, qui il Coach AI vedra\' dove stai migliorando e dove sei fermo.</div>'}
+          <div class="coach-divider"></div>
+          <div class="surface-title">Schede recenti</div>
+          ${recentPrograms.length ? `
+            <div class="coach-context-list">
+              ${recentPrograms.slice(0, 4).map((program) => `
+                <div class="mini-row">
+                  <div class="mini-copy">
+                    <strong>${escapeHtml(program.title)}</strong>
+                    <span>${escapeHtml(program.subtitle || 'Scheda allenamento')} · ${program.totalSessions} sessioni salvate</span>
+                  </div>
+                  <span class="mini-pill">${program.origin === 'ai' ? 'AI' : 'PT'}</span>
+                </div>
+              `).join('')}
+            </div>` : '<div class="coach-empty">Importa almeno una scheda del PT per far capire al Coach AI il tuo stile di allenamento.</div>'}
+          ${historyItems.length ? `
+            <div class="coach-divider"></div>
+            <div class="surface-title">Ultime sessioni</div>
+            <div class="coach-context-list">
+              ${historyItems.slice(0, 4).map((entry) => `
+                <div class="mini-row">
+                  <div class="mini-copy">
+                    <strong>${escapeHtml(entry.day || 'Sessione')}</strong>
+                    <span>${escapeHtml(entry.date || '')}</span>
+                  </div>
+                  <span class="mini-pill">${entry.week ? 'W' + entry.week : entry.exercisesDone + ' ex'}</span>
+                </div>
+              `).join('')}
+            </div>` : ''}
+        </div>
+        <div class="coach-card">
+          <div class="surface-title">${aiCoachState.questions.length ? 'Domande mirate prima della bozza' : 'Wizard Coach AI'}</div>
+          <div class="coach-questions">${questionHtml}</div>
+        </div>
+        ${rationaleHtml}
+        ${warningsHtml}
+      </div>
+    </div>
+  `;
+}
+
+async function startAiProgramFlow() {
+  if (aiCoachState.busy) return;
+  if (!ensureCoachAiAvailable()) return;
+  const profile = saveCoachProfileFromForm(true);
+  const context = buildAiContext();
+
+  aiCoachState.busy = true;
+  aiCoachState.phase = 'intake';
+  aiCoachState.error = '';
+  aiCoachState.status = 'Sto analizzando profilo, schede e progressi per capire cosa chiederti.';
+  aiCoachState.questions = [];
+  aiCoachState.answers = {};
+  renderCoachSection();
 
   try {
-    const response = await fetch(getChatEndpoint(), {
+    const response = await fetch(getAiIntakeEndpoint(), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        messages: messages.slice(-12),
-        context: buildChatContext()
-      })
+      body: JSON.stringify({ profile, context })
     });
     const payload = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(payload.error || 'Chat non disponibile in questo momento.');
+    if (!response.ok) throw new Error(payload.error || 'Coach AI non disponibile in questo momento.');
 
-    messages.push({
-      role: 'assistant',
-      content: cleanText(payload.reply || 'Non sono riuscito a generare una risposta utile.'),
-      createdAt: new Date().toISOString()
-    });
-    saveChatMessages(messages);
-    renderChatThread();
-    setChatStatus('Risposta ricevuta. Puoi continuare la conversazione.', '');
+    aiCoachState.questions = Array.isArray(payload.questions) ? payload.questions : [];
+    aiCoachState.phase = aiCoachState.questions.length ? 'questions' : 'ready';
+    aiCoachState.status = aiCoachState.questions.length
+      ? 'Ho ancora bisogno di poche conferme prima di creare la nuova scheda.'
+      : 'Profilo completo. Sto passando direttamente alla generazione della bozza.';
+    aiCoachState.error = '';
   } catch (error) {
-    console.error('Errore chat coach', error);
-    setChatStatus(error.message || 'Chat non disponibile in questo momento.', 'error');
+    console.error('Errore intake Coach AI', error);
+    aiCoachState.error = error.message || 'Coach AI non disponibile in questo momento.';
+    aiCoachState.status = '';
   } finally {
-    chatBusy = false;
-    if (sendBtn) {
-      sendBtn.disabled = false;
-      sendBtn.textContent = 'Invia';
-    }
+    aiCoachState.busy = false;
+    renderCoachSection();
+  }
+
+  if (!aiCoachState.error && !aiCoachState.questions.length) {
+    requestAiProgramGeneration();
   }
 }
 
-function clearChatMessages() {
-  if (!confirm('Vuoi iniziare una nuova chat? La conversazione attuale verra` cancellata.')) return;
-  try { localStorage.removeItem(CHAT_STORAGE_KEY); } catch (error) {}
-  renderChatThread();
-  setChatStatus('Nuova chat pronta.', '');
-  const input = document.getElementById('chat-input');
-  if (input) {
-    input.value = '';
-    syncChatInputHeight();
-    input.focus();
+async function submitAiAnswers() {
+  if (aiCoachState.busy) return;
+  aiCoachState.answers = collectAiAnswers();
+  const missing = aiCoachState.questions.some((question) => !cleanText(aiCoachState.answers?.[question.id] || ''));
+  if (missing) {
+    aiCoachState.error = 'Rispondi a tutte le domande essenziali prima di generare la bozza.';
+    aiCoachState.status = '';
+    renderCoachSection();
+    return;
   }
+  await requestAiProgramGeneration();
+}
+
+async function requestAiProgramGeneration() {
+  if (aiCoachState.busy) return;
+  if (!ensureCoachAiAvailable()) return;
+
+  const profile = saveCoachProfileFromForm(true);
+  const context = buildAiContext();
+  const answers = aiCoachState.questions.length ? aiCoachState.answers : {};
+
+  aiCoachState.busy = true;
+  aiCoachState.phase = 'generating';
+  aiCoachState.error = '';
+  aiCoachState.status = 'Sto creando una scheda realistica basata sul tuo storico e sulle preferenze che mi hai dato.';
+  renderCoachSection();
+
+  try {
+    const response = await fetch(getAiGenerateEndpoint(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profile, context, answers })
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      if (Array.isArray(payload.questions) && payload.questions.length) {
+        aiCoachState.questions = payload.questions;
+        aiCoachState.phase = 'questions';
+      }
+      throw new Error(payload.error || 'Generazione scheda non disponibile in questo momento.');
+    }
+
+    aiCoachState.phase = 'review';
+    aiCoachState.questions = [];
+    aiCoachState.rationale = Array.isArray(payload.rationale) ? payload.rationale.map(cleanText).filter(Boolean) : [];
+    aiCoachState.warnings = Array.isArray(payload.warnings) ? payload.warnings.map(cleanText).filter(Boolean) : [];
+    aiCoachState.confidence = Math.max(0, Math.min(1, Number(payload.confidence) || 0));
+    aiCoachState.draftProgram = cloneValue(payload.candidateProgram || null);
+    aiCoachState.status = 'Bozza pronta. La trovi gia` nell\'editor della scheda per rifinirla e salvarla.';
+    aiCoachState.error = '';
+    loadAiDraftIntoImportReview(payload);
+  } catch (error) {
+    console.error('Errore generazione Coach AI', error);
+    aiCoachState.error = error.message || 'Generazione scheda non disponibile in questo momento.';
+    aiCoachState.status = '';
+  } finally {
+    aiCoachState.busy = false;
+    renderCoachSection();
+  }
+}
+
+function loadAiDraftIntoImportReview(result) {
+  importMeta = {
+    sourceFilename: 'Coach AI',
+    parserVersion: cleanText(result.parserVersion || 'coach-ai-v1'),
+    confidence: Math.max(0, Math.min(1, Number(result.confidence) || 0)),
+    warnings: Array.isArray(result.warnings) ? result.warnings.map(cleanText).filter(Boolean) : [],
+    rationale: Array.isArray(result.rationale) ? result.rationale.map(cleanText).filter(Boolean) : [],
+    origin: 'ai'
+  };
+  importDraft = buildImportDraft(result.candidateProgram || {}, {
+    sourceFilename: 'Coach AI',
+    parserVersion: importMeta.parserVersion,
+    confidence: importMeta.confidence,
+    origin: 'ai'
+  });
+  renderImportReview();
+}
+
+function reopenAiDraft() {
+  if (!aiCoachState.draftProgram) return;
+  loadAiDraftIntoImportReview({
+    candidateProgram: cloneValue(aiCoachState.draftProgram),
+    rationale: cloneValue(aiCoachState.rationale),
+    warnings: cloneValue(aiCoachState.warnings),
+    confidence: aiCoachState.confidence,
+    parserVersion: 'coach-ai-v1'
+  });
 }
 
 function openExerciseDemo(di, ei) {
@@ -1859,10 +2345,7 @@ function setAppSection(section) {
   if (section === 'today') renderHome();
   if (section === 'plans') renderPrograms();
   if (section === 'progress') renderProgressSection();
-  if (section === 'chat') {
-    renderChatThread();
-    syncChatInputHeight();
-  }
+  if (section === 'chat') renderCoachSection();
   document.getElementById('app')?.scrollTo({ top: 0, behavior: 'smooth' });
   updateHeader();
 }
@@ -1910,6 +2393,9 @@ function renderPrograms() {
   label.textContent = 'Programmi disponibili';
   PROGRAMS.forEach((program, i) => {
     const stats = getProgramStats(program);
+    const badges = [];
+    if (currentProgram && currentProgram.id === program.id) badges.push('<span class="program-pill">Attiva</span>');
+    if (program?.importMeta?.origin === 'ai') badges.push('<span class="program-pill">Coach AI</span>');
     const card = document.createElement('div');
     card.className = 'program-card pop' + (currentProgram && currentProgram.id === program.id ? ' active' : '');
     card.style.animationDelay = (i * 0.05) + 's';
@@ -1920,7 +2406,7 @@ function renderPrograms() {
           <p>${escapeHtml(program.subtitle || 'Scheda allenamento')}</p>
         </div>
         <div class="program-card-actions">
-          ${(currentProgram && currentProgram.id === program.id ? '<span class="program-pill">Attiva</span>' : '') + (program.source === 'imported' ? '<button class="program-delete" type="button">Elimina</button>' : '')}
+          ${badges.join('') + (program.source === 'imported' ? '<button class="program-delete" type="button">Elimina</button>' : '')}
         </div>
       </div>
       <div class="program-meta">
@@ -1982,7 +2468,7 @@ async function loadPrograms() {
   if (!currentProgram && currentSection === 'today') currentSection = 'plans';
   if (currentSection === 'today') renderHome();
   if (currentSection === 'progress') renderProgressSection();
-  if (currentSection === 'chat') renderChatThread();
+  if (currentSection === 'chat') renderCoachSection();
   renderSectionNav();
   updateHeader();
 }
@@ -2714,11 +3200,24 @@ function validateImportDraft(draft) {
 
 function renderImportReview(validationError = '') {
   if (!importDraft || !importMeta) return;
+  const isAiDraft = cleanText(importMeta.origin || '') === 'ai';
 
   const warningHtml = importMeta.warnings.length ? `
     <div class="imp-alert">
       <strong>Controlla questi punti prima di salvare:</strong><br>
       ${importMeta.warnings.map((warning) => '• ' + escapeHtml(warning)).join('<br>')}
+    </div>` : '';
+  const rationaleHtml = isAiDraft && Array.isArray(importMeta.rationale) && importMeta.rationale.length ? `
+    <div class="imp-card imp-section">
+      <div class="imp-section-title">Perche' il Coach AI ha scelto questa bozza</div>
+      <div style="display:grid;gap:10px">
+        ${importMeta.rationale.map((item, index) => `
+          <div class="imp-state" style="text-align:left">
+            <strong>Scelta ${index + 1}</strong><br>
+            ${escapeHtml(item)}
+          </div>
+        `).join('')}
+      </div>
     </div>` : '';
 
   const errorHtml = validationError ? `<div class="imp-error">${escapeHtml(validationError)}</div>` : '';
@@ -2773,18 +3272,21 @@ function renderImportReview(validationError = '') {
   `).join('');
 
   setImportView({
-    subtitle: 'Controlla la bozza prima di salvarla tra le tue schede',
+    subtitle: isAiDraft
+      ? 'Controlla la bozza del Coach AI prima di salvarla tra le tue schede'
+      : 'Controlla la bozza prima di salvarla tra le tue schede',
     canSave: true,
     saveLabel: 'Aggiungi scheda',
     html: `
       ${errorHtml}
       ${warningHtml}
+      ${rationaleHtml}
       <div class="imp-card imp-section">
-        <div class="imp-section-title">Riepilogo import</div>
+        <div class="imp-section-title">${isAiDraft ? 'Riepilogo Coach AI' : 'Riepilogo import'}</div>
         <div class="imp-badge-row">
-          <span class="imp-badge good">PDF: ${escapeHtml(importMeta.sourceFilename)}</span>
+          <span class="imp-badge good">${isAiDraft ? 'Origine: Coach AI' : 'PDF: ' + escapeHtml(importMeta.sourceFilename)}</span>
           <span class="imp-badge ${importMeta.confidence >= 0.7 ? 'good' : 'warn'}">Confidenza: ${Math.round(importMeta.confidence * 100)}%</span>
-          <span class="imp-badge">Parser: ${escapeHtml(importMeta.parserVersion || 'pt-pdf-v1')}</span>
+          <span class="imp-badge">${isAiDraft ? 'Motore' : 'Parser'}: ${escapeHtml(importMeta.parserVersion || (isAiDraft ? 'coach-ai-v1' : 'pt-pdf-v1'))}</span>
         </div>
       </div>
       <div class="imp-card imp-section">
@@ -2875,7 +3377,10 @@ function saveImportedProgram() {
       filename: importMeta?.sourceFilename || '',
       importedAt: new Date().toISOString(),
       parserVersion: importMeta?.parserVersion || 'pt-pdf-v1',
-      confidence: importMeta?.confidence || 0
+      confidence: importMeta?.confidence || 0,
+      origin: cleanText(importMeta?.origin || 'pdf'),
+      warnings: Array.isArray(importMeta?.warnings) ? importMeta.warnings.map(cleanText).filter(Boolean) : [],
+      rationale: Array.isArray(importMeta?.rationale) ? importMeta.rationale.map(cleanText).filter(Boolean) : []
     }
   }], 'imported')[0];
 
@@ -2930,16 +3435,8 @@ function deleteImportedProgram(programId) {
 // INIT
 initPwa();
 document.getElementById('pdf-file-input').addEventListener('change', handlePdfInputChange);
-document.getElementById('chat-input').addEventListener('input', syncChatInputHeight);
-document.getElementById('chat-input').addEventListener('keydown', (event) => {
-  if (event.key === 'Enter' && !event.shiftKey) {
-    event.preventDefault();
-    sendChatMessage();
-  }
-});
 renderSectionNav();
-renderChatThread();
-syncChatInputHeight();
+renderCoachSection();
 setAppSection('plans');
 loadPrograms();
 </script>

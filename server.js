@@ -20,6 +20,7 @@ const PORT = Number(process.env.PORT || 3000);
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4.1';
 const CORS_ALLOWED_ORIGIN = (process.env.CORS_ALLOWED_ORIGIN || '').trim();
 const PARSER_VERSION = 'pt-pdf-v1';
+const COACH_AI_VERSION = 'coach-ai-v1';
 const ROOT_DIR = __dirname;
 const ICONS_DIR = path.join(ROOT_DIR, 'icons');
 
@@ -82,6 +83,61 @@ const IMPORT_SCHEMA = {
   }
 };
 
+const COACH_PROGRAM_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['candidateProgram', 'rationale', 'warnings', 'confidence'],
+  properties: {
+    candidateProgram: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['title', 'subtitle', 'weeks', 'days'],
+      properties: {
+        title: { type: 'string' },
+        subtitle: { type: 'string' },
+        weeks: { type: 'string' },
+        days: {
+          type: 'array',
+          minItems: 1,
+          items: {
+            type: 'object',
+            additionalProperties: false,
+            required: ['name', 'label', 'exercises'],
+            properties: {
+              name: { type: 'string' },
+              label: { type: 'string' },
+              exercises: {
+                type: 'array',
+                minItems: 1,
+                items: {
+                  type: 'object',
+                  additionalProperties: false,
+                  required: ['name', 'series', 'reps', 'note'],
+                  properties: {
+                    name: { type: 'string' },
+                    series: { type: 'integer', minimum: 1 },
+                    reps: { type: 'string' },
+                    note: { type: 'string' }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    rationale: {
+      type: 'array',
+      items: { type: 'string' }
+    },
+    warnings: {
+      type: 'array',
+      items: { type: 'string' }
+    },
+    confidence: { type: 'number', minimum: 0, maximum: 1 }
+  }
+};
+
 const SYSTEM_PROMPT = [
   'Sei un parser di schede allenamento in PDF per una PWA fitness.',
   'Leggi il PDF del personal trainer e restituisci solo i dati workout in JSON conforme allo schema.',
@@ -102,6 +158,17 @@ const CHAT_SYSTEM_PROMPT = [
   'Se la domanda tocca temi medici, infortuni, farmaci o dolore, invita con calma a sentire un medico o professionista qualificato.',
   'Mantieni risposte brevi ma utili: massimo 6-8 frasi salvo richiesta esplicita di approfondimento.',
   'Quando hai contesto sulla scheda attiva, usalo in modo naturale senza elencarlo tutto ogni volta.'
+].join(' ');
+
+const COACH_PROGRAM_SYSTEM_PROMPT = [
+  'Sei il Coach AI di Massi Gym e lavori come un personal trainer pratico.',
+  'Generi nuove schede palestra realistiche e progressive usando prima lo storico reale dell\'utente e poi le sue preferenze.',
+  'Mantieni continuita` con le schede precedenti quando ha senso, a meno che il contesto chieda un cambio netto.',
+  'Rispondi sempre in italiano e restituisci solo JSON valido conforme allo schema.',
+  'La scheda deve essere adatta al livello dichiarato, all\'attrezzatura disponibile, alla durata media della seduta e ai giorni a settimana.',
+  'Usa esercizi comprensibili e note brevi, concrete e non prolisse.',
+  'Evita programmi estremi, volumi irrealistici o esercizi incompatibili con limitazioni e attrezzatura.',
+  'Se alcuni dati sono mancanti, fai assunzioni prudenti e segnala quei punti in warnings.'
 ].join(' ');
 
 function applyCors(req, res) {
@@ -172,6 +239,249 @@ function buildChatContextText(context) {
     lines.push('Giorni scheda: ' + context.dayLabels.map(cleanString).filter(Boolean).join(', '));
   }
   return lines.join('\n');
+}
+
+function normalizeStringList(value) {
+  const source = Array.isArray(value) ? value : String(value || '').split(/[,;\n]+/);
+  return source.map(cleanString).filter(Boolean).slice(0, 12);
+}
+
+function normalizeAiProfile(rawProfile, context = null) {
+  const safe = rawProfile && typeof rawProfile === 'object' ? rawProfile : {};
+  const inferredDays = Math.max(
+    0,
+    parseInt(safe.daysPerWeek, 10) || 0,
+    parseInt(context?.currentProgram?.daysCount, 10) || 0,
+    parseInt(context?.recentPrograms?.[0]?.daysCount, 10) || 0
+  );
+
+  return {
+    name: cleanString(safe.name || ''),
+    goal: cleanString(safe.goal || ''),
+    experience: cleanString(safe.experience || ''),
+    daysPerWeek: inferredDays,
+    sessionLength: cleanString(safe.sessionLength || ''),
+    equipment: cleanString(safe.equipment || ''),
+    focusAreas: normalizeStringList(safe.focusAreas || []),
+    avoidExercises: normalizeStringList(safe.avoidExercises || []),
+    limitations: cleanString(safe.limitations || ''),
+    notes: cleanString(safe.notes || '')
+  };
+}
+
+function normalizeAiContext(rawContext) {
+  const safe = rawContext && typeof rawContext === 'object' ? rawContext : {};
+  return {
+    currentProgram: safe.currentProgram && typeof safe.currentProgram === 'object' ? {
+      id: cleanString(safe.currentProgram.id || ''),
+      title: cleanString(safe.currentProgram.title || ''),
+      subtitle: cleanString(safe.currentProgram.subtitle || ''),
+      weeks: cleanString(safe.currentProgram.weeks || ''),
+      daysCount: Math.max(0, parseInt(safe.currentProgram.daysCount, 10) || 0),
+      currentWeek: Math.max(0, parseInt(safe.currentProgram.currentWeek, 10) || 0),
+      completedDaysThisWeek: Math.max(0, parseInt(safe.currentProgram.completedDaysThisWeek, 10) || 0),
+      totalDaysThisWeek: Math.max(0, parseInt(safe.currentProgram.totalDaysThisWeek, 10) || 0),
+      dayLabels: (Array.isArray(safe.currentProgram.dayLabels) ? safe.currentProgram.dayLabels : []).map(cleanString).filter(Boolean).slice(0, 10)
+    } : null,
+    recentPrograms: (Array.isArray(safe.recentPrograms) ? safe.recentPrograms : []).slice(0, 4).map((program) => ({
+      id: cleanString(program?.id || ''),
+      title: cleanString(program?.title || ''),
+      subtitle: cleanString(program?.subtitle || ''),
+      weeks: cleanString(program?.weeks || ''),
+      daysCount: Math.max(0, parseInt(program?.daysCount, 10) || 0),
+      totalSessions: Math.max(0, parseInt(program?.totalSessions, 10) || 0),
+      totalCompletedDays: Math.max(0, parseInt(program?.totalCompletedDays, 10) || 0),
+      origin: cleanString(program?.origin || '')
+    })),
+    historySummary: (Array.isArray(safe.historySummary) ? safe.historySummary : []).slice(0, 8).map((entry) => ({
+      date: cleanString(entry?.date || ''),
+      week: Math.max(0, parseInt(entry?.week, 10) || 0),
+      day: cleanString(entry?.day || ''),
+      exercisesDone: Math.max(0, parseInt(entry?.exercisesDone, 10) || 0)
+    })),
+    progressionSummary: (Array.isArray(safe.progressionSummary) ? safe.progressionSummary : []).slice(0, 10).map((entry) => ({
+      day: cleanString(entry?.day || ''),
+      exercise: cleanString(entry?.exercise || ''),
+      lastWeight: cleanString(entry?.lastWeight || ''),
+      trend: ['up', 'same', 'down', 'new'].includes(entry?.trend) ? entry.trend : 'same',
+      week: Math.max(0, parseInt(entry?.week, 10) || 0)
+    }))
+  };
+}
+
+function buildCoachContextText(profile, context) {
+  const lines = [];
+  if (profile.name) lines.push('Nome atleta: ' + profile.name);
+  if (profile.goal) lines.push('Obiettivo principale: ' + profile.goal);
+  if (profile.experience) lines.push('Livello: ' + profile.experience);
+  if (profile.daysPerWeek) lines.push('Giorni richiesti a settimana: ' + profile.daysPerWeek);
+  if (profile.sessionLength) lines.push('Durata media seduta: ' + profile.sessionLength + ' minuti');
+  if (profile.equipment) lines.push('Attrezzatura disponibile: ' + profile.equipment);
+  if (profile.focusAreas.length) lines.push('Focus desiderati: ' + profile.focusAreas.join(', '));
+  if (profile.avoidExercises.length) lines.push('Esercizi da evitare: ' + profile.avoidExercises.join(', '));
+  if (profile.limitations) lines.push('Limitazioni o fastidi: ' + profile.limitations);
+  if (profile.notes) lines.push('Note utente: ' + profile.notes);
+
+  if (context.currentProgram?.title) {
+    lines.push('Scheda attiva: ' + context.currentProgram.title);
+    if (context.currentProgram.subtitle) lines.push('Sottotitolo scheda attiva: ' + context.currentProgram.subtitle);
+    if (context.currentProgram.weeks) lines.push('Durata scheda attiva: ' + context.currentProgram.weeks);
+    if (context.currentProgram.daysCount) lines.push('Giorni nella scheda attiva: ' + context.currentProgram.daysCount);
+    if (context.currentProgram.currentWeek) {
+      lines.push(
+        'Settimana corrente: ' + context.currentProgram.currentWeek +
+        ' con ' + context.currentProgram.completedDaysThisWeek + '/' + context.currentProgram.totalDaysThisWeek + ' giorni completati'
+      );
+    }
+    if (context.currentProgram.dayLabels.length) lines.push('Split attuale: ' + context.currentProgram.dayLabels.join(', '));
+  }
+
+  if (context.recentPrograms.length) {
+    lines.push('Schede recenti: ' + context.recentPrograms.map((program) => {
+      return [
+        program.title || 'Scheda',
+        program.daysCount ? program.daysCount + ' giorni' : '',
+        program.totalSessions ? program.totalSessions + ' sessioni' : '',
+        program.origin === 'ai' ? 'origine AI' : 'origine PT'
+      ].filter(Boolean).join(' · ');
+    }).join(' | '));
+  }
+
+  if (context.progressionSummary.length) {
+    lines.push('Progressi recenti: ' + context.progressionSummary.map((item) => {
+      return [
+        item.exercise || 'Esercizio',
+        item.day || '',
+        item.lastWeight ? 'ultimo picco ' + item.lastWeight + ' kg' : '',
+        item.trend === 'up' ? 'trend in salita' : item.trend === 'down' ? 'trend in calo' : item.trend === 'same' ? 'trend stabile' : 'nuovo riferimento'
+      ].filter(Boolean).join(' · ');
+    }).join(' | '));
+  }
+
+  if (context.historySummary.length) {
+    lines.push('Ultime sessioni: ' + context.historySummary.map((entry) => {
+      return [
+        entry.day || 'Sessione',
+        entry.week ? 'week ' + entry.week : '',
+        entry.exercisesDone ? entry.exercisesDone + ' esercizi completati' : '',
+        entry.date || ''
+      ].filter(Boolean).join(' · ');
+    }).join(' | '));
+  }
+
+  return lines.join('\n');
+}
+
+function createAiIntakeQuestions(profile, context) {
+  const questions = [];
+  if (!profile.goal) {
+    questions.push({
+      id: 'goal',
+      label: 'Obiettivo',
+      question: 'Qual e` l\'obiettivo principale del prossimo blocco?',
+      type: 'select',
+      options: [
+        { value: 'ipertrofia', label: 'Ipertrofia' },
+        { value: 'ricomposizione', label: 'Ricomposizione' },
+        { value: 'dimagrimento', label: 'Dimagrimento' },
+        { value: 'forza', label: 'Forza' }
+      ]
+    });
+  }
+  if (!profile.experience) {
+    questions.push({
+      id: 'experience',
+      label: 'Livello',
+      question: 'Con che livello vuoi che il Coach AI ragioni?',
+      type: 'select',
+      options: [
+        { value: 'principiante', label: 'Principiante' },
+        { value: 'intermedio', label: 'Intermedio' },
+        { value: 'avanzato', label: 'Avanzato' }
+      ]
+    });
+  }
+  if (!profile.daysPerWeek) {
+    questions.push({
+      id: 'daysPerWeek',
+      label: 'Giorni a settimana',
+      question: 'Quanti giorni vuoi allenarti nel prossimo blocco?',
+      type: 'select',
+      options: [2, 3, 4, 5, 6].map((value) => ({ value: String(value), label: String(value) }))
+    });
+  }
+  if (!profile.sessionLength) {
+    questions.push({
+      id: 'sessionLength',
+      label: 'Durata seduta',
+      question: 'Quanto deve durare mediamente ogni allenamento?',
+      type: 'select',
+      options: [
+        { value: '45-60', label: '45-60 min' },
+        { value: '60-75', label: '60-75 min' },
+        { value: '75-90', label: '75-90 min' }
+      ]
+    });
+  }
+  if (!profile.equipment) {
+    questions.push({
+      id: 'equipment',
+      label: 'Attrezzatura',
+      question: 'Con che attrezzatura deve essere costruita la scheda?',
+      type: 'select',
+      options: [
+        { value: 'palestra_completa', label: 'Palestra completa' },
+        { value: 'basic_gym', label: 'Palestra essenziale' },
+        { value: 'home_gym', label: 'Home gym' }
+      ]
+    });
+  }
+  if (!profile.focusAreas.length && !context.currentProgram && !context.recentPrograms.length) {
+    questions.push({
+      id: 'focusAreas',
+      label: 'Focus muscolari',
+      question: 'Se vuoi, dimmi i gruppi muscolari su cui vuoi spingere di piu`.',
+      type: 'text',
+      placeholder: 'Per esempio: petto, dorso, spalle'
+    });
+  }
+  return questions.slice(0, 6);
+}
+
+function validateAiGeneratedProgram(result, profile) {
+  const safe = result && typeof result === 'object' ? result : {};
+  const normalized = normalizeCandidateProgram({
+    athleteName: '',
+    title: safe.candidateProgram?.title || '',
+    subtitle: safe.candidateProgram?.subtitle || '',
+    weeks: safe.candidateProgram?.weeks || '',
+    confidence: safe.confidence,
+    warnings: Array.isArray(safe.warnings) ? safe.warnings : [],
+    days: Array.isArray(safe.candidateProgram?.days) ? safe.candidateProgram.days : []
+  }, 'coach-ai');
+
+  if (!normalized.days.length) {
+    const error = new Error('Il Coach AI non ha generato giorni di allenamento validi.');
+    error.statusCode = 502;
+    throw error;
+  }
+
+  if (profile.daysPerWeek && normalized.days.length !== profile.daysPerWeek) {
+    normalized.warnings.push('La bozza generata ha ' + normalized.days.length + ' giorni invece dei ' + profile.daysPerWeek + ' richiesti: controllala prima di salvarla.');
+  }
+
+  return {
+    candidateProgram: {
+      id: '',
+      title: cleanString(safe.candidateProgram?.title || normalized.title || 'Coach AI · Nuova scheda'),
+      subtitle: cleanString(safe.candidateProgram?.subtitle || '') || 'Scheda generata dal Coach AI',
+      weeks: normalized.weeks || '5 settimane',
+      days: normalized.days
+    },
+    rationale: (Array.isArray(safe.rationale) ? safe.rationale : []).map(cleanString).filter(Boolean).slice(0, 6),
+    warnings: normalized.warnings,
+    confidence: Math.max(0, Math.min(1, Number(safe.confidence) || 0))
+  };
 }
 
 function normalizeCandidateProgram(raw, filename) {
@@ -392,6 +702,77 @@ async function createCoachReply(messages, context) {
   return reply;
 }
 
+async function generateAiProgram(profileInput, contextInput, answersInput) {
+  if (!client) {
+    const error = new Error('OPENAI_API_KEY mancante sul server.');
+    error.statusCode = 500;
+    throw error;
+  }
+
+  const context = normalizeAiContext(contextInput);
+  const profile = normalizeAiProfile({ ...(profileInput || {}), ...(answersInput || {}) }, context);
+  const missingQuestions = createAiIntakeQuestions(profile, context);
+  if (missingQuestions.length) {
+    const error = new Error('Mancano ancora alcune informazioni prima di generare la scheda.');
+    error.statusCode = 422;
+    error.questions = missingQuestions;
+    throw error;
+  }
+
+  const response = await client.responses.create({
+    model: OPENAI_MODEL,
+    max_output_tokens: 2800,
+    input: [
+      {
+        role: 'system',
+        content: [
+          { type: 'input_text', text: COACH_PROGRAM_SYSTEM_PROMPT }
+        ]
+      },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'input_text',
+            text: [
+              'Usa il seguente contesto per generare una nuova scheda JSON compatibile con Massi Gym.',
+              '',
+              'Profilo e memoria utente:',
+              buildCoachContextText(profile, context),
+              '',
+              'Regole operative:',
+              '- crea ' + profile.daysPerWeek + ' giorni di allenamento',
+              '- tieni le sedute realistiche per una durata media di ' + profile.sessionLength + ' minuti',
+              '- se esiste gia` una scheda attiva, continua il filo logico di quel lavoro salvo segnali contrari',
+              '- favorisci esercizi comprensibili e adatti a ' + profile.equipment,
+              '- mantieni note brevi e pratiche',
+              '- il campo weeks deve essere una stringa leggibile, per esempio "5 settimane" o "6 settimane"',
+              '- title e subtitle devono far capire che si tratta di una nuova scheda Coach AI'
+            ].join('\n')
+          }
+        ]
+      }
+    ],
+    text: {
+      format: {
+        type: 'json_schema',
+        name: 'coach_ai_program_generation',
+        strict: true,
+        schema: COACH_PROGRAM_SCHEMA
+      }
+    }
+  });
+
+  if (!response.output_text) {
+    const error = new Error('Risposta Coach AI vuota.');
+    error.statusCode = 502;
+    throw error;
+  }
+
+  const parsed = JSON.parse(response.output_text);
+  return validateAiGeneratedProgram(parsed, profile);
+}
+
 app.use((req, res, next) => {
   applyCors(req, res);
   if (req.method === 'OPTIONS') {
@@ -402,7 +783,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/healthz', (_req, res) => {
-  res.json({ ok: true, parserVersion: PARSER_VERSION });
+  res.json({ ok: true, parserVersion: PARSER_VERSION, coachAiVersion: COACH_AI_VERSION });
 });
 
 app.post('/api/import-pdf', upload.single('file'), async (req, res) => {
@@ -443,6 +824,41 @@ app.post('/api/chat', async (req, res) => {
       ? 'Chat non disponibile in questo momento. Riprova tra poco.'
       : error.message;
     sendJsonError(res, statusCode, message);
+  }
+});
+
+app.post('/api/ai/intake', async (req, res) => {
+  try {
+    const context = normalizeAiContext(req.body?.context);
+    const profile = normalizeAiProfile(req.body?.profile, context);
+    res.json({
+      questions: createAiIntakeQuestions(profile, context),
+      coachAiVersion: COACH_AI_VERSION
+    });
+  } catch (error) {
+    console.error('Coach AI intake error:', error);
+    const statusCode = error.statusCode || 500;
+    const message = statusCode >= 500
+      ? 'Coach AI non disponibile in questo momento. Riprova tra poco.'
+      : error.message;
+    sendJsonError(res, statusCode, message);
+  }
+});
+
+app.post('/api/ai/generate-program', async (req, res) => {
+  try {
+    const generated = await generateAiProgram(req.body?.profile, req.body?.context, req.body?.answers);
+    res.json({
+      ...generated,
+      parserVersion: COACH_AI_VERSION
+    });
+  } catch (error) {
+    console.error('Coach AI generate error:', error);
+    const statusCode = error.statusCode || 500;
+    const message = statusCode >= 500
+      ? 'Generazione scheda non disponibile in questo momento. Riprova tra poco.'
+      : error.message;
+    sendJsonError(res, statusCode, message, error.questions ? { questions: error.questions } : {});
   }
 });
 

@@ -15,7 +15,7 @@ Flusso schede:
 - Ogni import PDF crea una nuova scheda, senza sostituire quelle esistenti
 
 Variabili ambiente backend:
-- OPENAI_API_KEY -> obbligatoria per l'import PDF
+- OPENAI_API_KEY -> obbligatoria per import PDF e Coach AI
 - CORS_ALLOWED_ORIGIN -> opzionale, utile se frontend e backend non sono sullo stesso dominio
 - OPENAI_MODEL -> opzionale, default gpt-4.1
 
@@ -33,5 +33,14 @@ Deploy su Render:
 
 Endpoint:
 - POST /api/import-pdf -> riceve multipart/form-data con file PDF
-- POST /api/chat -> riceve JSON con messaggi e contesto scheda attiva
+- POST /api/chat -> chat generale del coach AI, lasciata disponibile per evoluzioni future
+- POST /api/ai/intake -> legge profilo + contesto e restituisce solo le domande mancanti per creare una nuova scheda
+- POST /api/ai/generate-program -> genera una scheda JSON compatibile con l'app partendo da profilo, storico e risposte finali
 - GET /healthz -> healthcheck semplice
+
+Coach AI fase 1:
+- Il tab Coach non e` una chat libera: e` un wizard PT AI
+- Il profilo utente viene salvato in localStorage con chiave massi_user_profile
+- Il Coach AI legge scheda attiva, settimane, storico e progressi recenti
+- La bozza generata viene aperta nello stesso editor/review usato per l'import PDF
+- Le schede salvate dal Coach AI restano schede utente normali con origin = ai
