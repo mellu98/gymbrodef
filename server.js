@@ -18,9 +18,11 @@ const upload = multer({
 
 const PORT = Number(process.env.PORT || 3000);
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4.1';
+const OPENAI_ASSISTANT_MODEL = process.env.OPENAI_ASSISTANT_MODEL || 'gpt-5-nano';
 const CORS_ALLOWED_ORIGIN = (process.env.CORS_ALLOWED_ORIGIN || '').trim();
 const PARSER_VERSION = 'pt-pdf-v1';
 const COACH_AI_VERSION = 'coach-ai-v1';
+const ASSISTANT_CHAT_VERSION = 'assistant-overlay-v1';
 const ROOT_DIR = __dirname;
 const ICONS_DIR = path.join(ROOT_DIR, 'icons');
 
@@ -151,13 +153,13 @@ const SYSTEM_PROMPT = [
 ].join(' ');
 
 const CHAT_SYSTEM_PROMPT = [
-  'Sei il coach AI interno di una app palestra chiamata Massi Gym.',
-  'Rispondi sempre in italiano, con tono pratico, chiaro e motivante.',
-  'Aiuta su lettura schede, gestione settimane, progressione dei carichi, organizzazione allenamenti e dubbi fitness generali.',
-  'Non inventare dati personali o risultati di salute non forniti.',
-  'Se la domanda tocca temi medici, infortuni, farmaci o dolore, invita con calma a sentire un medico o professionista qualificato.',
-  'Mantieni risposte brevi ma utili: massimo 6-8 frasi salvo richiesta esplicita di approfondimento.',
-  'Quando hai contesto sulla scheda attiva, usalo in modo naturale senza elencarlo tutto ogni volta.'
+  'Sei l\'Assistente AI rapido di Massi Gym, una mini chat flottante sempre disponibile durante la consultazione della scheda e durante il workout.',
+  'Rispondi sempre in italiano con tono pratico, operativo e rassicurante.',
+  'Sei specializzato in chiarimenti veloci su esercizi, ordine della scheda, recupero, gestione dei carichi, progressione settimana per settimana e dubbi rapidi durante l\'allenamento.',
+  'Usa il contesto della schermata corrente quando presente, senza ripeterlo in blocco e senza inventare dati mancanti.',
+  'Preferisci risposte brevi e subito utili: massimo 4-6 frasi o pochi punti essenziali salvo richiesta esplicita di approfondimento.',
+  'Se manca un dato importante, dillo chiaramente e proponi il passo pratico successivo.',
+  'Se il tema tocca dolore, infortunio, farmaci o aspetti medici, invita con calma a confrontarsi con un medico o professionista qualificato.'
 ].join(' ');
 
 const COACH_PROGRAM_SYSTEM_PROMPT = [
@@ -228,6 +230,7 @@ function normalizeChatMessages(rawMessages) {
 function buildChatContextText(context) {
   if (!context || typeof context !== 'object') return '';
   const lines = [];
+  if (cleanString(context.sectionLabel)) lines.push('Schermata attuale: ' + cleanString(context.sectionLabel));
   if (cleanString(context.programTitle)) lines.push('Scheda attiva: ' + cleanString(context.programTitle));
   if (cleanString(context.programSubtitle)) lines.push('Sottotitolo: ' + cleanString(context.programSubtitle));
   if (cleanString(context.weeksLabel)) lines.push('Durata indicata: ' + cleanString(context.weeksLabel));
@@ -235,8 +238,50 @@ function buildChatContextText(context) {
   if (Number(context.completedDays) >= 0 && Number(context.totalDays) > 0) {
     lines.push('Giorni completati: ' + Number(context.completedDays) + '/' + Number(context.totalDays));
   }
+  if (cleanString(context.currentDayLabel)) lines.push('Giorno attivo: ' + cleanString(context.currentDayLabel));
+  if (cleanString(context.viewMode)) lines.push('Vista attuale: ' + cleanString(context.viewMode));
   if (Array.isArray(context.dayLabels) && context.dayLabels.length) {
     lines.push('Giorni scheda: ' + context.dayLabels.map(cleanString).filter(Boolean).join(', '));
+  }
+  if (context.currentExercise && typeof context.currentExercise === 'object' && cleanString(context.currentExercise.name)) {
+    lines.push(
+      'Esercizio focus: ' +
+      cleanString(context.currentExercise.name) +
+      ' · ' +
+      Math.max(0, parseInt(context.currentExercise.series, 10) || 0) +
+      ' serie · ' +
+      cleanString(context.currentExercise.reps || '')
+    );
+  }
+  if (context.nextExercise && typeof context.nextExercise === 'object' && cleanString(context.nextExercise.name)) {
+    lines.push(
+      'Prossimo esercizio: ' +
+      cleanString(context.nextExercise.name) +
+      ' · ' +
+      Math.max(0, parseInt(context.nextExercise.series, 10) || 0) +
+      ' serie · ' +
+      cleanString(context.nextExercise.reps || '')
+    );
+  }
+  if (Array.isArray(context.progressionSummary) && context.progressionSummary.length) {
+    lines.push(
+      'Progressi recenti: ' + context.progressionSummary.slice(0, 3).map((item) => {
+        const exercise = cleanString(item?.exercise || '');
+        const weight = cleanString(item?.lastWeight || '');
+        const trend = cleanString(item?.trend || '');
+        return [exercise, weight ? 'ultimo ' + weight + ' kg' : '', trend ? 'trend ' + trend : ''].filter(Boolean).join(' · ');
+      }).filter(Boolean).join(' | ')
+    );
+  }
+  if (Array.isArray(context.recentSessions) && context.recentSessions.length) {
+    lines.push(
+      'Ultime sessioni: ' + context.recentSessions.slice(0, 3).map((item) => {
+        const label = cleanString(item?.day || '');
+        const week = Math.max(0, parseInt(item?.week, 10) || 0);
+        const date = cleanString(item?.date || '');
+        return [label, week ? 'W' + week : '', date].filter(Boolean).join(' · ');
+      }).filter(Boolean).join(' | ')
+    );
   }
   return lines.join('\n');
 }
@@ -653,7 +698,7 @@ async function createCoachReply(messages, context) {
 
   const normalizedMessages = normalizeChatMessages(messages);
   if (!normalizedMessages.length) {
-    const error = new Error('Invia almeno un messaggio al coach AI.');
+    const error = new Error('Invia almeno un messaggio all\'assistente AI.');
     error.statusCode = 400;
     throw error;
   }
@@ -687,14 +732,14 @@ async function createCoachReply(messages, context) {
   });
 
   const response = await client.responses.create({
-    model: OPENAI_MODEL,
+    model: OPENAI_ASSISTANT_MODEL,
     input,
-    max_output_tokens: 500
+    max_output_tokens: 260
   });
 
   const reply = cleanString(response.output_text || '');
   if (!reply) {
-    const error = new Error('Risposta chat vuota.');
+    const error = new Error('Risposta assistente vuota.');
     error.statusCode = 502;
     throw error;
   }
@@ -783,7 +828,13 @@ app.use((req, res, next) => {
 });
 
 app.get('/healthz', (_req, res) => {
-  res.json({ ok: true, parserVersion: PARSER_VERSION, coachAiVersion: COACH_AI_VERSION });
+  res.json({
+    ok: true,
+    parserVersion: PARSER_VERSION,
+    coachAiVersion: COACH_AI_VERSION,
+    assistantChatVersion: ASSISTANT_CHAT_VERSION,
+    assistantModel: OPENAI_ASSISTANT_MODEL
+  });
 });
 
 app.post('/api/import-pdf', upload.single('file'), async (req, res) => {
@@ -815,13 +866,13 @@ app.post('/api/chat', async (req, res) => {
     const reply = await createCoachReply(req.body?.messages, req.body?.context);
     res.json({
       reply,
-      model: OPENAI_MODEL
+      model: OPENAI_ASSISTANT_MODEL
     });
   } catch (error) {
     console.error('Chat error:', error);
     const statusCode = error.statusCode || 500;
     const message = statusCode >= 500
-      ? 'Chat non disponibile in questo momento. Riprova tra poco.'
+      ? 'Assistente AI non disponibile in questo momento. Riprova tra poco.'
       : error.message;
     sendJsonError(res, statusCode, message);
   }

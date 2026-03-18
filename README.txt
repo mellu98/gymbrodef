@@ -17,7 +17,8 @@ Flusso schede:
 Variabili ambiente backend:
 - OPENAI_API_KEY -> obbligatoria per import PDF e Coach AI
 - CORS_ALLOWED_ORIGIN -> opzionale, utile se frontend e backend non sono sullo stesso dominio
-- OPENAI_MODEL -> opzionale, default gpt-4.1
+- OPENAI_MODEL -> opzionale, default gpt-4.1, usato per import PDF e generazione schede del Coach AI
+- OPENAI_ASSISTANT_MODEL -> opzionale, default gpt-5-nano, usato dalla mini chat flottante Assistente AI
 
 Avvio locale:
 1. npm install
@@ -33,7 +34,7 @@ Deploy su Render:
 
 Endpoint:
 - POST /api/import-pdf -> riceve multipart/form-data con file PDF
-- POST /api/chat -> chat generale del coach AI, lasciata disponibile per evoluzioni future
+- POST /api/chat -> mini assistente AI rapido, contestuale alla schermata corrente
 - POST /api/ai/intake -> legge profilo + contesto e restituisce solo le domande mancanti per creare una nuova scheda
 - POST /api/ai/generate-program -> genera una scheda JSON compatibile con l'app partendo da profilo, storico e risposte finali
 - GET /healthz -> healthcheck semplice
@@ -44,3 +45,9 @@ Coach AI fase 1:
 - Il Coach AI legge scheda attiva, settimane, storico e progressi recenti
 - La bozza generata viene aperta nello stesso editor/review usato per l'import PDF
 - Le schede salvate dal Coach AI restano schede utente normali con origin = ai
+
+Assistente AI flottante:
+- Il pulsante robot apre una mini chat overlay separata dal tab Coach
+- La mini chat usa sessionStorage con chiave massi_overlay_assistant_v1
+- I messaggi restano disponibili finche' l'app resta aperta, ma ripartono visivamente da zero quando la sessione della PWA/browser viene riaperta
+- Il payload verso /api/chat include anche contesto automatico della schermata corrente, della scheda attiva e del workout in corso

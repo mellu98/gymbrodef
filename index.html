@@ -194,6 +194,87 @@ body{font-family:'DM Sans',sans-serif;background:
 .action-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .surface-empty{font-size:12px;color:var(--tm);line-height:1.6}
 
+/* FLOATING ASSISTANT */
+.assistant-fab{
+  position:fixed;right:18px;bottom:calc(104px + var(--dock-safe-bottom));z-index:140;
+  width:58px;height:58px;border-radius:50%;border:1px solid rgba(255,255,255,.12);
+  background:rgba(16,16,16,.88);color:#fff;display:flex;align-items:center;justify-content:center;
+  font-size:25px;cursor:pointer;box-shadow:0 16px 32px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.05);
+  backdrop-filter:blur(18px) saturate(150%);-webkit-backdrop-filter:blur(18px) saturate(150%);
+  transform:translateY(16px) scale(.94);opacity:0;pointer-events:none;transition:all .24s ease
+}
+.assistant-fab.show{opacity:1;transform:none;pointer-events:auto}
+.assistant-fab.session{bottom:calc(96px + var(--safe-bottom))}
+.assistant-fab.open{border-color:rgba(0,230,118,.32);box-shadow:0 16px 34px rgba(0,0,0,.34),0 0 0 6px rgba(0,230,118,.08)}
+.assistant-fab:hover{border-color:rgba(0,230,118,.24);transform:translateY(-1px)}
+.assistant-fab.show.open:hover{transform:translateY(-1px)}
+.assistant-fab-label{display:none}
+.assistant-layer{
+  position:fixed;inset:0;z-index:150;pointer-events:none;opacity:0;transition:opacity .2s ease
+}
+.assistant-layer.show{opacity:1;pointer-events:auto}
+.assistant-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.16)}
+.assistant-panel{
+  position:absolute;right:14px;bottom:calc(176px + var(--dock-safe-bottom));width:min(392px,calc(100vw - 28px));
+  max-height:min(66vh,620px);display:flex;flex-direction:column;background:rgba(12,12,12,.92);
+  border:1px solid rgba(255,255,255,.10);border-radius:24px;overflow:hidden;
+  box-shadow:0 22px 48px rgba(0,0,0,.42),inset 0 1px 0 rgba(255,255,255,.04);
+  backdrop-filter:blur(24px) saturate(145%);-webkit-backdrop-filter:blur(24px) saturate(145%);
+  transform:translateY(18px) scale(.98);transition:transform .22s ease
+}
+.assistant-layer.show .assistant-panel{transform:none}
+.assistant-layer.session .assistant-panel{bottom:calc(168px + var(--safe-bottom))}
+.assistant-top{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:16px 16px 12px;border-bottom:1px solid rgba(255,255,255,.06)
+}
+.assistant-top-copy strong{display:block;font-size:14px;line-height:1.2}
+.assistant-top-copy span{display:block;font-size:11px;color:var(--tm);margin-top:4px;line-height:1.5}
+.assistant-top-actions{display:flex;align-items:center;gap:8px}
+.assistant-top-btn{
+  background:transparent;border:none;color:var(--tm);font-size:11px;font-weight:700;letter-spacing:1px;
+  text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:color .2s
+}
+.assistant-top-btn:hover{color:var(--g)}
+.assistant-top-btn.close{font-size:18px;line-height:1}
+.assistant-thread-wrap{padding:14px 16px 8px;overflow-y:auto;flex:1;min-height:180px}
+.assistant-thread{display:flex;flex-direction:column;gap:10px}
+.assistant-empty{
+  background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.10);border-radius:18px;
+  padding:18px 16px;text-align:center;font-size:12px;line-height:1.75;color:var(--tm)
+}
+.assistant-msg{
+  max-width:90%;padding:12px 14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);
+  font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word
+}
+.assistant-msg.user{
+  align-self:flex-end;background:linear-gradient(180deg,rgba(0,230,118,.14),rgba(0,200,83,.08));
+  border-color:rgba(0,230,118,.18)
+}
+.assistant-msg.assistant{
+  align-self:flex-start;background:rgba(255,255,255,.03)
+}
+.assistant-msg.typing{
+  align-self:flex-start;color:var(--tm);background:rgba(255,255,255,.02);border-style:dashed
+}
+.assistant-compose{
+  padding:12px 14px 14px;border-top:1px solid rgba(255,255,255,.06);background:linear-gradient(180deg,rgba(255,255,255,.01),rgba(255,255,255,.03))
+}
+.assistant-compose-row{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:end}
+.assistant-input{
+  width:100%;min-height:52px;max-height:140px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.10);
+  color:var(--t);border-radius:18px;padding:14px 16px;font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:none;outline:none
+}
+.assistant-input:focus{border-color:rgba(0,230,118,.34);box-shadow:0 0 0 4px rgba(0,230,118,.08)}
+.assistant-send{
+  min-width:90px;height:52px;border-radius:16px;background:var(--s2);border:1px solid var(--td);
+  color:var(--t);font-size:12px;font-weight:700;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s
+}
+.assistant-send:hover{border-color:var(--g);color:var(--g)}
+.assistant-send:disabled{opacity:.5;cursor:not-allowed}
+.assistant-status{font-size:11px;color:var(--tm);line-height:1.5;padding:8px 2px 0}
+.assistant-status.error{color:#ff8a9b}
+.assistant-status.good{color:var(--g)}
+
 /* CHAT */
 .chat-shell{max-width:980px;margin:0 auto}
 .chat-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap;margin-bottom:14px}
@@ -546,6 +627,12 @@ body{font-family:'DM Sans',sans-serif;background:
   .section-tab{padding:11px 12px;gap:8px}
   .section-tab-label{font-size:11px}
   .section-tab-ico{width:30px;height:30px;border-radius:10px;font-size:14px}
+  .assistant-fab{right:14px;bottom:calc(96px + var(--dock-safe-bottom));width:54px;height:54px;font-size:23px}
+  .assistant-fab.session{bottom:calc(90px + var(--safe-bottom))}
+  .assistant-panel{right:14px;left:14px;width:auto;bottom:calc(164px + var(--dock-safe-bottom));max-height:min(62vh,560px)}
+  .assistant-layer.session .assistant-panel{bottom:calc(156px + var(--safe-bottom))}
+  .assistant-compose-row{grid-template-columns:1fr}
+  .assistant-send{width:100%}
   .section-copy h2{font-size:30px}
   #programs,#home,#progress,#coach{padding-bottom:calc(148px + var(--safe-bottom))}
   .chat-head h2{font-size:30px}
@@ -673,6 +760,37 @@ body{font-family:'DM Sans',sans-serif;background:
 </div>
 
 </div><!-- end #app -->
+
+<!-- FLOATING ASSISTANT -->
+<button id="assistant-fab" class="assistant-fab" type="button" onclick="toggleAssistantOverlay()" aria-label="Apri assistente AI" title="Assistente AI">
+  <span aria-hidden="true">🤖</span>
+</button>
+
+<div id="assistant-layer" class="assistant-layer" aria-hidden="true">
+  <div class="assistant-backdrop" onclick="closeAssistantOverlay()"></div>
+  <div class="assistant-panel" role="dialog" aria-label="Assistente AI rapido" onclick="event.stopPropagation()">
+    <div class="assistant-top">
+      <div class="assistant-top-copy">
+        <strong>Assistente AI</strong>
+        <span>Chiedi chiarimenti rapidi su scheda, esercizi, carichi e recupero.</span>
+      </div>
+      <div class="assistant-top-actions">
+        <button class="assistant-top-btn" type="button" onclick="resetAssistantSession()">Nuova</button>
+        <button class="assistant-top-btn close" type="button" onclick="closeAssistantOverlay()" aria-label="Chiudi assistente">×</button>
+      </div>
+    </div>
+    <div class="assistant-thread-wrap">
+      <div id="assistant-thread" class="assistant-thread"></div>
+    </div>
+    <div class="assistant-compose">
+      <div class="assistant-compose-row">
+        <textarea id="assistant-input" class="assistant-input" placeholder="Scrivi al volo al tuo assistente AI..."></textarea>
+        <button id="assistant-send-btn" class="assistant-send" type="button" onclick="sendAssistantMessage()">Invia</button>
+      </div>
+      <div id="assistant-status" class="assistant-status">Pronto.</div>
+    </div>
+  </div>
+</div>
 
 <!-- FAB TIMER -->
 <button id="fab" onclick="openTimer()">T</button>
@@ -1046,6 +1164,7 @@ const PROGRAMS_URL = './programs.json';
 const IMPORT_API_BASE_URL = String(window.MASSI_CONFIG?.importApiBaseUrl || '').replace(/\/$/, '');
 const USER_PROGRAMS_KEY = 'massi_user_programs';
 const USER_PROFILE_KEY = 'massi_user_profile';
+const ASSISTANT_SESSION_KEY = 'massi_overlay_assistant_v1';
 const PROGRAM_STATE_PREFIX = 'massi_state_';
 const SHOW_BUNDLED_PROGRAMS = false;
 const MAIN_SECTION_IDS = ['programs', 'home', 'progress', 'coach'];
@@ -1064,6 +1183,8 @@ let deferredPrompt = null;
 let importDraft = null;
 let importMeta = null;
 let importBusy = false;
+let assistantOpen = false;
+let assistantBusy = false;
 let aiCoachState = {
   phase: 'idle',
   busy: false,
@@ -1142,6 +1263,10 @@ function getAiIntakeEndpoint() {
 
 function getAiGenerateEndpoint() {
   return buildApiUrl('/api/ai/generate-program');
+}
+
+function getChatEndpoint() {
+  return buildApiUrl('/api/chat');
 }
 
 function normalizePrograms(programs, sourceFallback = 'bundled') {
@@ -1954,6 +2079,257 @@ function buildAiContext() {
   };
 }
 
+function getAssistantMessages() {
+  try {
+    const parsed = JSON.parse(sessionStorage.getItem(ASSISTANT_SESSION_KEY) || '[]');
+    return (Array.isArray(parsed) ? parsed : [])
+      .map((item) => ({
+        role: item?.role === 'assistant' ? 'assistant' : 'user',
+        content: cleanText(item?.content || '')
+      }))
+      .filter((item) => item.content)
+      .slice(-10);
+  } catch (error) {
+    return [];
+  }
+}
+
+function saveAssistantMessages(messages) {
+  try {
+    sessionStorage.setItem(ASSISTANT_SESSION_KEY, JSON.stringify((Array.isArray(messages) ? messages : []).slice(-10)));
+    return true;
+  } catch (error) {
+    console.error('Errore salvataggio chat assistente', error);
+    return false;
+  }
+}
+
+function setAssistantStatus(message, tone = '') {
+  const status = document.getElementById('assistant-status');
+  if (!status) return;
+  status.textContent = cleanText(message || 'Pronto.');
+  status.className = 'assistant-status' + (tone ? ' ' + tone : '');
+}
+
+function syncAssistantInputHeight() {
+  const input = document.getElementById('assistant-input');
+  if (!input) return;
+  input.style.height = 'auto';
+  input.style.height = Math.min(input.scrollHeight, 170) + 'px';
+}
+
+function buildAssistantSectionLabel() {
+  if (currentDay !== null) {
+    return currentTab === 'focus' ? 'Allenamento Focus' : 'Allenamento';
+  }
+  if (currentSection === 'plans') return 'Schede';
+  if (currentSection === 'progress') return 'Progressi';
+  if (currentSection === 'chat') return 'Coach AI';
+  if (currentSection === 'today') return 'Scheda attiva';
+  return 'Massi Gym';
+}
+
+function buildAssistantContext() {
+  const base = buildAiContext();
+  const context = {
+    section: currentDay !== null ? 'session' : currentSection,
+    sectionLabel: buildAssistantSectionLabel()
+  };
+
+  if (currentProgram) {
+    context.programTitle = cleanText(currentProgram.title || '');
+    context.programSubtitle = cleanText(currentProgram.subtitle || '');
+    context.weeksLabel = cleanText(currentProgram.weeks || '');
+    context.currentWeek = currentWeek;
+    context.completedDays = getCompletedDaysCount(currentWeek);
+    context.totalDays = getDays().length;
+    context.dayLabels = getDays().map((day) => cleanText(day.label || day.name)).filter(Boolean);
+  }
+
+  if (currentDay !== null) {
+    const day = getDays()?.[currentDay];
+    const currentExercise = day?.exercises?.[focusIdx] || null;
+    const nextExercise = day?.exercises?.[focusIdx + 1] || null;
+    context.currentDayLabel = cleanText(day?.label || day?.name || '');
+    context.viewMode = currentTab === 'focus' ? 'focus' : 'list';
+    if (currentExercise) {
+      context.currentExercise = {
+        name: cleanText(currentExercise.name),
+        series: Math.max(0, parseInt(currentExercise.series, 10) || 0),
+        reps: cleanText(currentExercise.reps || ''),
+        note: cleanText(currentExercise.note || '')
+      };
+    }
+    if (nextExercise) {
+      context.nextExercise = {
+        name: cleanText(nextExercise.name),
+        series: Math.max(0, parseInt(nextExercise.series, 10) || 0),
+        reps: cleanText(nextExercise.reps || ''),
+        note: cleanText(nextExercise.note || '')
+      };
+    }
+  }
+
+  context.progressionSummary = (Array.isArray(base.progressionSummary) ? base.progressionSummary : []).slice(0, 3).map((item) => ({
+    exercise: cleanText(item.exercise || ''),
+    day: cleanText(item.day || ''),
+    lastWeight: cleanText(item.lastWeight || ''),
+    trend: cleanText(item.trend || '')
+  }));
+  context.recentSessions = getCurrentProgramHistoryPreview(3).map((entry) => ({
+    date: cleanText(entry.date || ''),
+    day: cleanText(entry.day || ''),
+    week: Math.max(0, parseInt(entry.week, 10) || 0),
+    exercisesDone: Array.isArray(entry.exercises) ? entry.exercises.filter((exercise) => exercise?.done).length : 0
+  }));
+  return context;
+}
+
+function renderAssistantThread() {
+  const thread = document.getElementById('assistant-thread');
+  const wrap = document.querySelector('.assistant-thread-wrap');
+  if (!thread) return;
+  const messages = getAssistantMessages();
+  if (!messages.length && !assistantBusy) {
+    thread.innerHTML = `
+      <div class="assistant-empty">
+        Chiedimi al volo cosa fare oggi, che peso riprendere, quanto recuperare o cosa viene dopo nella scheda.
+      </div>`;
+  } else {
+    const html = messages.map((message) => `
+      <div class="assistant-msg ${message.role === 'assistant' ? 'assistant' : 'user'}">${escapeHtml(message.content)}</div>
+    `).join('');
+    thread.innerHTML = html + (assistantBusy ? '<div class="assistant-msg typing">Sto scrivendo...</div>' : '');
+  }
+  if (wrap) {
+    requestAnimationFrame(() => { wrap.scrollTop = wrap.scrollHeight; });
+  }
+}
+
+function resetAssistantSession() {
+  if (assistantBusy) return;
+  try { sessionStorage.removeItem(ASSISTANT_SESSION_KEY); } catch (error) {}
+  renderAssistantThread();
+  setAssistantStatus('Nuova chat pronta.');
+  const input = document.getElementById('assistant-input');
+  if (input) {
+    input.value = '';
+    syncAssistantInputHeight();
+    input.focus();
+  }
+}
+
+function hasBlockingOverlayOpen() {
+  return ['timer-ov', 'hist-modal', 'week-modal', 'import-modal'].some((id) => document.getElementById(id)?.classList.contains('show'));
+}
+
+function syncAssistantUi() {
+  const fab = document.getElementById('assistant-fab');
+  const layer = document.getElementById('assistant-layer');
+  const sendBtn = document.getElementById('assistant-send-btn');
+  const input = document.getElementById('assistant-input');
+  if (!fab || !layer) return;
+
+  const inSession = currentDay !== null;
+  const hasVisibleAppSection = inSession || ['plans', 'progress', 'chat', 'today'].includes(currentSection);
+  const blocked = hasBlockingOverlayOpen();
+  const showFab = hasVisibleAppSection && !blocked;
+
+  if (!showFab) assistantOpen = false;
+
+  fab.classList.toggle('show', showFab);
+  fab.classList.toggle('session', inSession);
+  fab.classList.toggle('open', showFab && assistantOpen);
+  fab.setAttribute('aria-hidden', showFab ? 'false' : 'true');
+
+  layer.classList.toggle('show', showFab && assistantOpen);
+  layer.classList.toggle('session', inSession);
+  layer.setAttribute('aria-hidden', showFab && assistantOpen ? 'false' : 'true');
+
+  if (sendBtn) sendBtn.disabled = assistantBusy;
+  if (input) input.disabled = assistantBusy;
+  renderAssistantThread();
+}
+
+function openAssistantOverlay() {
+  if (hasBlockingOverlayOpen()) return;
+  assistantOpen = true;
+  syncAssistantUi();
+  const input = document.getElementById('assistant-input');
+  if (input) {
+    syncAssistantInputHeight();
+    requestAnimationFrame(() => input.focus());
+  }
+}
+
+function closeAssistantOverlay() {
+  assistantOpen = false;
+  syncAssistantUi();
+}
+
+function toggleAssistantOverlay() {
+  if (assistantOpen) closeAssistantOverlay();
+  else openAssistantOverlay();
+}
+
+async function sendAssistantMessage() {
+  if (assistantBusy) return;
+  const input = document.getElementById('assistant-input');
+  if (!input) return;
+  const message = cleanText(input.value || '');
+  if (!message) {
+    setAssistantStatus('Scrivi una domanda prima di inviare.');
+    return;
+  }
+  if (window.location.protocol === 'file:' && !IMPORT_API_BASE_URL) {
+    setAssistantStatus('L\'assistente AI funziona nella versione pubblicata dell\'app o con il server locale attivo.', 'error');
+    return;
+  }
+  if (!navigator.onLine) {
+    setAssistantStatus('Serve connessione internet per usare l\'assistente AI.', 'error');
+    return;
+  }
+
+  const messages = getAssistantMessages();
+  messages.push({ role: 'user', content: message });
+  saveAssistantMessages(messages);
+  input.value = '';
+  syncAssistantInputHeight();
+  assistantBusy = true;
+  setAssistantStatus('Sto scrivendo...');
+  renderAssistantThread();
+  syncAssistantUi();
+
+  try {
+    const response = await fetch(getChatEndpoint(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        messages: messages.slice(-8),
+        context: buildAssistantContext()
+      })
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      throw new Error(payload.error || 'Assistente AI non disponibile in questo momento.');
+    }
+    const reply = cleanText(payload.reply || '');
+    if (!reply) throw new Error('Risposta assistente vuota.');
+
+    messages.push({ role: 'assistant', content: reply });
+    saveAssistantMessages(messages);
+    renderAssistantThread();
+    setAssistantStatus('Risposta pronta.', 'good');
+  } catch (error) {
+    console.error('Errore assistente overlay', error);
+    setAssistantStatus(error.message || 'Assistente AI non disponibile in questo momento.', 'error');
+    renderAssistantThread();
+  } finally {
+    assistantBusy = false;
+    syncAssistantUi();
+  }
+}
+
 function ensureCoachAiAvailable() {
   if (window.location.protocol === 'file:' && !IMPORT_API_BASE_URL) {
     aiCoachState.error = 'Il Coach AI funziona nella versione pubblicata dell\'app o con il server locale attivo.';
@@ -2400,10 +2776,12 @@ function updateHeader() {
   if (!currentProgram || isSession || currentSection === 'chat') {
     historyBtn.style.display = 'none';
     syncHeaderBalance();
+    syncAssistantUi();
     return;
   }
   historyBtn.style.display = currentSection === 'progress' || currentSection === 'today' ? 'inline-block' : 'none';
   syncHeaderBalance();
+  syncAssistantUi();
 }
 
 function renderPrograms() {
@@ -2924,10 +3302,12 @@ function openTimer() {
   timerLeft = timerTotal;
   updateTimerDisplay();
   document.getElementById('timer-ov').classList.add('show');
+  syncAssistantUi();
   startTimer();
 }
 function closeTimer() {
   document.getElementById('timer-ov').classList.remove('show');
+  syncAssistantUi();
   stopTimer();
 }
 function setDur(secs, btn) {
@@ -3057,11 +3437,13 @@ function openWeekReport(weekNumber = currentWeek) {
 
   nextBtn.style.display = isWeekComplete(targetWeek) && canAdvanceToWeek(targetWeek) ? 'inline-block' : 'none';
   modal.classList.add('show');
+  syncAssistantUi();
   renderHome();
 }
 
 function closeWeekReport() {
   document.getElementById('week-modal').classList.remove('show');
+  syncAssistantUi();
 }
 
 function goToNextWeek() {
@@ -3093,8 +3475,12 @@ function openHist() {
       </div>`).join('');
   }
   document.getElementById('hist-modal').classList.add('show');
+  syncAssistantUi();
 }
-function closeHist() { document.getElementById('hist-modal').classList.remove('show'); }
+function closeHist() {
+  document.getElementById('hist-modal').classList.remove('show');
+  syncAssistantUi();
+}
 function clearHist() {
   if (confirm('Cancellare tutto lo storico?')) {
     saveHistory([]);
@@ -3117,6 +3503,7 @@ function getImportEndpoint() {
 
 function openImportModal() {
   document.getElementById('import-modal').classList.add('show');
+  syncAssistantUi();
 }
 
 function closeImportModal(force = false) {
@@ -3131,6 +3518,7 @@ function closeImportModal(force = false) {
   importDraft = null;
   importMeta = null;
   importBusy = false;
+  syncAssistantUi();
 }
 
 function setImportView({ subtitle, html, canSave = false, saveLabel = 'Aggiungi scheda' }) {
@@ -3491,6 +3879,18 @@ function deleteImportedProgram(programId) {
 // INIT
 initPwa();
 document.getElementById('pdf-file-input').addEventListener('change', handlePdfInputChange);
+document.getElementById('assistant-input').addEventListener('input', syncAssistantInputHeight);
+document.getElementById('assistant-input').addEventListener('keydown', (event) => {
+  if (event.key === 'Enter' && !event.shiftKey) {
+    event.preventDefault();
+    sendAssistantMessage();
+  }
+});
+document.addEventListener('keydown', (event) => {
+  if (event.key === 'Escape' && assistantOpen) closeAssistantOverlay();
+});
+syncAssistantInputHeight();
+renderAssistantThread();
 renderSectionNav();
 renderCoachSection();
 setAppSection('plans');
