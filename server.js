@@ -18,10 +18,8 @@ const upload = multer({
 
 const PORT = Number(process.env.PORT || 3000);
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4.1';
-const OPENAI_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1.5';
 const CORS_ALLOWED_ORIGIN = (process.env.CORS_ALLOWED_ORIGIN || '').trim();
 const PARSER_VERSION = 'pt-pdf-v1';
-const DEMO_VERSION = 'exercise-demo-v2';
 const ROOT_DIR = __dirname;
 const ICONS_DIR = path.join(ROOT_DIR, 'icons');
 
@@ -106,39 +104,6 @@ const CHAT_SYSTEM_PROMPT = [
   'Quando hai contesto sulla scheda attiva, usalo in modo naturale senza elencarlo tutto ogni volta.'
 ].join(' ');
 
-const EXERCISE_DEMO_SCHEMA = {
-  type: 'object',
-  additionalProperties: false,
-  required: [
-    'normalizedExercise',
-    'demoTitle',
-    'coachHint',
-    'imageLabel',
-    'imagePrompt'
-  ],
-  properties: {
-    normalizedExercise: { type: 'string' },
-    demoTitle: { type: 'string' },
-    coachHint: { type: 'string' },
-    imageLabel: { type: 'string' },
-    imagePrompt: { type: 'string' }
-  }
-};
-
-const EXERCISE_DEMO_SYSTEM_PROMPT = [
-  'Trasforma il nome di un esercizio palestra in una mini guida visuale per principianti.',
-  'Ricevi un nome esercizio scritto dal personal trainer, a volte con abbreviazioni o testo in italiano.',
-  'Restituisci JSON con titolo demo e un solo prompt immagine.',
-  'demoTitle, coachHint e imageLabel devono essere in italiano chiaro.',
-  'imagePrompt deve essere in inglese e servire per generare una sola immagine didattica in formato landscape.',
-  'La singola immagine deve essere una tavola guida a 2 pannelli orizzontali: a sinistra la posizione iniziale o di allungamento, a destra la posizione finale o di contrazione.',
-  'Il prompt deve descrivere lo stesso atleta nei due pannelli, stessa palestra, stessa inquadratura 3/4 laterale, stile realistico istruttivo, attrezzatura ben visibile.',
-  'L immagine deve essere pensata per un principiante che deve capire il movimento con un colpo d occhio.',
-  'Inserisci sempre: no text, no labels, no collage, no split screen, no watermark, no extra people.',
-  'Anche se chiedi 2 pannelli, non usare testo sovrapposto: la separazione deve essere solo visiva e naturale nella composizione.',
-  'coachHint deve essere una sola frase breve che dica cosa osservare per capire il movimento.'
-].join(' ');
-
 function applyCors(req, res) {
   if (!CORS_ALLOWED_ORIGIN) return;
   const origin = req.headers.origin;
@@ -181,10 +146,6 @@ function slugify(value) {
 
 function filenameWithoutExt(filename) {
   return String(filename || 'scheda-importata').replace(/\.pdf$/i, '').trim();
-}
-
-function createDataUrl(base64, mimeType = 'image/jpeg') {
-  return 'data:' + mimeType + ';base64,' + String(base64 || '');
 }
 
 function normalizeChatMessages(rawMessages) {
@@ -431,130 +392,6 @@ async function createCoachReply(messages, context) {
   return reply;
 }
 
-async function createExerciseDemoPlan(exerciseName, note, reps) {
-  if (!client) {
-    const error = new Error('OPENAI_API_KEY mancante sul server.');
-    error.statusCode = 500;
-    throw error;
-  }
-
-  const normalizedName = cleanString(exerciseName);
-  const normalizedNote = cleanString(note);
-  const normalizedReps = cleanString(reps);
-  if (!normalizedName) {
-    const error = new Error('Nome esercizio mancante per la demo.');
-    error.statusCode = 400;
-    throw error;
-  }
-
-  const response = await client.responses.create({
-    model: OPENAI_MODEL,
-    temperature: 0.2,
-    input: [
-      {
-        role: 'system',
-        content: [
-          { type: 'input_text', text: EXERCISE_DEMO_SYSTEM_PROMPT }
-        ]
-      },
-      {
-        role: 'user',
-        content: [
-          {
-            type: 'input_text',
-            text: [
-              'Nome esercizio: ' + normalizedName,
-              normalizedNote ? 'Note PT: ' + normalizedNote : '',
-              normalizedReps ? 'Reps indicate: ' + normalizedReps : '',
-              'Obiettivo: creare una demo visuale semplice per un principiante che deve capire la posizione iniziale e finale del movimento.'
-            ].filter(Boolean).join('\n')
-          }
-        ]
-      }
-    ],
-    text: {
-      format: {
-        type: 'json_schema',
-        name: 'exercise_demo_plan',
-        strict: true,
-        schema: EXERCISE_DEMO_SCHEMA
-      }
-    },
-    max_output_tokens: 600
-  });
-
-  if (!response.output_text) {
-    const error = new Error('Risposta vuota durante la preparazione della demo esercizio.');
-    error.statusCode = 502;
-    throw error;
-  }
-
-  return JSON.parse(response.output_text);
-}
-
-async function generateInstructionImage(prompt, userId) {
-  const modelsToTry = [...new Set([OPENAI_IMAGE_MODEL, 'gpt-image-1.5', 'gpt-image-1'])];
-  let lastError = null;
-
-  for (const modelName of modelsToTry) {
-    try {
-      const response = await client.images.generate({
-        model: modelName,
-        prompt,
-        size: '1536x1024',
-        quality: 'medium',
-        output_format: 'jpeg',
-        output_compression: 75,
-        background: 'opaque',
-        moderation: 'auto',
-        user: userId
-      });
-
-      const image = Array.isArray(response?.data) ? response.data[0] : null;
-      if (!image?.b64_json) {
-        const error = new Error('Immagine demo vuota.');
-        error.statusCode = 502;
-        throw error;
-      }
-
-      return {
-        mimeType: 'image/jpeg',
-        dataUrl: createDataUrl(image.b64_json, 'image/jpeg'),
-        modelUsed: modelName
-      };
-    } catch (error) {
-      lastError = error;
-    }
-  }
-
-  throw lastError || new Error('Impossibile generare la demo immagine.');
-}
-
-async function createExerciseDemo(exerciseName, note, reps) {
-  const safeName = cleanString(exerciseName);
-  const plan = await createExerciseDemoPlan(safeName, note, reps);
-  const userId = 'exercise-demo-' + slugify(safeName);
-
-  const guideImage = await generateInstructionImage(cleanString(plan.imagePrompt), userId + '-storyboard');
-
-  return {
-    exerciseName: safeName,
-    title: cleanString(plan.demoTitle) || safeName,
-    hint: cleanString(plan.coachHint),
-    cacheKey: slugify(safeName),
-    generatedAt: new Date().toISOString(),
-    demoVersion: DEMO_VERSION,
-    model: guideImage.modelUsed,
-    images: [
-      {
-        label: cleanString(plan.imageLabel) || 'Movimento completo',
-        alt: cleanString(plan.demoTitle || safeName) + ' - demo movimento completo',
-        dataUrl: guideImage.dataUrl
-      }
-    ]
-  };
-}
-
 app.use((req, res, next) => {
   applyCors(req, res);
   if (req.method === 'OPTIONS') {
@@ -565,7 +402,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/healthz', (_req, res) => {
-  res.json({ ok: true, parserVersion: PARSER_VERSION, demoVersion: DEMO_VERSION });
+  res.json({ ok: true, parserVersion: PARSER_VERSION });
 });
 
 app.post('/api/import-pdf', upload.single('file'), async (req, res) => {
@@ -604,27 +441,6 @@ app.post('/api/chat', async (req, res) => {
     const statusCode = error.statusCode || 500;
     const message = statusCode >= 500
       ? 'Chat non disponibile in questo momento. Riprova tra poco.'
-      : error.message;
-    sendJsonError(res, statusCode, message);
-  }
-});
-
-app.post('/api/exercise-demo', async (req, res) => {
-  try {
-    const exerciseName = cleanString(req.body?.exerciseName || '');
-    const note = cleanString(req.body?.note || '');
-    const reps = cleanString(req.body?.reps || '');
-    if (!exerciseName) {
-      return sendJsonError(res, 400, 'Nome esercizio mancante.');
-    }
-
-    const demo = await createExerciseDemo(exerciseName, note, reps);
-    res.json(demo);
-  } catch (error) {
-    console.error('Exercise demo error:', error);
-    const statusCode = error.statusCode || 500;
-    const message = statusCode >= 500
-      ? 'Demo esercizio non disponibile in questo momento. Riprova tra poco.'
       : error.message;
     sendJsonError(res, statusCode, message);
   }
