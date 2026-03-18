@@ -18,10 +18,10 @@ const upload = multer({
 
 const PORT = Number(process.env.PORT || 3000);
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4.1';
-const OPENAI_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1';
+const OPENAI_IMAGE_MODEL = process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1.5';
 const CORS_ALLOWED_ORIGIN = (process.env.CORS_ALLOWED_ORIGIN || '').trim();
 const PARSER_VERSION = 'pt-pdf-v1';
-const DEMO_VERSION = 'exercise-demo-v1';
+const DEMO_VERSION = 'exercise-demo-v2';
 const ROOT_DIR = __dirname;
 const ICONS_DIR = path.join(ROOT_DIR, 'icons');
 
@@ -113,32 +113,29 @@ const EXERCISE_DEMO_SCHEMA = {
     'normalizedExercise',
     'demoTitle',
     'coachHint',
-    'startLabel',
-    'endLabel',
-    'startPrompt',
-    'endPrompt'
+    'imageLabel',
+    'imagePrompt'
   ],
   properties: {
     normalizedExercise: { type: 'string' },
     demoTitle: { type: 'string' },
     coachHint: { type: 'string' },
-    startLabel: { type: 'string' },
-    endLabel: { type: 'string' },
-    startPrompt: { type: 'string' },
-    endPrompt: { type: 'string' }
+    imageLabel: { type: 'string' },
+    imagePrompt: { type: 'string' }
   }
 };
 
 const EXERCISE_DEMO_SYSTEM_PROMPT = [
   'Trasforma il nome di un esercizio palestra in una mini guida visuale per principianti.',
   'Ricevi un nome esercizio scritto dal personal trainer, a volte con abbreviazioni o testo in italiano.',
-  'Restituisci JSON con titolo demo e due prompt immagine separati.',
-  'demoTitle, coachHint, startLabel e endLabel devono essere in italiano chiaro.',
-  'startPrompt e endPrompt devono essere in inglese e servono per generare una sola immagine ciascuno.',
-  'startPrompt deve mostrare la posizione iniziale, allungata o eccentrica del movimento.',
-  'endPrompt deve mostrare la posizione finale, contratta o concentrica del movimento.',
-  'Ogni prompt deve descrivere un solo atleta, lo stesso esercizio, attrezzatura ben visibile, inquadratura 3/4 laterale, stile realistico istruttivo, palestra pulita e neutra.',
+  'Restituisci JSON con titolo demo e un solo prompt immagine.',
+  'demoTitle, coachHint e imageLabel devono essere in italiano chiaro.',
+  'imagePrompt deve essere in inglese e servire per generare una sola immagine didattica in formato landscape.',
+  'La singola immagine deve essere una tavola guida a 2 pannelli orizzontali: a sinistra la posizione iniziale o di allungamento, a destra la posizione finale o di contrazione.',
+  'Il prompt deve descrivere lo stesso atleta nei due pannelli, stessa palestra, stessa inquadratura 3/4 laterale, stile realistico istruttivo, attrezzatura ben visibile.',
+  'L immagine deve essere pensata per un principiante che deve capire il movimento con un colpo d occhio.',
   'Inserisci sempre: no text, no labels, no collage, no split screen, no watermark, no extra people.',
+  'Anche se chiedi 2 pannelli, non usare testo sovrapposto: la separazione deve essere solo visiva e naturale nella composizione.',
   'coachHint deve essere una sola frase breve che dica cosa osservare per capire il movimento.'
 ].join(' ');
 
@@ -496,7 +493,7 @@ async function createExerciseDemoPlan(exerciseName, note, reps) {
 }
 
 async function generateInstructionImage(prompt, userId) {
-  const modelsToTry = [...new Set([OPENAI_IMAGE_MODEL, 'gpt-image-1'])];
+  const modelsToTry = [...new Set([OPENAI_IMAGE_MODEL, 'gpt-image-1.5', 'gpt-image-1'])];
   let lastError = null;
 
   for (const modelName of modelsToTry) {
@@ -504,8 +501,8 @@ async function generateInstructionImage(prompt, userId) {
       const response = await client.images.generate({
         model: modelName,
         prompt,
-        size: '1024x1024',
-        quality: 'low',
+        size: '1536x1024',
+        quality: 'medium',
         output_format: 'jpeg',
         output_compression: 75,
         background: 'opaque',
@@ -538,10 +535,7 @@ async function createExerciseDemo(exerciseName, note, reps) {
   const plan = await createExerciseDemoPlan(safeName, note, reps);
   const userId = 'exercise-demo-' + slugify(safeName);
 
-  const [startImage, endImage] = await Promise.all([
-    generateInstructionImage(cleanString(plan.startPrompt), userId + '-start'),
-    generateInstructionImage(cleanString(plan.endPrompt), userId + '-end')
-  ]);
+  const guideImage = await generateInstructionImage(cleanString(plan.imagePrompt), userId + '-storyboard');
 
   return {
     exerciseName: safeName,
@@ -550,19 +544,12 @@ async function createExerciseDemo(exerciseName, note, reps) {
     cacheKey: slugify(safeName),
     generatedAt: new Date().toISOString(),
     demoVersion: DEMO_VERSION,
-    model: startImage.modelUsed === endImage.modelUsed
-      ? startImage.modelUsed
-      : startImage.modelUsed + ' + ' + endImage.modelUsed,
+    model: guideImage.modelUsed,
     images: [
       {
-        label: cleanString(plan.startLabel) || 'Posizione iniziale',
-        alt: cleanString(plan.demoTitle || safeName) + ' - posizione iniziale',
-        dataUrl: startImage.dataUrl
-      },
-      {
-        label: cleanString(plan.endLabel) || 'Posizione finale',
-        alt: cleanString(plan.demoTitle || safeName) + ' - posizione finale',
-        dataUrl: endImage.dataUrl
+        label: cleanString(plan.imageLabel) || 'Movimento completo',
+        alt: cleanString(plan.demoTitle || safeName) + ' - demo movimento completo',
+        dataUrl: guideImage.dataUrl
       }
     ]
   };

@@ -678,7 +678,7 @@ body{font-family:'DM Sans',sans-serif;background:
   <div class="demo-hdr">
     <div>
       <div class="demo-title" id="demo-title">Demo esercizio</div>
-      <div class="demo-sub" id="demo-subtitle">Due immagini guida per capire meglio il movimento.</div>
+      <div class="demo-sub" id="demo-subtitle">Una tavola guida per capire meglio il movimento.</div>
     </div>
     <button class="week-close" onclick="closeExerciseDemo()">X</button>
   </div>
@@ -1009,7 +1009,7 @@ const CHAT_STORAGE_KEY = 'massi_chat_messages_v1';
 const EXERCISE_DEMO_CACHE_DB = 'massi_exercise_demo_cache';
 const EXERCISE_DEMO_CACHE_STORE = 'exercise_demos';
 const EXERCISE_DEMO_CACHE_VERSION = 1;
-const EXERCISE_DEMO_SCHEMA_VERSION = 'demo-v1';
+const EXERCISE_DEMO_SCHEMA_VERSION = 'demo-v2';
 const SHOW_BUNDLED_PROGRAMS = false;
 const MAIN_SECTION_IDS = ['programs', 'home', 'progress', 'coach'];
 const SECTION_TRANSITION_MS = 260;
@@ -1965,7 +1965,7 @@ function setExerciseDemoView(title, subtitle, html) {
   const modal = document.getElementById('demo-modal');
   if (!modal) return;
   document.getElementById('demo-title').textContent = title || 'Demo esercizio';
-  document.getElementById('demo-subtitle').textContent = subtitle || 'Due immagini guida per capire meglio il movimento.';
+  document.getElementById('demo-subtitle').textContent = subtitle || 'Una tavola guida per capire meglio il movimento.';
   document.getElementById('demo-content').innerHTML = html;
   modal.classList.add('show');
 }
@@ -1979,8 +1979,8 @@ function closeExerciseDemo() {
 function renderExerciseDemoLoading(exerciseName) {
   setExerciseDemoView(
     exerciseName,
-    'Sto preparando due immagini guida: posizione iniziale e finale del movimento.',
-    `<div class="demo-state"><strong>Generazione in corso.</strong><br>La prima volta puo' richiedere qualche secondo, poi la demo restera' salvata sul dispositivo.</div>`
+    'Sto preparando una tavola guida del movimento.',
+    `<div class="demo-state"><strong>Generazione in corso.</strong><br>Creo una singola immagine didattica che mostra il gesto completo, poi restera' salvata sul dispositivo.</div>`
   );
 }
 
@@ -2014,7 +2014,7 @@ function renderExerciseDemoPayload(payload, fromCache = false) {
             <div class="demo-frame">
               <img src="${image.dataUrl}" alt="${escapeHtml(image.alt)}" loading="lazy">
             </div>
-            <div class="demo-caption">Usa questa immagine come riferimento visivo rapido del movimento.</div>
+            <div class="demo-caption">Leggi l'immagine da sinistra verso destra per seguire il movimento in modo semplice.</div>
           </div>
         `).join('')}
       </div>`

@@ -18,7 +18,7 @@ Variabili ambiente backend:
 - OPENAI_API_KEY -> obbligatoria per l'import PDF
 - CORS_ALLOWED_ORIGIN -> opzionale, utile se frontend e backend non sono sullo stesso dominio
 - OPENAI_MODEL -> opzionale, default gpt-4.1
-- OPENAI_IMAGE_MODEL -> opzionale, default gpt-image-1 per le demo immagini degli esercizi
+- OPENAI_IMAGE_MODEL -> opzionale, default gpt-image-1.5 per le demo immagini degli esercizi
 
 Avvio locale:
 1. npm install
@@ -35,5 +35,5 @@ Deploy su Render:
 Endpoint:
 - POST /api/import-pdf -> riceve multipart/form-data con file PDF
 - POST /api/chat -> riceve JSON con messaggi e contesto scheda attiva
-- POST /api/exercise-demo -> riceve nome esercizio e restituisce 2 immagini guida AI
+- POST /api/exercise-demo -> riceve nome esercizio e restituisce una tavola guida AI del movimento
 - GET /healthz -> healthcheck semplice
