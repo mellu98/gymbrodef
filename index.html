@@ -22,7 +22,7 @@
   --safe-left:env(safe-area-inset-left,0px);
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;overflow:hidden}
+html,body{height:100%;overflow:hidden;overscroll-behavior:none;background:#060606}
 body{font-family:'DM Sans',sans-serif;background:
   radial-gradient(circle at top,rgba(0,230,118,.06),transparent 32%),
   linear-gradient(180deg,#090909 0%,#060606 100%);
@@ -57,16 +57,16 @@ body{font-family:'DM Sans',sans-serif;background:
   transition:opacity .26s ease,transform .26s ease
 }
 .section-shell.hidden{opacity:0;transform:translateY(24px);pointer-events:none}
-.section-shell-row{width:min(100%,920px);display:flex;align-items:center;justify-content:center;gap:12px;pointer-events:auto}
+.section-shell-row{width:min(100%,780px);display:flex;align-items:center;justify-content:center;gap:12px;pointer-events:auto}
 .section-dock{
-  flex:1;max-width:700px;display:flex;align-items:center;gap:8px;padding:10px;
+  flex:1;display:flex;align-items:center;gap:8px;padding:9px 10px;
   background:rgba(14,14,14,.62);border:1px solid rgba(255,255,255,.12);border-radius:999px;
   backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%);
   box-shadow:0 18px 42px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.05)
 }
 .section-tab{
   flex:1;min-width:0;background:transparent;border:none;border-radius:999px;
-  padding:13px 10px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+  padding:12px 18px;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:10px;
   color:#f2f2f2;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .24s ease
 }
 .section-tab:hover{background:rgba(255,255,255,.05);transform:translateY(-1px)}
@@ -80,24 +80,30 @@ body{font-family:'DM Sans',sans-serif;background:
 }
 .section-tab.on .section-tab-label{color:var(--g)}
 .section-tab-ico{
-  width:42px;height:42px;border-radius:16px;border:1px solid rgba(255,255,255,.12);
+  width:34px;height:34px;border-radius:12px;border:1px solid rgba(255,255,255,.12);
   display:flex;align-items:center;justify-content:center;font-size:16px;font-family:'JetBrains Mono',monospace;
   color:#d7d7d7;background:rgba(255,255,255,.03);transition:all .24s ease
 }
 .section-tab-label{font-size:12px;font-weight:700;line-height:1;color:#f1f1f1;transition:color .24s ease}
 .section-action{
-  width:78px;flex:0 0 78px;min-height:92px;border-radius:32px;border:1px solid rgba(255,255,255,.12);
-  background:rgba(14,14,14,.62);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;
+  width:98px;flex:0 0 98px;min-height:70px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(14,14,14,.62);display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;
   color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .24s ease;
   backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%);
   box-shadow:0 18px 42px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.05)
 }
 .section-action:hover{border-color:rgba(0,230,118,.3);color:var(--g);transform:translateY(-1px)}
 .section-action-ico{
-  width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);font-size:22px;line-height:1
+  width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);font-size:20px;line-height:1
 }
-.section-action-label{font-size:10px;letter-spacing:1px;text-transform:uppercase}
+.section-action-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+.bottom-safe-fill{
+  position:fixed;left:0;right:0;bottom:0;height:calc(30px + var(--safe-bottom));
+  background:linear-gradient(180deg,rgba(6,6,6,0),rgba(6,6,6,.92) 42%,#060606 100%);
+  pointer-events:none;z-index:110;transition:opacity .22s ease
+}
+.bottom-safe-fill.hidden{opacity:0}
 
 /* HOME */
 #programs,#home,#progress,#coach{padding:20px 16px calc(156px + var(--safe-bottom))}
@@ -449,11 +455,11 @@ body{font-family:'DM Sans',sans-serif;background:
   .section-shell{bottom:calc(14px + var(--safe-bottom))}
   .section-shell-row{gap:10px}
   .section-dock{padding:8px}
-  .section-tab{padding:11px 5px 10px}
+  .section-tab{padding:11px 12px;gap:8px}
   .section-tab-label{font-size:11px}
-  .section-tab-ico{width:38px;height:38px;border-radius:14px}
-  .section-action{width:68px;flex-basis:68px;min-height:84px;border-radius:28px}
-  .section-action-ico{width:38px;height:38px}
+  .section-tab-ico{width:30px;height:30px;border-radius:10px;font-size:14px}
+  .section-action{width:88px;flex-basis:88px;min-height:64px;border-radius:999px}
+  .section-action-ico{width:30px;height:30px;border-radius:10px;font-size:18px}
   .section-copy h2{font-size:30px}
   #programs,#home,#progress,#coach{padding-bottom:calc(148px + var(--safe-bottom))}
   .chat-head h2{font-size:30px}
@@ -486,11 +492,7 @@ body{font-family:'DM Sans',sans-serif;background:
 <div class="section-shell" id="section-shell">
   <div class="section-shell-row">
     <div class="section-dock">
-      <button class="section-tab on" id="section-tab-today" type="button" onclick="setAppSection('today')">
-        <span class="section-tab-ico">O</span>
-        <span class="section-tab-label">Oggi</span>
-      </button>
-      <button class="section-tab" id="section-tab-plans" type="button" onclick="setAppSection('plans')">
+      <button class="section-tab on" id="section-tab-plans" type="button" onclick="setAppSection('plans')">
         <span class="section-tab-ico">S</span>
         <span class="section-tab-label">Schede</span>
       </button>
@@ -509,6 +511,7 @@ body{font-family:'DM Sans',sans-serif;background:
     </button>
   </div>
 </div>
+<div class="bottom-safe-fill" aria-hidden="true"></div>
 
 <!-- APP SCROLL AREA -->
 <div id="app">
@@ -1567,17 +1570,20 @@ function getCurrentProgramHistoryPreview(limit = 4) {
 }
 
 function renderSectionNav() {
-  ['today', 'plans', 'progress', 'chat'].forEach((section) => {
+  const activeSection = currentSection === 'today' ? 'plans' : currentSection;
+  ['plans', 'progress', 'chat'].forEach((section) => {
     const button = document.getElementById('section-tab-' + section);
     if (!button) return;
-    button.classList.toggle('on', currentSection === section);
+    button.classList.toggle('on', activeSection === section);
   });
 }
 
 function setSectionShellVisible(visible) {
   const shell = document.getElementById('section-shell');
+  const safeFill = document.querySelector('.bottom-safe-fill');
   if (!shell) return;
   shell.classList.toggle('hidden', !visible);
+  if (safeFill) safeFill.classList.toggle('hidden', !visible);
 }
 
 function showMainSection(targetId) {
