@@ -504,8 +504,8 @@ async function generateInstructionImage(prompt, userId) {
       const response = await client.images.generate({
         model: modelName,
         prompt,
-        size: '512x512',
-        quality: 'medium',
+        size: '1024x1024',
+        quality: 'low',
         output_format: 'jpeg',
         output_compression: 75,
         background: 'opaque',
