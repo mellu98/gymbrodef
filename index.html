@@ -87,6 +87,10 @@ body{font-family:'DM Sans',sans-serif;background:
   display:flex;align-items:center;justify-content:center;font-size:16px;font-family:'JetBrains Mono',monospace;
   color:#d7d7d7;background:rgba(255,255,255,.03);transition:all .24s ease
 }
+.section-tab-ico.emoji{
+  font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif;
+  font-size:18px;line-height:1
+}
 .section-tab-label{font-size:12px;font-weight:700;line-height:1;color:#f1f1f1;transition:color .24s ease}
 .bottom-safe-fill{
   position:fixed;left:0;right:0;bottom:0;height:calc(30px + var(--safe-bottom));
@@ -571,11 +575,11 @@ body{font-family:'DM Sans',sans-serif;background:
   <div class="section-shell-row">
     <div class="section-dock">
       <button class="section-tab on" id="section-tab-plans" type="button" onclick="setAppSection('plans')">
-        <span class="section-tab-ico">S</span>
+        <span class="section-tab-ico emoji">🗂️</span>
         <span class="section-tab-label">Schede</span>
       </button>
       <button class="section-tab" id="section-tab-progress" type="button" onclick="setAppSection('progress')">
-        <span class="section-tab-ico">P</span>
+        <span class="section-tab-ico emoji">📈</span>
         <span class="section-tab-label">Progressi</span>
       </button>
       <button class="section-tab" id="section-tab-chat" type="button" onclick="setAppSection('chat')">
