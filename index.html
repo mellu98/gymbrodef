@@ -280,8 +280,11 @@ body{font-family:'DM Sans',sans-serif;background:
 .fnav-btn:disabled{opacity:.3;cursor:default}
 .fnav-ctr{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--tm)}
 .focus-card{background:var(--s1);border:1px solid var(--td);border-radius:18px;padding:22px 18px}
+.focus-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:6px}
+.fc-head{min-width:0}
 .fc-name{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;line-height:1.1;color:var(--t)}
 .fc-meta{font-size:13px;color:var(--tm);margin-top:6px}
+.fc-demo-btn{flex:0 0 auto;min-width:88px}
 .fc-note{background:rgba(255,193,7,.07);border-left:2px solid var(--amber);padding:10px 12px;border-radius:6px;margin:14px 0;font-size:12px;color:var(--amber);line-height:1.5}
 .fc-series-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin-bottom:8px}
 .fc-serie-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #161616}
@@ -394,6 +397,25 @@ body{font-family:'DM Sans',sans-serif;background:
 .week-report-delta.new{color:#fff;background:rgba(255,255,255,.05);border-color:rgba(255,255,255,.14)}
 .week-report-actions{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;justify-content:flex-end;padding:14px calc(18px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(18px + var(--safe-left));background:linear-gradient(180deg,rgba(8,8,8,0),rgba(8,8,8,.96) 24%,rgba(8,8,8,1))}
 
+/* EXERCISE DEMO MODAL */
+#demo-modal{position:fixed;inset:0;background:rgba(0,0,0,.96);z-index:330;display:none;flex-direction:column}
+#demo-modal.show{display:flex}
+.demo-hdr{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;padding:calc(18px + var(--safe-top)) calc(18px + var(--safe-right)) 18px calc(18px + var(--safe-left));border-bottom:1px solid #1a1a1a;flex-shrink:0}
+.demo-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:2px;color:var(--g)}
+.demo-sub{font-size:12px;color:var(--tm);margin-top:4px;line-height:1.6;max-width:560px}
+.demo-scroll{flex:1;overflow-y:auto;padding:18px 18px 120px}
+.demo-intro{background:rgba(41,182,246,.08);border:1px solid rgba(41,182,246,.24);border-radius:16px;padding:14px 16px;color:var(--t);font-size:13px;line-height:1.7}
+.demo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:14px}
+.demo-card{background:var(--s1);border:1px solid var(--td);border-radius:18px;padding:12px}
+.demo-card h3{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--tm);margin-bottom:10px}
+.demo-frame{aspect-ratio:1/1;border-radius:16px;overflow:hidden;background:#0e0e0e;border:1px solid #1a1a1a}
+.demo-frame img{width:100%;height:100%;object-fit:cover;display:block}
+.demo-caption{font-size:12px;color:var(--tm);line-height:1.6;margin-top:10px}
+.demo-state,.demo-error{border-radius:16px;padding:16px;font-size:13px;line-height:1.7}
+.demo-state{background:var(--s1);border:1px solid var(--td);color:var(--tm)}
+.demo-error{background:rgba(255,23,68,.08);border:1px solid rgba(255,23,68,.22);color:#ff8a9b}
+.demo-actions{position:fixed;left:0;right:0;bottom:0;display:flex;gap:10px;justify-content:flex-end;padding:14px calc(18px + var(--safe-right)) calc(14px + var(--safe-bottom)) calc(18px + var(--safe-left));background:linear-gradient(180deg,rgba(8,8,8,0),rgba(8,8,8,.96) 24%,rgba(8,8,8,1))}
+
 /* IMPORT MODAL */
 #import-modal{position:fixed;inset:0;background:rgba(0,0,0,.97);z-index:340;display:none;flex-direction:column}
 #import-modal.show{display:flex}
@@ -452,6 +474,9 @@ body{font-family:'DM Sans',sans-serif;background:
   .chat-compose-shell{padding:12px 14px 14px}
   .chat-compose{grid-template-columns:1fr}
   .chat-send{width:100%;height:52px}
+  .focus-top{flex-direction:column;align-items:stretch}
+  .fc-demo-btn{width:100%}
+  .demo-grid{grid-template-columns:1fr}
 }
 
 @keyframes pop{0%{transform:scale(.8);opacity:0}60%{transform:scale(1.1)}100%{transform:scale(1);opacity:1}}
@@ -645,6 +670,21 @@ body{font-family:'DM Sans',sans-serif;background:
   <div class="week-report-actions">
     <button class="t-btn" onclick="closeWeekReport()">Chiudi</button>
     <button class="t-btn" id="week-report-next-btn" style="display:none" onclick="goToNextWeek()">Vai alla settimana successiva</button>
+  </div>
+</div>
+
+<!-- EXERCISE DEMO MODAL -->
+<div id="demo-modal">
+  <div class="demo-hdr">
+    <div>
+      <div class="demo-title" id="demo-title">Demo esercizio</div>
+      <div class="demo-sub" id="demo-subtitle">Due immagini guida per capire meglio il movimento.</div>
+    </div>
+    <button class="week-close" onclick="closeExerciseDemo()">X</button>
+  </div>
+  <div class="demo-scroll" id="demo-content"></div>
+  <div class="demo-actions">
+    <button class="t-btn" onclick="closeExerciseDemo()">Chiudi</button>
   </div>
 </div>
 
@@ -966,6 +1006,10 @@ const IMPORT_API_BASE_URL = String(window.MASSI_CONFIG?.importApiBaseUrl || '').
 const USER_PROGRAMS_KEY = 'massi_user_programs';
 const PROGRAM_STATE_PREFIX = 'massi_state_';
 const CHAT_STORAGE_KEY = 'massi_chat_messages_v1';
+const EXERCISE_DEMO_CACHE_DB = 'massi_exercise_demo_cache';
+const EXERCISE_DEMO_CACHE_STORE = 'exercise_demos';
+const EXERCISE_DEMO_CACHE_VERSION = 1;
+const EXERCISE_DEMO_SCHEMA_VERSION = 'demo-v1';
 const SHOW_BUNDLED_PROGRAMS = false;
 const MAIN_SECTION_IDS = ['programs', 'home', 'progress', 'coach'];
 const SECTION_TRANSITION_MS = 260;
@@ -984,6 +1028,8 @@ let importDraft = null;
 let importMeta = null;
 let importBusy = false;
 let chatBusy = false;
+let demoBusy = false;
+let demoRequestToken = 0;
 // Timer state
 let timerInterval = null;
 let timerTotal = 90;
@@ -1046,6 +1092,31 @@ function buildApiUrl(path) {
 
 function getChatEndpoint() {
   return buildApiUrl('/api/chat');
+}
+
+function getExerciseDemoEndpoint() {
+  return buildApiUrl('/api/exercise-demo');
+}
+
+function makeExerciseDemoCacheKey(exercise) {
+  return EXERCISE_DEMO_SCHEMA_VERSION + ':' + slugify(
+    [exercise?.name || '', exercise?.note || '', exercise?.reps || ''].map(cleanText).filter(Boolean).join(' ')
+  );
+}
+
+function normalizeExerciseDemoPayload(payload, fallbackTitle = '') {
+  const safe = payload && typeof payload === 'object' ? payload : {};
+  return {
+    title: cleanText(safe.title || fallbackTitle || 'Demo esercizio'),
+    hint: cleanText(safe.hint || 'Osserva la posizione iniziale e quella finale per capire il movimento.'),
+    generatedAt: cleanText(safe.generatedAt || ''),
+    model: cleanText(safe.model || ''),
+    images: (Array.isArray(safe.images) ? safe.images : []).map((image, index) => ({
+      label: cleanText(image?.label || (index === 0 ? 'Posizione iniziale' : 'Posizione finale')),
+      alt: cleanText(image?.alt || fallbackTitle || 'Demo esercizio'),
+      dataUrl: String(image?.dataUrl || '').trim()
+    })).filter((image) => /^data:image\//.test(image.dataUrl))
+  };
 }
 
 function normalizePrograms(programs, sourceFallback = 'bundled') {
@@ -1827,8 +1898,185 @@ function clearChatMessages() {
   }
 }
 
+function openExerciseDemoDb() {
+  return new Promise((resolve, reject) => {
+    if (!window.indexedDB) {
+      resolve(null);
+      return;
+    }
+    const request = window.indexedDB.open(EXERCISE_DEMO_CACHE_DB, EXERCISE_DEMO_CACHE_VERSION);
+    request.onerror = () => reject(request.error || new Error('Demo cache non disponibile.'));
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(EXERCISE_DEMO_CACHE_STORE)) {
+        db.createObjectStore(EXERCISE_DEMO_CACHE_STORE, { keyPath: 'key' });
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+  });
+}
+
+async function readExerciseDemoCache(cacheKey) {
+  const db = await openExerciseDemoDb();
+  if (!db) return null;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(EXERCISE_DEMO_CACHE_STORE, 'readonly');
+    const store = tx.objectStore(EXERCISE_DEMO_CACHE_STORE);
+    const request = store.get(cacheKey);
+    request.onerror = () => reject(request.error || new Error('Errore lettura cache demo.'));
+    request.onsuccess = () => {
+      resolve(request.result?.payload || null);
+      db.close();
+    };
+    tx.onabort = () => {
+      db.close();
+      reject(tx.error || new Error('Transazione cache demo annullata.'));
+    };
+  });
+}
+
+async function writeExerciseDemoCache(cacheKey, payload) {
+  const db = await openExerciseDemoDb();
+  if (!db) return false;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(EXERCISE_DEMO_CACHE_STORE, 'readwrite');
+    const store = tx.objectStore(EXERCISE_DEMO_CACHE_STORE);
+    store.put({
+      key: cacheKey,
+      savedAt: new Date().toISOString(),
+      payload
+    });
+    tx.oncomplete = () => {
+      db.close();
+      resolve(true);
+    };
+    tx.onerror = () => {
+      db.close();
+      reject(tx.error || new Error('Errore salvataggio cache demo.'));
+    };
+    tx.onabort = () => {
+      db.close();
+      reject(tx.error || new Error('Transazione cache demo annullata.'));
+    };
+  }).catch(() => false);
+}
+
+function setExerciseDemoView(title, subtitle, html) {
+  const modal = document.getElementById('demo-modal');
+  if (!modal) return;
+  document.getElementById('demo-title').textContent = title || 'Demo esercizio';
+  document.getElementById('demo-subtitle').textContent = subtitle || 'Due immagini guida per capire meglio il movimento.';
+  document.getElementById('demo-content').innerHTML = html;
+  modal.classList.add('show');
+}
+
+function closeExerciseDemo() {
+  demoRequestToken++;
+  demoBusy = false;
+  document.getElementById('demo-modal').classList.remove('show');
+}
+
+function renderExerciseDemoLoading(exerciseName) {
+  setExerciseDemoView(
+    exerciseName,
+    'Sto preparando due immagini guida: posizione iniziale e finale del movimento.',
+    `<div class="demo-state"><strong>Generazione in corso.</strong><br>La prima volta puo' richiedere qualche secondo, poi la demo restera' salvata sul dispositivo.</div>`
+  );
+}
+
+function renderExerciseDemoError(exerciseName, message) {
+  setExerciseDemoView(
+    exerciseName,
+    'Demo non disponibile',
+    `<div class="demo-error">${escapeHtml(message)}</div>`
+  );
+}
+
+function renderExerciseDemoPayload(payload, fromCache = false) {
+  const safe = normalizeExerciseDemoPayload(payload, payload?.title || 'Demo esercizio');
+  if (!safe.images.length) {
+    renderExerciseDemoError(safe.title, 'Non sono riuscito a ottenere immagini utili per questo esercizio.');
+    return;
+  }
+  const generatedMeta = safe.generatedAt ? new Date(safe.generatedAt).toLocaleString('it-IT') : '';
+  setExerciseDemoView(
+    safe.title,
+    fromCache ? 'Demo salvata sul dispositivo' : 'Demo AI pronta da consultare',
+    `
+      <div class="demo-intro">
+        <strong>Come leggerla:</strong> ${escapeHtml(safe.hint)}
+        ${generatedMeta ? '<br><span class="demo-caption">Generata il ' + escapeHtml(generatedMeta) + (safe.model ? ' · ' + escapeHtml(safe.model) : '') + '</span>' : ''}
+      </div>
+      <div class="demo-grid">
+        ${safe.images.map((image) => `
+          <div class="demo-card">
+            <h3>${escapeHtml(image.label)}</h3>
+            <div class="demo-frame">
+              <img src="${image.dataUrl}" alt="${escapeHtml(image.alt)}" loading="lazy">
+            </div>
+            <div class="demo-caption">Usa questa immagine come riferimento visivo rapido del movimento.</div>
+          </div>
+        `).join('')}
+      </div>`
+  );
+}
+
+async function openExerciseDemo(di, ei) {
+  const exercise = getDays()?.[di]?.exercises?.[ei];
+  if (!exercise) return;
+
+  const cacheKey = makeExerciseDemoCacheKey(exercise);
+  const requestToken = ++demoRequestToken;
+  demoBusy = true;
+  renderExerciseDemoLoading(exercise.name);
+
+  try {
+    const cached = await readExerciseDemoCache(cacheKey).catch(() => null);
+    if (requestToken !== demoRequestToken) return;
+    if (cached) {
+      renderExerciseDemoPayload(cached, true);
+      demoBusy = false;
+      return;
+    }
+
+    if (window.location.protocol === 'file:' && !IMPORT_API_BASE_URL) {
+      renderExerciseDemoError(exercise.name, 'La demo immagini funziona nella versione pubblicata dell\'app o con il server locale attivo.');
+      return;
+    }
+
+    if (!navigator.onLine) {
+      renderExerciseDemoError(exercise.name, 'Serve connessione internet per generare la demo la prima volta.');
+      return;
+    }
+
+    const response = await fetch(getExerciseDemoEndpoint(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        exerciseName: exercise.name,
+        note: exercise.note || '',
+        reps: exercise.reps || ''
+      })
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || 'Demo esercizio non disponibile in questo momento.');
+    if (requestToken !== demoRequestToken) return;
+
+    const normalizedPayload = normalizeExerciseDemoPayload(payload, exercise.name);
+    await writeExerciseDemoCache(cacheKey, normalizedPayload);
+    renderExerciseDemoPayload(normalizedPayload, false);
+  } catch (error) {
+    console.error('Errore demo esercizio', error);
+    if (requestToken !== demoRequestToken) return;
+    renderExerciseDemoError(exercise.name, error.message || 'Demo esercizio non disponibile in questo momento.');
+  } finally {
+    if (requestToken === demoRequestToken) demoBusy = false;
+  }
+}
+
 function setAppSection(section) {
   currentSection = section;
+  closeExerciseDemo();
   const sectionMap = {
     today: 'home',
     plans: 'programs',
@@ -2257,8 +2505,13 @@ function renderFocusView(di, ei) {
   }
 
   document.getElementById('focus-card').innerHTML = `
-    <div class="fc-name">${ex.name}</div>
-    <div class="fc-meta">${ex.series} serie - ${ex.reps} reps</div>
+    <div class="focus-top">
+      <div class="fc-head">
+        <div class="fc-name">${ex.name}</div>
+        <div class="fc-meta">${ex.series} serie - ${ex.reps} reps</div>
+      </div>
+      <button class="hdr-btn fc-demo-btn" type="button" onclick="openExerciseDemo(${di},${ei})">DEMO</button>
+    </div>
     ${ex.note ? `<div class="fc-note">${ex.note}</div>` : ''}
     <div class="chrono-row">
       <span class="chrono-lbl">Cronometro serie:</span>
