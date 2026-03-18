@@ -57,9 +57,9 @@ body{font-family:'DM Sans',sans-serif;background:
   transition:opacity .26s ease,transform .26s ease
 }
 .section-shell.hidden{opacity:0;transform:translateY(24px);pointer-events:none}
-.section-shell-row{width:min(100%,780px);display:flex;align-items:center;justify-content:center;gap:12px;pointer-events:auto}
+.section-shell-row{width:100%;max-width:720px;display:flex;align-items:center;justify-content:center;pointer-events:auto}
 .section-dock{
-  flex:1;display:flex;align-items:center;gap:8px;padding:9px 10px;
+  width:100%;display:flex;align-items:center;gap:8px;padding:9px 10px;
   background:rgba(14,14,14,.62);border:1px solid rgba(255,255,255,.12);border-radius:999px;
   backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%);
   box-shadow:0 18px 42px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.05)
@@ -85,19 +85,6 @@ body{font-family:'DM Sans',sans-serif;background:
   color:#d7d7d7;background:rgba(255,255,255,.03);transition:all .24s ease
 }
 .section-tab-label{font-size:12px;font-weight:700;line-height:1;color:#f1f1f1;transition:color .24s ease}
-.section-action{
-  width:98px;flex:0 0 98px;min-height:70px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
-  background:rgba(14,14,14,.62);display:flex;flex-direction:row;align-items:center;justify-content:center;gap:8px;
-  color:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .24s ease;
-  backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%);
-  box-shadow:0 18px 42px rgba(0,0,0,.34),inset 0 1px 0 rgba(255,255,255,.05)
-}
-.section-action:hover{border-color:rgba(0,230,118,.3);color:var(--g);transform:translateY(-1px)}
-.section-action-ico{
-  width:34px;height:34px;border-radius:12px;display:flex;align-items:center;justify-content:center;
-  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.10);font-size:20px;line-height:1
-}
-.section-action-label{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase}
 .bottom-safe-fill{
   position:fixed;left:0;right:0;bottom:0;height:calc(30px + var(--safe-bottom));
   background:linear-gradient(180deg,rgba(6,6,6,0),rgba(6,6,6,.92) 42%,#060606 100%);
@@ -453,13 +440,10 @@ body{font-family:'DM Sans',sans-serif;background:
   .hdr-actions{gap:6px;flex-wrap:wrap;justify-content:flex-end}
   .hdr-btn{padding:7px 10px}
   .section-shell{bottom:calc(14px + var(--safe-bottom))}
-  .section-shell-row{gap:10px}
   .section-dock{padding:8px}
   .section-tab{padding:11px 12px;gap:8px}
   .section-tab-label{font-size:11px}
   .section-tab-ico{width:30px;height:30px;border-radius:10px;font-size:14px}
-  .section-action{width:88px;flex-basis:88px;min-height:64px;border-radius:999px}
-  .section-action-ico{width:30px;height:30px;border-radius:10px;font-size:18px}
   .section-copy h2{font-size:30px}
   #programs,#home,#progress,#coach{padding-bottom:calc(148px + var(--safe-bottom))}
   .chat-head h2{font-size:30px}
@@ -505,10 +489,6 @@ body{font-family:'DM Sans',sans-serif;background:
         <span class="section-tab-label">Coach</span>
       </button>
     </div>
-    <button class="section-action" id="section-import-btn" type="button" onclick="triggerPdfImport()">
-      <span class="section-action-ico">+</span>
-      <span class="section-action-label">PDF</span>
-    </button>
   </div>
 </div>
 <div class="bottom-safe-fill" aria-hidden="true"></div>
@@ -1885,7 +1865,7 @@ function updateHeader() {
   const importBtn = document.getElementById('importBtn');
   const isSession = currentDay !== null;
   setSectionShellVisible(!isSession);
-  importBtn.style.display = 'none';
+  importBtn.style.display = !isSession ? 'inline-block' : 'none';
   if (!currentProgram || isSession || currentSection === 'chat') {
     historyBtn.style.display = 'none';
     syncHeaderBalance();
