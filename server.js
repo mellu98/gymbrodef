@@ -732,9 +732,7 @@ async function createCoachReply(messages, context) {
   const input = [
     {
       role: 'system',
-      content: [
-        { type: 'input_text', text: CHAT_SYSTEM_PROMPT }
-      ]
+      content: CHAT_SYSTEM_PROMPT
     }
   ];
 
@@ -742,32 +740,36 @@ async function createCoachReply(messages, context) {
   if (contextText) {
     input.push({
       role: 'system',
-      content: [
-        { type: 'input_text', text: 'Contesto attuale utente:\n' + contextText }
-      ]
+      content: 'Contesto attuale utente:\n' + contextText
     });
   }
 
   normalizedMessages.forEach((message) => {
     input.push({
       role: message.role,
-      content: [
-        { type: 'input_text', text: message.content }
-      ]
+      content: message.content
     });
   });
 
   const modelsToTry = Array.from(new Set([
     OPENAI_ASSISTANT_MODEL,
+    'gpt-4.1-nano',
     'gpt-4.1-mini'
   ].filter(Boolean)));
 
   for (const model of modelsToTry) {
-    const response = await client.responses.create({
+    const request = {
       model,
       input,
       max_output_tokens: 260
-    });
+    };
+
+    if (model.startsWith('gpt-5')) {
+      request.reasoning = { effort: 'minimal' };
+      request.text = { verbosity: 'low' };
+    }
+
+    const response = await client.responses.create(request);
 
     const reply = extractResponseText(response);
     if (reply) {
