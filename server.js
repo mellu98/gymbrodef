@@ -70,7 +70,7 @@ const IMPORT_SCHEMA = {
             items: {
               type: 'object',
               additionalProperties: false,
-              required: ['name', 'series', 'reps', 'note'],
+              required: ['name', 'series', 'reps', 'repsPlan', 'note'],
               properties: {
                 name: { type: 'string' },
                 series: { type: 'integer', minimum: 1 },
@@ -175,7 +175,7 @@ const COACH_PROGRAM_SCHEMA = {
                 items: {
                   type: 'object',
                   additionalProperties: false,
-                  required: ['name', 'series', 'reps', 'note'],
+                  required: ['name', 'series', 'reps', 'repsPlan', 'note'],
                   properties: {
                     name: { type: 'string' },
                     series: { type: 'integer', minimum: 1 },
@@ -396,6 +396,38 @@ function extractResponseText(response) {
   });
 
   return cleanString(chunks.join('\n').trim());
+}
+
+function parseJsonObjectFromText(value) {
+  const raw = typeof value === 'string' ? value.trim() : '';
+  if (!raw) {
+    const error = new SyntaxError('Risposta JSON vuota.');
+    error.code = 'empty_json';
+    throw error;
+  }
+
+  const candidates = [raw];
+  const fenceMatch = raw.match(/```(?:json)?\s*([\s\S]+?)\s*```/i);
+  if (fenceMatch?.[1]) {
+    candidates.push(fenceMatch[1].trim());
+  }
+
+  const firstBrace = raw.indexOf('{');
+  const lastBrace = raw.lastIndexOf('}');
+  if (firstBrace >= 0 && lastBrace > firstBrace) {
+    candidates.push(raw.slice(firstBrace, lastBrace + 1).trim());
+  }
+
+  let lastError = null;
+  for (const candidate of candidates) {
+    try {
+      return JSON.parse(candidate);
+    } catch (error) {
+      lastError = error;
+    }
+  }
+
+  throw lastError || new SyntaxError('JSON non valido.');
 }
 
 function buildChatContextText(context) {
@@ -863,52 +895,73 @@ async function parseWorkoutPdf(file) {
   ].join(' ');
 
   async function runImportAttempt(schema, prompt, schemaName) {
-    const response = await client.responses.create({
-      model: OPENAI_MODEL,
-      temperature: 0,
-      input: [
-        {
-          role: 'system',
-          content: [
+    const modelsToTry = Array.from(new Set([
+      OPENAI_MODEL,
+      'gpt-4.1'
+    ].filter(Boolean)));
+
+    let lastError = null;
+    for (const model of modelsToTry) {
+      try {
+        const response = await client.responses.create({
+          model,
+          temperature: 0,
+          input: [
             {
-              type: 'input_text',
-              text: SYSTEM_PROMPT
-            }
-          ]
-        },
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'input_file',
-              filename,
-              file_data: 'data:application/pdf;base64,' + base64File
+              role: 'system',
+              content: [
+                {
+                  type: 'input_text',
+                  text: SYSTEM_PROMPT
+                }
+              ]
             },
             {
-              type: 'input_text',
-              text: prompt
+              role: 'user',
+              content: [
+                {
+                  type: 'input_file',
+                  filename,
+                  file_data: 'data:application/pdf;base64,' + base64File
+                },
+                {
+                  type: 'input_text',
+                  text: prompt
+                }
+              ]
             }
-          ]
-        }
-      ],
-      text: {
-        format: {
-          type: 'json_schema',
-          name: schemaName,
-          strict: true,
-          schema
-        }
-      }
-    });
+          ],
+          text: {
+            format: {
+              type: 'json_schema',
+              name: schemaName,
+              strict: true,
+              schema
+            }
+          }
+        });
 
-    const outputText = extractResponseText(response);
-    if (!outputText) {
-      const error = new Error('Risposta OpenAI vuota durante il parsing del PDF.');
-      error.statusCode = 502;
-      throw error;
+        const outputText = response.output_text || extractResponseText(response);
+        if (!outputText) {
+          const error = new Error('Risposta OpenAI vuota durante il parsing del PDF.');
+          error.statusCode = 502;
+          throw error;
+        }
+
+        return parseJsonObjectFromText(outputText);
+      } catch (error) {
+        lastError = error;
+        console.warn('PDF import attempt failed for model, trying fallback if available.', {
+          schemaName,
+          model,
+          message: error?.message || String(error),
+          code: error?.code || '',
+          status: error?.statusCode || error?.status || ''
+        });
+      }
     }
 
-    return JSON.parse(outputText);
+    throw lastError || new Error('Parsing PDF fallito.');
   }
 
   try {
