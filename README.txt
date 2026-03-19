@@ -17,7 +17,8 @@ Flusso schede:
 Variabili ambiente backend:
 - OPENAI_API_KEY -> obbligatoria per import PDF e Coach AI
 - CORS_ALLOWED_ORIGIN -> opzionale, utile se frontend e backend non sono sullo stesso dominio
-- OPENAI_MODEL -> opzionale, default gpt-4.1, usato per import PDF e generazione schede del Coach AI
+- OPENAI_MODEL -> opzionale, default gpt-4.1, usato per generazione schede del Coach AI
+- OPENAI_PDF_MODEL -> opzionale, default gpt-5.1, usato dal parser PDF; fallback automatici: gpt-5.4 poi gpt-4.1
 - OPENAI_ASSISTANT_MODEL -> opzionale, default gpt-5-nano, usato dalla mini chat flottante Assistente AI
 
 Avvio locale:

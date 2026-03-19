@@ -18,6 +18,7 @@ const upload = multer({
 
 const PORT = Number(process.env.PORT || 3000);
 const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4.1';
+const OPENAI_PDF_MODEL = process.env.OPENAI_PDF_MODEL || 'gpt-5.1';
 const OPENAI_ASSISTANT_MODEL = process.env.OPENAI_ASSISTANT_MODEL || 'gpt-5-nano';
 const CORS_ALLOWED_ORIGIN = (process.env.CORS_ALLOWED_ORIGIN || '').trim();
 const PARSER_VERSION = 'pt-pdf-v1';
@@ -896,7 +897,8 @@ async function parseWorkoutPdf(file) {
 
   async function runImportAttempt(schema, prompt, schemaName) {
     const modelsToTry = Array.from(new Set([
-      OPENAI_MODEL,
+      OPENAI_PDF_MODEL,
+      'gpt-5.4',
       'gpt-4.1'
     ].filter(Boolean)));
 
