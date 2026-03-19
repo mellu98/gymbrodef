@@ -27,6 +27,7 @@ const NUTRITION_AI_VERSION = 'nutrition-ai-v1';
 const ASSISTANT_CHAT_VERSION = 'assistant-overlay-v1';
 const ROOT_DIR = __dirname;
 const ICONS_DIR = path.join(ROOT_DIR, 'icons');
+const ASSETS_DIR = path.join(ROOT_DIR, 'assets');
 
 const client = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
 
@@ -2174,6 +2175,7 @@ app.post('/api/ai/nutrition/refine-plan', async (req, res) => {
 });
 
 app.use('/icons', express.static(ICONS_DIR, { maxAge: '7d', index: false }));
+app.use('/assets', express.static(ASSETS_DIR, { maxAge: '7d', index: false }));
 
 [
   ['/', 'index.html'],

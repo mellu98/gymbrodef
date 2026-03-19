@@ -1,9 +1,11 @@
-const CACHE_NAME = 'hypercore-ai-v13';
+const CACHE_NAME = 'hypercore-ai-v14';
 const APP_SHELL = [
   './',
   './index.html',
   './programs.json',
   './app.webmanifest',
+  './assets/css/app.css',
+  './assets/js/app.js',
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
