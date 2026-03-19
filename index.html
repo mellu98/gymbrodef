@@ -38,13 +38,46 @@ body{font-family:'DM Sans',sans-serif;background:
 .hdr{
   background:var(--s1);border-bottom:1px solid #1a1a1a;
   padding:calc(var(--hdr-top-gap) + var(--safe-top)) calc(18px + var(--safe-right)) var(--hdr-bottom-gap) calc(18px + var(--safe-left));
-  display:flex;align-items:center;justify-content:space-between;
+  display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;
   flex-shrink:0;
 }
-.hdr-spacer{flex:0 0 auto;min-width:0;visibility:hidden;pointer-events:none}
-.hdr-brand{display:flex;align-items:center;justify-content:center;min-width:0;flex:0 0 auto}
+.hdr-left{display:flex;align-items:center;justify-content:flex-start;min-width:0}
+.hdr-brand{display:flex;align-items:center;justify-content:center;min-width:0;justify-self:center}
 .hdr-logo{display:block;height:clamp(40px,5.4vw,50px);width:auto;max-width:min(56vw,268px);object-fit:contain;filter:drop-shadow(0 8px 18px rgba(0,0,0,.28))}
-.hdr-actions{display:flex;align-items:center;gap:8px}
+.hdr-actions{display:flex;align-items:center;gap:8px;justify-self:end}
+.hdr-menu-wrap{position:relative;display:flex;align-items:center}
+.hdr-menu-btn{
+  width:42px;height:42px;border-radius:14px;border:1px solid rgba(255,255,255,.12);
+  background:rgba(255,255,255,.04);color:#f2f2f2;display:flex;align-items:center;justify-content:center;
+  font-size:22px;line-height:1;cursor:pointer;transition:all .22s ease
+}
+.hdr-menu-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.2);color:var(--g)}
+.hdr-menu-btn.on{background:rgba(0,230,118,.12);border-color:rgba(0,230,118,.28);color:var(--g)}
+.hdr-dropdown{
+  position:absolute;top:calc(100% + 12px);left:0;min-width:238px;padding:10px;
+  background:rgba(12,12,12,.9);border:1px solid rgba(255,255,255,.12);border-radius:20px;
+  box-shadow:0 24px 46px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.04);
+  backdrop-filter:blur(24px) saturate(150%);-webkit-backdrop-filter:blur(24px) saturate(150%);
+  opacity:0;transform:translateY(-8px) scale(.98);visibility:hidden;pointer-events:none;z-index:180;
+  transition:opacity .22s ease,transform .22s ease,visibility .22s ease
+}
+.hdr-dropdown.show{opacity:1;transform:none;visibility:visible;pointer-events:auto}
+.hdr-menu-list{display:flex;flex-direction:column;gap:6px}
+.hdr-menu-item{
+  width:100%;border:none;border-radius:16px;padding:12px 14px;background:transparent;color:#f2f2f2;
+  display:flex;align-items:flex-start;justify-content:space-between;gap:12px;text-align:left;cursor:pointer;
+  transition:all .2s ease
+}
+.hdr-menu-item:hover{background:rgba(255,255,255,.06)}
+.hdr-menu-item.on{background:rgba(255,255,255,.09);box-shadow:inset 0 0 0 1px rgba(255,255,255,.05)}
+.hdr-menu-copy{display:flex;flex-direction:column;gap:4px}
+.hdr-menu-copy strong{font-size:13px;line-height:1.1}
+.hdr-menu-copy span{font-size:11px;line-height:1.35;color:var(--tm)}
+.hdr-menu-pill{
+  min-width:28px;height:28px;border-radius:10px;border:1px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.03);
+  font-size:14px;line-height:1;font-family:'Apple Color Emoji','Segoe UI Emoji','Noto Color Emoji',sans-serif
+}
 .hdr-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--g)}
 .hdr-btn{background:var(--s2);border:1px solid var(--td);color:var(--tm);border-radius:8px;padding:7px 12px;font-size:11px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
 .hdr-btn:hover{color:var(--g);border-color:var(--gdim)}
@@ -705,6 +738,8 @@ body{font-family:'DM Sans',sans-serif;background:
     padding:calc(var(--hdr-top-gap) + var(--safe-top)) calc(14px + var(--safe-right)) var(--hdr-bottom-gap) calc(14px + var(--safe-left))
   }
   .hdr-logo{height:clamp(36px,4.8vw,44px);max-width:min(50vw,214px)}
+  .hdr-menu-btn{width:38px;height:38px;border-radius:12px}
+  .hdr-dropdown{left:0;right:auto;min-width:min(248px,calc(100vw - 28px))}
   .hdr-actions{gap:6px;flex-wrap:wrap;justify-content:flex-end}
   .hdr-btn{padding:7px 10px}
   .section-shell{bottom:calc(14px + var(--dock-safe-bottom))}
@@ -739,7 +774,50 @@ body{font-family:'DM Sans',sans-serif;background:
 
 <!-- HEADER -->
 <div class="hdr" id="main-hdr">
-  <div class="hdr-spacer" id="hdr-spacer" aria-hidden="true"></div>
+  <div class="hdr-left">
+    <div class="hdr-menu-wrap" id="hdr-menu-wrap">
+      <button class="hdr-menu-btn" id="hdr-menu-btn" type="button" aria-label="Apri menu" aria-expanded="false" onclick="toggleHeaderMenu(event)">☰</button>
+      <div class="hdr-dropdown" id="hdr-dropdown" aria-hidden="true">
+        <div class="hdr-menu-list">
+          <button class="hdr-menu-item" id="hdr-menu-plans" type="button" data-section="plans" onclick="navigateFromHeaderMenu('plans')">
+            <div class="hdr-menu-copy">
+              <strong>Schede</strong>
+              <span>Apri, importa o scegli la scheda attiva</span>
+            </div>
+            <span class="hdr-menu-pill">🗂️</span>
+          </button>
+          <button class="hdr-menu-item" id="hdr-menu-today" type="button" data-section="today" onclick="navigateFromHeaderMenu('today')">
+            <div class="hdr-menu-copy">
+              <strong>Settimana attiva</strong>
+              <span>Vai ai giorni della scheda attuale</span>
+            </div>
+            <span class="hdr-menu-pill">📆</span>
+          </button>
+          <button class="hdr-menu-item" id="hdr-menu-nutrition" type="button" data-section="nutrition" onclick="navigateFromHeaderMenu('nutrition')">
+            <div class="hdr-menu-copy">
+              <strong>Nutrizione</strong>
+              <span>Piano alimentare, oggi e tracking</span>
+            </div>
+            <span class="hdr-menu-pill">🥗</span>
+          </button>
+          <button class="hdr-menu-item" id="hdr-menu-progress" type="button" data-section="progress" onclick="navigateFromHeaderMenu('progress')">
+            <div class="hdr-menu-copy">
+              <strong>Progressi</strong>
+              <span>Storico, report e memoria carichi</span>
+            </div>
+            <span class="hdr-menu-pill">📈</span>
+          </button>
+          <button class="hdr-menu-item" id="hdr-menu-chat" type="button" data-section="chat" onclick="navigateFromHeaderMenu('chat')">
+            <div class="hdr-menu-copy">
+              <strong>Coach AI</strong>
+              <span>Crea o rifinisci una scheda con l'AI</span>
+            </div>
+            <span class="hdr-menu-pill" style="font-family:'JetBrains Mono',monospace;font-size:13px">AI</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
   <div class="hdr-brand">
     <img class="hdr-logo" src="./icons/logo-header-v2.png" alt="Massi Gym logo">
   </div>
@@ -756,10 +834,6 @@ body{font-family:'DM Sans',sans-serif;background:
       <button class="section-tab on" id="section-tab-plans" type="button" onclick="setAppSection('plans')">
         <span class="section-tab-ico emoji">🗂️</span>
         <span class="section-tab-label">Schede</span>
-      </button>
-      <button class="section-tab" id="section-tab-nutrition" type="button" onclick="setAppSection('nutrition')">
-        <span class="section-tab-ico emoji">🥗</span>
-        <span class="section-tab-label">Nutrizione</span>
       </button>
       <button class="section-tab" id="section-tab-progress" type="button" onclick="setAppSection('progress')">
         <span class="section-tab-ico emoji">📈</span>
@@ -1282,6 +1356,7 @@ let importMeta = null;
 let importBusy = false;
 let assistantOpen = false;
 let assistantBusy = false;
+let headerMenuOpen = false;
 let nutritionSelectedDate = '';
 let aiCoachState = {
   phase: 'idle',
@@ -1968,11 +2043,54 @@ function getCurrentProgramHistoryPreview(limit = 4) {
 
 function renderSectionNav() {
   const activeSection = currentSection === 'today' ? 'plans' : currentSection;
-  ['plans', 'nutrition', 'progress', 'chat'].forEach((section) => {
+  ['plans', 'progress', 'chat'].forEach((section) => {
     const button = document.getElementById('section-tab-' + section);
     if (!button) return;
     button.classList.toggle('on', activeSection === section);
   });
+}
+
+function syncHeaderMenuUi() {
+  const menuBtn = document.getElementById('hdr-menu-btn');
+  const dropdown = document.getElementById('hdr-dropdown');
+  const menuWrap = document.getElementById('hdr-menu-wrap');
+  const isSession = currentDay !== null;
+  const canShow = !isSession;
+  const isOpen = headerMenuOpen && canShow;
+  if (menuWrap) menuWrap.style.display = canShow ? 'flex' : 'none';
+  if (menuBtn) {
+    menuBtn.classList.toggle('on', isOpen);
+    menuBtn.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+  }
+  if (dropdown) {
+    dropdown.classList.toggle('show', isOpen);
+    dropdown.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
+  }
+  document.querySelectorAll('.hdr-menu-item[data-section]').forEach((item) => {
+    const target = item.getAttribute('data-section') || '';
+    item.classList.toggle('on', currentSection === target);
+  });
+}
+
+function closeHeaderMenu() {
+  if (!headerMenuOpen) {
+    syncHeaderMenuUi();
+    return;
+  }
+  headerMenuOpen = false;
+  syncHeaderMenuUi();
+}
+
+function toggleHeaderMenu(event) {
+  event?.stopPropagation();
+  if (currentDay !== null) return;
+  headerMenuOpen = !headerMenuOpen;
+  syncHeaderMenuUi();
+}
+
+function navigateFromHeaderMenu(section) {
+  closeHeaderMenu();
+  setAppSection(section);
 }
 
 function setSectionShellVisible(visible) {
@@ -4121,6 +4239,7 @@ function openExerciseDemo(di, ei) {
 }
 
 function setAppSection(section) {
+  closeHeaderMenu();
   currentSection = section;
   const sectionMap = {
     today: 'home',
@@ -4146,10 +4265,7 @@ function setAppSection(section) {
 }
 
 function syncHeaderBalance() {
-  const spacer = document.getElementById('hdr-spacer');
-  const actions = document.querySelector('.hdr-actions');
-  if (!spacer || !actions) return;
-  spacer.style.width = actions.offsetWidth + 'px';
+  return;
 }
 
 function updateHeader() {
@@ -4157,15 +4273,16 @@ function updateHeader() {
   const importBtn = document.getElementById('importBtn');
   const isSession = currentDay !== null;
   setSectionShellVisible(!isSession);
+  if (isSession) headerMenuOpen = false;
   importBtn.style.display = !isSession ? 'inline-block' : 'none';
   if (!currentProgram || isSession || currentSection === 'chat') {
     historyBtn.style.display = 'none';
-    syncHeaderBalance();
+    syncHeaderMenuUi();
     syncAssistantUi();
     return;
   }
   historyBtn.style.display = currentSection === 'progress' || currentSection === 'today' ? 'inline-block' : 'none';
-  syncHeaderBalance();
+  syncHeaderMenuUi();
   syncAssistantUi();
 }
 
@@ -5280,12 +5397,20 @@ document.getElementById('assistant-input').addEventListener('keydown', (event) =
 });
 document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape' && assistantOpen) closeAssistantOverlay();
+  if (event.key === 'Escape' && headerMenuOpen) closeHeaderMenu();
+});
+document.addEventListener('click', (event) => {
+  const menuWrap = document.getElementById('hdr-menu-wrap');
+  if (headerMenuOpen && menuWrap && !menuWrap.contains(event.target)) {
+    closeHeaderMenu();
+  }
 });
 syncAssistantInputHeight();
 renderAssistantThread();
 renderSectionNav();
 renderCoachSection();
 renderNutritionSection();
+syncHeaderMenuUi();
 setAppSection('plans');
 loadPrograms();
 </script>
