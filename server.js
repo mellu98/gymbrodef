@@ -89,6 +89,63 @@ const IMPORT_SCHEMA = {
   }
 };
 
+const IMPORT_SCHEMA_LEGACY = {
+  type: 'object',
+  additionalProperties: false,
+  required: [
+    'isWorkoutProgram',
+    'isTextualPdf',
+    'rejectionReason',
+    'athleteName',
+    'title',
+    'subtitle',
+    'weeks',
+    'confidence',
+    'warnings',
+    'days'
+  ],
+  properties: {
+    isWorkoutProgram: { type: 'boolean' },
+    isTextualPdf: { type: 'boolean' },
+    rejectionReason: { type: 'string' },
+    athleteName: { type: 'string' },
+    title: { type: 'string' },
+    subtitle: { type: 'string' },
+    weeks: { type: 'string' },
+    confidence: { type: 'number', minimum: 0, maximum: 1 },
+    warnings: {
+      type: 'array',
+      items: { type: 'string' }
+    },
+    days: {
+      type: 'array',
+      items: {
+        type: 'object',
+        additionalProperties: false,
+        required: ['name', 'label', 'exercises'],
+        properties: {
+          name: { type: 'string' },
+          label: { type: 'string' },
+          exercises: {
+            type: 'array',
+            items: {
+              type: 'object',
+              additionalProperties: false,
+              required: ['name', 'series', 'reps', 'note'],
+              properties: {
+                name: { type: 'string' },
+                series: { type: 'integer', minimum: 1 },
+                reps: { type: 'string' },
+                note: { type: 'string' }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+};
+
 const COACH_PROGRAM_SCHEMA = {
   type: 'object',
   additionalProperties: false,
@@ -795,53 +852,78 @@ async function parseWorkoutPdf(file) {
     'Se il documento non e` una scheda workout o e` una scansione/foto difficilmente leggibile, rifiuta.',
     'Ogni day deve avere un name tipo "Day 1" e una label leggibile.'
   ].join(' ');
+  const legacyUserPrompt = [
+    'Estrai questa scheda PDF in formato compatibile con una app palestra.',
+    'Usa il nome file come contesto: ' + filename + '.',
+    'Restituisci giorni, label dei day, esercizi, serie, reps, note, durata del ciclo e nome atleta se presente.',
+    'Se trovi righe miste nome+serie+note, separale correttamente.',
+    'Mantieni interi i nomi esercizio anche quando terminano con parole come alla Scott o presa inversa.',
+    'Se il documento non e` una scheda workout o e` una scansione/foto difficilmente leggibile, rifiuta.',
+    'Ogni day deve avere un name tipo "Day 1" e una label leggibile.'
+  ].join(' ');
 
-  const response = await client.responses.create({
-    model: OPENAI_MODEL,
-    temperature: 0,
-    input: [
-      {
-        role: 'system',
-        content: [
-          {
-            type: 'input_text',
-            text: SYSTEM_PROMPT
-          }
-        ]
-      },
-      {
-        role: 'user',
-        content: [
-          {
-            type: 'input_file',
-            filename,
-            file_data: 'data:application/pdf;base64,' + base64File
-          },
-          {
-            type: 'input_text',
-            text: userPrompt
-          }
-        ]
+  async function runImportAttempt(schema, prompt, schemaName) {
+    const response = await client.responses.create({
+      model: OPENAI_MODEL,
+      temperature: 0,
+      input: [
+        {
+          role: 'system',
+          content: [
+            {
+              type: 'input_text',
+              text: SYSTEM_PROMPT
+            }
+          ]
+        },
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'input_file',
+              filename,
+              file_data: 'data:application/pdf;base64,' + base64File
+            },
+            {
+              type: 'input_text',
+              text: prompt
+            }
+          ]
+        }
+      ],
+      text: {
+        format: {
+          type: 'json_schema',
+          name: schemaName,
+          strict: true,
+          schema
+        }
       }
-    ],
-    text: {
-      format: {
-        type: 'json_schema',
-        name: 'pt_workout_program_import',
-        strict: true,
-        schema: IMPORT_SCHEMA
-      }
+    });
+
+    const outputText = extractResponseText(response);
+    if (!outputText) {
+      const error = new Error('Risposta OpenAI vuota durante il parsing del PDF.');
+      error.statusCode = 502;
+      throw error;
     }
-  });
 
-  if (!response.output_text) {
-    const error = new Error('Risposta OpenAI vuota durante il parsing del PDF.');
-    error.statusCode = 502;
-    throw error;
+    return JSON.parse(outputText);
   }
 
-  const parsed = JSON.parse(response.output_text);
-  return validateCandidateProgram(parsed, filename);
+  try {
+    const parsed = await runImportAttempt(IMPORT_SCHEMA, userPrompt, 'pt_workout_program_import');
+    return validateCandidateProgram(parsed, filename);
+  } catch (error) {
+    console.warn('Advanced PDF import attempt failed, retrying legacy parser.', {
+      message: error?.message || String(error),
+      code: error?.code || '',
+      status: error?.statusCode || error?.status || ''
+    });
+  }
+
+  const legacyParsed = await runImportAttempt(IMPORT_SCHEMA_LEGACY, legacyUserPrompt, 'pt_workout_program_import_legacy');
+  return validateCandidateProgram(legacyParsed, filename);
 }
 
 async function createCoachReply(messages, context) {
