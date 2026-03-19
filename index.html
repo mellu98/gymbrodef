@@ -103,8 +103,8 @@ body{font-family:'DM Sans',sans-serif;background:
 .bottom-safe-fill.hidden{opacity:0}
 
 /* HOME */
-#programs,#home,#progress,#coach{padding:20px 16px calc(156px + var(--safe-bottom))}
-#progress,#coach{display:none}
+#programs,#home,#progress,#nutrition,#coach{padding:20px 16px calc(156px + var(--safe-bottom))}
+#progress,#nutrition,#coach{display:none}
 .app-section{opacity:0;transform:translateY(20px) scale(.985);filter:blur(10px)}
 .app-section.is-visible{opacity:1;transform:none;filter:none;transition:opacity .26s ease,transform .26s ease,filter .26s ease}
 .app-section.is-leaving{opacity:0;transform:translateY(14px) scale(.985);filter:blur(8px);transition:opacity .2s ease,transform .2s ease,filter .2s ease}
@@ -418,6 +418,60 @@ body{font-family:'DM Sans',sans-serif;background:
 .coach-refine-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .coach-refine-actions .hdr-btn[disabled]{opacity:.5;cursor:not-allowed}
 
+/* NUTRITION */
+.nutrition-shell{max-width:1040px;margin:0 auto}
+.nutrition-grid{display:grid;grid-template-columns:1.06fr .94fr;gap:12px}
+.nutrition-note{margin-top:12px;font-size:12px;color:var(--tm);line-height:1.7}
+.nutrition-plan-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nutrition-day-card{background:var(--s2);border:1px solid #242424;border-radius:16px;padding:14px}
+.nutrition-day-card h3{font-size:13px;margin-bottom:10px}
+.nutrition-target-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.nutrition-target{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:10px}
+.nutrition-target strong{display:block;font-size:11px;color:var(--tm);text-transform:uppercase;letter-spacing:1px}
+.nutrition-target span{display:block;font-size:18px;font-weight:700;margin-top:6px}
+.nutrition-meals{display:flex;flex-direction:column;gap:10px}
+.nutrition-meal{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px}
+.nutrition-meal-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.nutrition-meal h4{font-size:13px;line-height:1.4}
+.nutrition-meal-time{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--tm)}
+.nutrition-food-list{display:flex;flex-direction:column;gap:6px;margin-top:10px}
+.nutrition-food{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;font-size:12px;line-height:1.6}
+.nutrition-food span:last-child{color:var(--tm);white-space:nowrap}
+.nutrition-food-note,.nutrition-meal-note{font-size:11px;color:var(--tm);line-height:1.6;margin-top:8px}
+.nutrition-today-top{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.nutrition-date-nav{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.nutrition-date-chip{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--tm);background:var(--s2);border:1px solid var(--td);border-radius:999px;padding:7px 10px}
+.nutrition-toggle-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+.nutrition-toggle-btn{background:var(--s2);border:1px solid var(--td);color:var(--tm);border-radius:999px;padding:8px 12px;font-size:11px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s}
+.nutrition-toggle-btn.on{border-color:rgba(0,230,118,.24);color:var(--g);background:rgba(0,230,118,.08)}
+.nutrition-log-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px}
+.nutrition-log-field{display:flex;flex-direction:column;gap:6px}
+.nutrition-log-field.full{grid-column:1/-1}
+.nutrition-log-field label{font-size:11px;color:var(--tm);text-transform:uppercase;letter-spacing:1px}
+.nutrition-log-field input,.nutrition-log-field textarea{
+  width:100%;background:var(--s2);border:1px solid var(--td);color:var(--t);border-radius:12px;
+  padding:11px 12px;font-family:'DM Sans',sans-serif;font-size:13px;outline:none
+}
+.nutrition-log-field textarea{min-height:90px;resize:vertical;line-height:1.5}
+.nutrition-log-field input:focus,.nutrition-log-field textarea:focus{border-color:var(--g)}
+.nutrition-adherence{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.nutrition-history-list{display:flex;flex-direction:column;gap:10px}
+.nutrition-empty{font-size:12px;color:var(--tm);line-height:1.7}
+.nutrition-refine-note{font-size:12px;color:var(--tm);line-height:1.7;margin-bottom:12px}
+.nutrition-refine-thread{display:flex;flex-direction:column;gap:10px;min-height:180px;max-height:320px;overflow-y:auto;padding:2px 2px 2px 0}
+.nutrition-refine-msg{max-width:92%;padding:12px 14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
+.nutrition-refine-msg.user{align-self:flex-end;background:linear-gradient(180deg,rgba(0,230,118,.14),rgba(0,200,83,.08));border-color:rgba(0,230,118,.18)}
+.nutrition-refine-msg.assistant{align-self:flex-start;background:rgba(255,255,255,.03)}
+.nutrition-refine-msg.typing{align-self:flex-start;color:var(--tm);background:rgba(255,255,255,.02);border-style:dashed}
+.nutrition-refine-compose{margin-top:14px}
+.nutrition-refine-compose textarea{
+  width:100%;min-height:88px;background:var(--s2);border:1px solid var(--td);color:var(--t);border-radius:14px;
+  padding:12px 13px;font-family:'DM Sans',sans-serif;font-size:13px;line-height:1.6;resize:vertical;outline:none
+}
+.nutrition-refine-compose textarea:focus{border-color:var(--g)}
+.nutrition-refine-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.nutrition-refine-actions .hdr-btn[disabled]{opacity:.5;cursor:not-allowed}
+
 /* SESSION */
 #session{display:none;flex-direction:column;height:100%}
 .sess-hdr{padding:12px 16px 0;flex-shrink:0}
@@ -665,14 +719,14 @@ body{font-family:'DM Sans',sans-serif;background:
   .assistant-compose-row{grid-template-columns:1fr}
   .assistant-send{width:100%}
   .section-copy h2{font-size:30px}
-  #programs,#home,#progress,#coach{padding-bottom:calc(148px + var(--safe-bottom))}
+  #programs,#home,#progress,#nutrition,#coach{padding-bottom:calc(148px + var(--safe-bottom))}
   .chat-head h2{font-size:30px}
   .chat-panel-top{padding:16px 16px 12px}
   .chat-thread-wrap{min-height:calc(100vh - 330px);padding:18px 16px 14px}
   .chat-compose-shell{padding:12px 14px 14px}
   .chat-compose{grid-template-columns:1fr}
   .chat-send{width:100%;height:52px}
-  .coach-grid,.coach-form-grid{grid-template-columns:1fr}
+  .coach-grid,.coach-form-grid,.nutrition-grid,.nutrition-plan-grid,.nutrition-log-grid{grid-template-columns:1fr}
   .focus-top{flex-direction:column;align-items:stretch}
   .fc-demo-btn{width:100%}
 }
@@ -702,6 +756,10 @@ body{font-family:'DM Sans',sans-serif;background:
       <button class="section-tab on" id="section-tab-plans" type="button" onclick="setAppSection('plans')">
         <span class="section-tab-ico emoji">🗂️</span>
         <span class="section-tab-label">Schede</span>
+      </button>
+      <button class="section-tab" id="section-tab-nutrition" type="button" onclick="setAppSection('nutrition')">
+        <span class="section-tab-ico emoji">🥗</span>
+        <span class="section-tab-label">Nutrizione</span>
       </button>
       <button class="section-tab" id="section-tab-progress" type="button" onclick="setAppSection('progress')">
         <span class="section-tab-ico emoji">📈</span>
@@ -758,6 +816,11 @@ body{font-family:'DM Sans',sans-serif;background:
     </div>
     <div id="progress-content"></div>
   </div>
+</div>
+
+<!-- NUTRITION -->
+<div id="nutrition" class="app-section">
+  <div id="nutrition-root" class="nutrition-shell"></div>
 </div>
 
 <!-- COACH -->
@@ -1195,10 +1258,13 @@ const PROGRAMS_URL = './programs.json';
 const IMPORT_API_BASE_URL = String(window.MASSI_CONFIG?.importApiBaseUrl || '').replace(/\/$/, '');
 const USER_PROGRAMS_KEY = 'massi_user_programs';
 const USER_PROFILE_KEY = 'massi_user_profile';
+const NUTRITION_PROFILE_KEY = 'massi_user_nutrition_profile';
+const NUTRITION_PLANS_KEY = 'massi_user_nutrition_plans';
+const NUTRITION_LOG_KEY = 'massi_nutrition_log_v1';
 const ASSISTANT_SESSION_KEY = 'massi_overlay_assistant_v1';
 const PROGRAM_STATE_PREFIX = 'massi_state_';
 const SHOW_BUNDLED_PROGRAMS = false;
-const MAIN_SECTION_IDS = ['programs', 'home', 'progress', 'coach'];
+const MAIN_SECTION_IDS = ['programs', 'home', 'progress', 'nutrition', 'coach'];
 const SECTION_TRANSITION_MS = 260;
 let PROGRAMS = [];
 let bundledPrograms = [];
@@ -1216,6 +1282,7 @@ let importMeta = null;
 let importBusy = false;
 let assistantOpen = false;
 let assistantBusy = false;
+let nutritionSelectedDate = '';
 let aiCoachState = {
   phase: 'idle',
   busy: false,
@@ -1227,6 +1294,19 @@ let aiCoachState = {
   warnings: [],
   confidence: 0,
   draftProgram: null,
+  refineMessages: []
+};
+let nutritionAiState = {
+  phase: 'idle',
+  busy: false,
+  error: '',
+  status: '',
+  questions: [],
+  answers: {},
+  rationale: [],
+  warnings: [],
+  confidence: 0,
+  draftPlan: null,
   refineMessages: []
 };
 // Timer state
@@ -1299,6 +1379,18 @@ function getAiGenerateEndpoint() {
 
 function getAiRefineEndpoint() {
   return buildApiUrl('/api/ai/refine-program');
+}
+
+function getNutritionAiIntakeEndpoint() {
+  return buildApiUrl('/api/ai/nutrition/intake');
+}
+
+function getNutritionAiGenerateEndpoint() {
+  return buildApiUrl('/api/ai/nutrition/generate-plan');
+}
+
+function getNutritionAiRefineEndpoint() {
+  return buildApiUrl('/api/ai/nutrition/refine-plan');
 }
 
 function getChatEndpoint() {
@@ -1876,7 +1968,7 @@ function getCurrentProgramHistoryPreview(limit = 4) {
 
 function renderSectionNav() {
   const activeSection = currentSection === 'today' ? 'plans' : currentSection;
-  ['plans', 'progress', 'chat'].forEach((section) => {
+  ['plans', 'nutrition', 'progress', 'chat'].forEach((section) => {
     const button = document.getElementById('section-tab-' + section);
     if (!button) return;
     button.classList.toggle('on', activeSection === section);
@@ -1925,13 +2017,75 @@ function showMainSection(targetId) {
 function renderProgressSection() {
   const container = document.getElementById('progress-content');
   if (!container) return;
+  const nutritionSummary = buildNutritionSummary();
+  const activeNutritionPlan = getActiveNutritionPlan();
+  const nutritionCardHtml = activeNutritionPlan ? `
+    <div class="surface-card">
+      <div class="surface-title">Nutrizione</div>
+      <div class="surface-stack">
+        <div class="mini-row">
+          <div class="mini-copy">
+            <strong>${escapeHtml(activeNutritionPlan.title)}</strong>
+            <span>${escapeHtml(activeNutritionPlan.subtitle || 'Piano alimentare attivo')}</span>
+          </div>
+          <span class="mini-pill">${nutritionSummary.sevenDayCount}/7 log</span>
+        </div>
+        <div class="mini-row">
+          <div class="mini-copy">
+            <strong>Aderenza ultimi 7 giorni</strong>
+            <span>${escapeHtml(nutritionSummary.adherenceText)}</span>
+          </div>
+          <span class="mini-pill">${nutritionSummary.adherenceRate}%</span>
+        </div>
+        <div class="mini-row">
+          <div class="mini-copy">
+            <strong>Ultimo peso registrato</strong>
+            <span>${nutritionSummary.lastWeightKg ? nutritionSummary.lastWeightKg + ' kg' : 'Ancora nessun peso registrato'}</span>
+          </div>
+          <span class="mini-pill">${nutritionSummary.lastWeightDate ? escapeHtml(nutritionSummary.lastWeightDate.slice(5)) : '--'}</span>
+        </div>
+        <div class="mini-row">
+          <div class="mini-copy">
+            <strong>Media acqua</strong>
+            <span>${nutritionSummary.averageWaterMl ? nutritionSummary.averageWaterMl + ' ml negli ultimi 7 giorni' : "Inizia a tracciare l'acqua per vedere la media"}</span>
+          </div>
+          <span class="mini-pill">${nutritionSummary.averageWaterMl ? Math.round(nutritionSummary.averageWaterMl / 1000 * 10) / 10 + ' L' : '--'}</span>
+        </div>
+      </div>
+      <div class="action-row">
+        <button class="hdr-btn" type="button" onclick="setAppSection('nutrition')">Apri nutrizione</button>
+      </div>
+    </div>` : `
+    <div class="surface-card">
+      <div class="surface-title">Nutrizione</div>
+      <div class="surface-empty">Non hai ancora un piano alimentare attivo. Il Nutrition Coach AI puo' crearlo e poi tracciare aderenza, peso e acqua giorno per giorno.</div>
+      <div class="action-row">
+        <button class="hdr-btn" type="button" onclick="setAppSection('nutrition')">Apri nutrizione</button>
+      </div>
+    </div>`;
 
-  if (!currentProgram) {
+  if (!currentProgram && !activeNutritionPlan) {
     container.innerHTML = `
       <div class="empty-pane">
         <h3>Nessuna scheda attiva</h3>
-        <p>Seleziona o importa una scheda per vedere progressi, report settimana e storico allenamenti in questa sezione.</p>
+        <p>Seleziona o importa una scheda per vedere progressi allenamento, oppure crea un piano alimentare per iniziare a tracciare anche la nutrizione.</p>
         <button class="hdr-btn" type="button" onclick="setAppSection('plans')">Vai alle schede</button>
+        <button class="hdr-btn" type="button" onclick="setAppSection('nutrition')">Apri nutrizione</button>
+      </div>`;
+    return;
+  }
+
+  if (!currentProgram) {
+    container.innerHTML = `
+      <div class="progress-layout">
+        <div class="surface-card">
+          <div class="surface-title">Allenamento</div>
+          <div class="surface-empty">Non hai una scheda allenamento attiva in questo momento. La parte nutrizione pero' e' gia' disponibile qui sotto.</div>
+          <div class="action-row">
+            <button class="hdr-btn" type="button" onclick="setAppSection('plans')">Vai alle schede</button>
+          </div>
+        </div>
+        ${nutritionCardHtml}
       </div>`;
     return;
   }
@@ -2006,6 +2160,7 @@ function renderProgressSection() {
               </div>`).join('')}
           </div>` : '<div class="surface-empty">Nessuna sessione salvata ancora. Quando termini un allenamento, qui vedrai i riferimenti piu` recenti.</div>'}
       </div>
+      ${nutritionCardHtml}
     </div>`;
 }
 
@@ -2180,6 +2335,328 @@ function buildAiContext() {
   };
 }
 
+function getTodayDateKey() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, '0');
+  const day = String(now.getDate()).padStart(2, '0');
+  return year + '-' + month + '-' + day;
+}
+
+function shiftDateKey(dateKey, deltaDays) {
+  const parts = String(dateKey || '').split('-').map((value) => parseInt(value, 10));
+  const base = parts.length === 3 && parts.every((value) => Number.isInteger(value))
+    ? new Date(parts[0], parts[1] - 1, parts[2])
+    : new Date();
+  base.setDate(base.getDate() + deltaDays);
+  const year = base.getFullYear();
+  const month = String(base.getMonth() + 1).padStart(2, '0');
+  const day = String(base.getDate()).padStart(2, '0');
+  return year + '-' + month + '-' + day;
+}
+
+function formatNutritionDateLabel(dateKey) {
+  const parts = String(dateKey || '').split('-').map((value) => parseInt(value, 10));
+  if (parts.length !== 3 || parts.some((value) => !Number.isInteger(value))) return cleanText(dateKey || '');
+  const date = new Date(parts[0], parts[1] - 1, parts[2]);
+  return new Intl.DateTimeFormat('it-IT', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short'
+  }).format(date);
+}
+
+function makeNutritionMealId(value, fallback) {
+  return cleanText(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 32) || fallback;
+}
+
+function getDefaultNutritionProfile() {
+  return {
+    goal: '',
+    currentWeightKg: 0,
+    targetWeightKg: 0,
+    heightCm: 0,
+    age: 0,
+    sex: '',
+    mealsPerDay: 0,
+    dietStyle: '',
+    allergies: [],
+    excludedFoods: [],
+    preferredFoods: [],
+    budgetStyle: '',
+    cookingTime: '',
+    notes: '',
+    updatedAt: ''
+  };
+}
+
+function normalizeNutritionProfile(rawProfile = {}) {
+  const safe = rawProfile && typeof rawProfile === 'object' ? rawProfile : {};
+  const workoutProfile = getUserProfile();
+  return {
+    goal: cleanText(safe.goal || '') || cleanText(workoutProfile.goal || ''),
+    currentWeightKg: Math.max(0, parseInt(safe.currentWeightKg, 10) || 0),
+    targetWeightKg: Math.max(0, parseInt(safe.targetWeightKg, 10) || 0),
+    heightCm: Math.max(0, parseInt(safe.heightCm, 10) || 0),
+    age: Math.max(0, parseInt(safe.age, 10) || 0),
+    sex: cleanText(safe.sex || ''),
+    mealsPerDay: Math.max(0, parseInt(safe.mealsPerDay, 10) || 0),
+    dietStyle: cleanText(safe.dietStyle || ''),
+    allergies: normalizeTextList(safe.allergies || []),
+    excludedFoods: normalizeTextList(safe.excludedFoods || []),
+    preferredFoods: normalizeTextList(safe.preferredFoods || []),
+    budgetStyle: cleanText(safe.budgetStyle || ''),
+    cookingTime: cleanText(safe.cookingTime || ''),
+    notes: cleanText(safe.notes || ''),
+    updatedAt: cleanText(safe.updatedAt || '')
+  };
+}
+
+function getNutritionProfile() {
+  try {
+    return normalizeNutritionProfile(JSON.parse(localStorage.getItem(NUTRITION_PROFILE_KEY) || 'null') || {});
+  } catch (error) {
+    return getDefaultNutritionProfile();
+  }
+}
+
+function saveNutritionProfile(profile) {
+  try {
+    localStorage.setItem(NUTRITION_PROFILE_KEY, JSON.stringify(normalizeNutritionProfile({
+      ...profile,
+      updatedAt: new Date().toISOString()
+    })));
+    return true;
+  } catch (error) {
+    console.error('Errore salvataggio profilo nutrizione', error);
+    return false;
+  }
+}
+
+function normalizeNutritionTargets(rawTargets = {}) {
+  const safe = rawTargets && typeof rawTargets === 'object' ? rawTargets : {};
+  return {
+    calories: Math.max(0, parseInt(safe.calories, 10) || 0),
+    proteinGrams: Math.max(0, parseInt(safe.proteinGrams, 10) || 0),
+    carbsGrams: Math.max(0, parseInt(safe.carbsGrams, 10) || 0),
+    fatsGrams: Math.max(0, parseInt(safe.fatsGrams, 10) || 0)
+  };
+}
+
+function normalizeNutritionFoods(rawFoods = []) {
+  return (Array.isArray(rawFoods) ? rawFoods : []).map((food, index) => ({
+    name: cleanText(food?.name || '') || 'Alimento ' + (index + 1),
+    grams: Math.max(1, parseInt(food?.grams, 10) || 0),
+    notes: cleanText(food?.notes || '')
+  })).filter((food) => food.name && food.grams > 0);
+}
+
+function normalizeNutritionMeals(rawMeals = [], prefix = 'meal') {
+  return (Array.isArray(rawMeals) ? rawMeals : []).map((meal, index) => {
+    const fallbackId = prefix + '-meal-' + (index + 1);
+    return {
+      id: makeNutritionMealId(meal?.id || meal?.label, fallbackId),
+      label: cleanText(meal?.label || '') || 'Pasto ' + (index + 1),
+      timeHint: cleanText(meal?.timeHint || ''),
+      foods: normalizeNutritionFoods(meal?.foods),
+      notes: cleanText(meal?.notes || '')
+    };
+  }).filter((meal) => meal.foods.length > 0);
+}
+
+function normalizeNutritionDayTemplate(rawTemplate = {}, prefix = 'training') {
+  const safe = rawTemplate && typeof rawTemplate === 'object' ? rawTemplate : {};
+  return {
+    dailyTargets: normalizeNutritionTargets(safe.dailyTargets),
+    meals: normalizeNutritionMeals(safe.meals, prefix)
+  };
+}
+
+function normalizeNutritionPlan(rawPlan = {}, index = 0) {
+  const safe = rawPlan && typeof rawPlan === 'object' ? rawPlan : {};
+  const fallbackTitle = 'Piano alimentare ' + (index + 1);
+  return {
+    id: cleanText(safe.id || '') || ('nutrition-' + Date.now() + '-' + index),
+    title: cleanText(safe.title || '') || fallbackTitle,
+    subtitle: cleanText(safe.subtitle || '') || 'Piano alimentare Coach AI',
+    source: cleanText(safe.source || '') || 'ai',
+    createdAt: cleanText(safe.createdAt || '') || new Date().toISOString(),
+    isActive: Boolean(safe.isActive),
+    confidence: Math.max(0, Math.min(1, Number(safe.confidence) || 0)),
+    rationale: (Array.isArray(safe.rationale) ? safe.rationale : []).map(cleanText).filter(Boolean).slice(0, 6),
+    warnings: (Array.isArray(safe.warnings) ? safe.warnings : []).map(cleanText).filter(Boolean).slice(0, 8),
+    hydrationTargetMl: Math.max(500, parseInt(safe.hydrationTargetMl, 10) || 2500),
+    trainingDay: normalizeNutritionDayTemplate(safe.trainingDay, 'training'),
+    restDay: normalizeNutritionDayTemplate(safe.restDay, 'rest')
+  };
+}
+
+function normalizeNutritionPlans(rawPlans = []) {
+  const plans = (Array.isArray(rawPlans) ? rawPlans : []).map((plan, index) => normalizeNutritionPlan(plan, index))
+    .filter((plan) => plan.trainingDay.meals.length && plan.restDay.meals.length);
+  if (!plans.length) return [];
+  let activeIndex = plans.findIndex((plan) => plan.isActive);
+  if (activeIndex === -1) activeIndex = 0;
+  return plans.map((plan, index) => ({
+    ...plan,
+    isActive: index === activeIndex
+  }));
+}
+
+function getNutritionPlans() {
+  try {
+    return normalizeNutritionPlans(JSON.parse(localStorage.getItem(NUTRITION_PLANS_KEY) || '[]'));
+  } catch (error) {
+    console.error('Errore lettura piani alimentari', error);
+    return [];
+  }
+}
+
+function saveNutritionPlans(plans) {
+  try {
+    const normalized = normalizeNutritionPlans(plans);
+    localStorage.setItem(NUTRITION_PLANS_KEY, JSON.stringify(normalized));
+    return true;
+  } catch (error) {
+    console.error('Errore salvataggio piani alimentari', error);
+    return false;
+  }
+}
+
+function getActiveNutritionPlan() {
+  const plans = getNutritionPlans();
+  return plans.find((plan) => plan.isActive) || plans[0] || null;
+}
+
+function setActiveNutritionPlan(planId) {
+  const plans = getNutritionPlans();
+  if (!plans.length) return false;
+  const updated = plans.map((plan) => ({
+    ...plan,
+    isActive: plan.id === planId
+  }));
+  return saveNutritionPlans(updated);
+}
+
+function getNutritionLogs() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(NUTRITION_LOG_KEY) || '{}');
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch (error) {
+    console.error('Errore lettura log nutrizione', error);
+    return {};
+  }
+}
+
+function saveNutritionLogs(logs) {
+  try {
+    localStorage.setItem(NUTRITION_LOG_KEY, JSON.stringify(logs && typeof logs === 'object' ? logs : {}));
+    return true;
+  } catch (error) {
+    console.error('Errore salvataggio log nutrizione', error);
+    return false;
+  }
+}
+
+function hasWorkoutSessionOnDate(dateKey) {
+  if (!dateKey) return false;
+  if (currentDay !== null && dateKey === getTodayDateKey()) return true;
+  return PROGRAMS.some((program) => {
+    try {
+      const history = JSON.parse(localStorage.getItem(getHistoryKey(program.id)) || '[]');
+      return (Array.isArray(history) ? history : []).some((entry) => cleanText(entry?.date || '') === dateKey);
+    } catch (error) {
+      return false;
+    }
+  });
+}
+
+function inferNutritionDayType(dateKey, storedValue = '') {
+  if (storedValue === 'training' || storedValue === 'rest') return storedValue;
+  return hasWorkoutSessionOnDate(dateKey) ? 'training' : 'rest';
+}
+
+function getNutritionLogEntry(dateKey, planId = '') {
+  const logs = getNutritionLogs();
+  const raw = logs?.[dateKey] && typeof logs[dateKey] === 'object' ? logs[dateKey] : {};
+  return {
+    planId: cleanText(raw.planId || '') || cleanText(planId || ''),
+    dayType: inferNutritionDayType(dateKey, cleanText(raw.dayType || '')),
+    mealChecks: raw.mealChecks && typeof raw.mealChecks === 'object' ? raw.mealChecks : {},
+    adherence: ['alta', 'parziale', 'saltata'].includes(raw.adherence) ? raw.adherence : '',
+    weightKg: Math.max(0, parseInt(raw.weightKg, 10) || 0),
+    waterMl: Math.max(0, parseInt(raw.waterMl, 10) || 0),
+    notes: cleanText(raw.notes || ''),
+    updatedAt: cleanText(raw.updatedAt || '')
+  };
+}
+
+function updateNutritionLogEntry(dateKey, patch) {
+  const activePlan = getActiveNutritionPlan();
+  const current = getNutritionLogEntry(dateKey, activePlan?.id || '');
+  const next = {
+    ...current,
+    ...(patch && typeof patch === 'object' ? patch : {}),
+    dayType: inferNutritionDayType(dateKey, cleanText((patch && patch.dayType) || current.dayType || '')),
+    updatedAt: new Date().toISOString()
+  };
+  const logs = getNutritionLogs();
+  logs[dateKey] = next;
+  return saveNutritionLogs(logs);
+}
+
+function getNutritionHistoryEntries(limit = 7) {
+  const logs = getNutritionLogs();
+  return Object.keys(logs)
+    .sort((left, right) => right.localeCompare(left))
+    .slice(0, limit)
+    .map((dateKey) => ({
+      date: dateKey,
+      ...getNutritionLogEntry(dateKey)
+    }));
+}
+
+function buildNutritionSummary() {
+  const activePlan = getActiveNutritionPlan();
+  const entries = getNutritionHistoryEntries(7);
+  const adherenceCount = entries.filter((entry) => entry.adherence === 'alta').length;
+  const waterEntries = entries.filter((entry) => entry.waterMl > 0);
+  const weightEntry = entries.find((entry) => entry.weightKg > 0) || null;
+  const averageWaterMl = waterEntries.length ? Math.round(waterEntries.reduce((sum, entry) => sum + entry.waterMl, 0) / waterEntries.length) : 0;
+  return {
+    activePlan,
+    entries,
+    adherenceCount,
+    adherenceText: entries.length ? adherenceCount + '/' + entries.length + ' giorni ad alta aderenza' : 'Nessun log recente',
+    lastWeightKg: weightEntry ? weightEntry.weightKg : 0,
+    averageWaterMl
+  };
+}
+
+function buildNutritionAiContext() {
+  const workoutContext = buildAiContext();
+  const summary = buildNutritionSummary();
+  const selectedDate = nutritionSelectedDate || getTodayDateKey();
+  const selectedEntry = getNutritionLogEntry(selectedDate, summary.activePlan?.id || '');
+  return {
+    ...workoutContext,
+    nutritionSummary: {
+      activePlanTitle: cleanText(summary.activePlan?.title || ''),
+      selectedDate,
+      selectedDayType: selectedEntry.dayType,
+      adherenceLast7Days: summary.adherenceText,
+      lastWeightKg: summary.lastWeightKg ? String(summary.lastWeightKg) : '',
+      averageWaterMl: summary.averageWaterMl
+    }
+  };
+}
+
 function getAssistantMessages() {
   try {
     const parsed = JSON.parse(sessionStorage.getItem(ASSISTANT_SESSION_KEY) || '[]');
@@ -2224,6 +2701,7 @@ function buildAssistantSectionLabel() {
     return currentTab === 'focus' ? 'Allenamento Focus' : 'Allenamento';
   }
   if (currentSection === 'plans') return 'Schede';
+  if (currentSection === 'nutrition') return 'Nutrizione';
   if (currentSection === 'progress') return 'Progressi';
   if (currentSection === 'chat') return 'Coach AI';
   if (currentSection === 'today') return 'Scheda attiva';
@@ -2937,6 +3415,702 @@ function reopenAiDraft() {
   });
 }
 
+function getNutritionFieldValue(id) {
+  return document.getElementById(id)?.value || '';
+}
+
+function collectNutritionProfileForm() {
+  return normalizeNutritionProfile({
+    goal: getNutritionFieldValue('nutrition-goal'),
+    currentWeightKg: getNutritionFieldValue('nutrition-current-weight'),
+    targetWeightKg: getNutritionFieldValue('nutrition-target-weight'),
+    heightCm: getNutritionFieldValue('nutrition-height'),
+    age: getNutritionFieldValue('nutrition-age'),
+    sex: getNutritionFieldValue('nutrition-sex'),
+    mealsPerDay: getNutritionFieldValue('nutrition-meals'),
+    dietStyle: getNutritionFieldValue('nutrition-style'),
+    allergies: getNutritionFieldValue('nutrition-allergies'),
+    excludedFoods: getNutritionFieldValue('nutrition-excluded'),
+    preferredFoods: getNutritionFieldValue('nutrition-preferred'),
+    budgetStyle: getNutritionFieldValue('nutrition-budget'),
+    cookingTime: getNutritionFieldValue('nutrition-cooking'),
+    notes: getNutritionFieldValue('nutrition-notes')
+  });
+}
+
+function saveNutritionProfileFromForm(silent = false) {
+  const profile = collectNutritionProfileForm();
+  const stored = saveNutritionProfile(profile);
+  if (!silent) {
+    nutritionAiState.error = stored ? '' : 'Non riesco a salvare il profilo nutrizione sul dispositivo.';
+    nutritionAiState.status = stored ? 'Profilo nutrizione aggiornato. Il Nutrition Coach AI partira` da questi dati.' : '';
+    renderNutritionSection();
+  }
+  return profile;
+}
+
+function ensureNutritionAiAvailable() {
+  if (window.location.protocol === 'file:' && !IMPORT_API_BASE_URL) {
+    nutritionAiState.error = 'Il Nutrition Coach AI funziona nella versione pubblicata dell\'app o con il server locale attivo.';
+    nutritionAiState.status = '';
+    renderNutritionSection();
+    return false;
+  }
+  if (!navigator.onLine) {
+    nutritionAiState.error = 'Serve connessione internet per creare o rifinire il piano alimentare.';
+    nutritionAiState.status = '';
+    renderNutritionSection();
+    return false;
+  }
+  return true;
+}
+
+function renderNutritionQuestionField(question) {
+  const fieldId = 'nutrition-question-' + question.id;
+  const value = String(nutritionAiState.answers?.[question.id] || '');
+  const optionsHtml = Array.isArray(question.options) ? question.options.map((option) => `
+    <option value="${escapeHtml(option.value)}"${value === option.value ? ' selected' : ''}>${escapeHtml(option.label)}</option>
+  `).join('') : '';
+  let controlHtml = `<input id="${fieldId}" type="text" value="${escapeHtml(value)}" placeholder="${escapeHtml(question.placeholder || '')}">`;
+  if (question.type === 'select') {
+    controlHtml = `
+      <select id="${fieldId}">
+        <option value="">Seleziona</option>
+        ${optionsHtml}
+      </select>`;
+  } else if (question.type === 'textarea') {
+    controlHtml = `<textarea id="${fieldId}" placeholder="${escapeHtml(question.placeholder || '')}">${escapeHtml(value)}</textarea>`;
+  }
+  return `
+    <div class="coach-question">
+      <div class="coach-question-title">${escapeHtml(question.label || 'Domanda')}</div>
+      <div class="coach-question-copy">${escapeHtml(question.question || '')}</div>
+      <div class="coach-question-field">${controlHtml}</div>
+    </div>
+  `;
+}
+
+function collectNutritionAnswers() {
+  const answers = {};
+  nutritionAiState.questions.forEach((question) => {
+    const value = cleanText(document.getElementById('nutrition-question-' + question.id)?.value || '');
+    if (value) answers[question.id] = value;
+  });
+  return answers;
+}
+
+function createNutritionRefineSeedMessage() {
+  return {
+    role: 'assistant',
+    content: 'Bozza nutrizione pronta. Puoi chiedermi modifiche pratiche come piu\' proteine a colazione, pasti piu\' semplici o meno latticini.'
+  };
+}
+
+function renderNutritionRefineMessages() {
+  if (!Array.isArray(nutritionAiState.refineMessages) || !nutritionAiState.refineMessages.length) {
+    return `
+      <div class="coach-refine-empty">
+        Qui puoi rifinire la bozza del piano alimentare in linguaggio naturale prima di salvarla come piano attivo.
+      </div>`;
+  }
+  return nutritionAiState.refineMessages.map((message) => `
+    <div class="nutrition-refine-msg ${message.role === 'assistant' ? 'assistant' : 'user'}">${escapeHtml(message.content)}</div>
+  `).join('') + (nutritionAiState.busy && nutritionAiState.phase === 'refining' ? '<div class="nutrition-refine-msg typing">Sto aggiornando il piano alimentare...</div>' : '');
+}
+
+function resetNutritionRefinementChat() {
+  if (nutritionAiState.busy || !nutritionAiState.draftPlan) return;
+  nutritionAiState.refineMessages = [createNutritionRefineSeedMessage()];
+  nutritionAiState.error = '';
+  nutritionAiState.status = 'Chat bozza nutrizione azzerata. Puoi chiedere una nuova modifica.';
+  renderNutritionSection();
+}
+
+function setNutritionSelectedDateRelative(delta) {
+  nutritionSelectedDate = shiftDateKey(nutritionSelectedDate || getTodayDateKey(), delta);
+  renderNutritionSection();
+}
+
+function resetNutritionDateToToday() {
+  nutritionSelectedDate = getTodayDateKey();
+  renderNutritionSection();
+}
+
+function setNutritionDayType(dayType) {
+  const activePlan = getActiveNutritionPlan();
+  const dateKey = nutritionSelectedDate || getTodayDateKey();
+  updateNutritionLogEntry(dateKey, {
+    planId: activePlan?.id || '',
+    dayType
+  });
+  renderNutritionSection();
+}
+
+function setNutritionAdherence(value) {
+  const activePlan = getActiveNutritionPlan();
+  const dateKey = nutritionSelectedDate || getTodayDateKey();
+  updateNutritionLogEntry(dateKey, {
+    planId: activePlan?.id || '',
+    adherence: value
+  });
+  renderNutritionSection();
+}
+
+function toggleNutritionMealCheck(mealId) {
+  const activePlan = getActiveNutritionPlan();
+  if (!activePlan) return;
+  const dateKey = nutritionSelectedDate || getTodayDateKey();
+  const entry = getNutritionLogEntry(dateKey, activePlan.id);
+  const mealChecks = { ...(entry.mealChecks || {}) };
+  mealChecks[mealId] = !mealChecks[mealId];
+  updateNutritionLogEntry(dateKey, {
+    planId: activePlan.id,
+    mealChecks
+  });
+  renderNutritionSection();
+}
+
+function updateNutritionLogField(field, value) {
+  const activePlan = getActiveNutritionPlan();
+  const dateKey = nutritionSelectedDate || getTodayDateKey();
+  const patch = { planId: activePlan?.id || '' };
+  patch[field] = field === 'weightKg' || field === 'waterMl'
+    ? Math.max(0, parseInt(value, 10) || 0)
+    : cleanText(value || '');
+  updateNutritionLogEntry(dateKey, patch);
+}
+
+function saveNutritionDraftPlan() {
+  if (!nutritionAiState.draftPlan) return;
+  const plans = getNutritionPlans();
+  const newPlan = normalizeNutritionPlan({
+    ...cloneValue(nutritionAiState.draftPlan),
+    id: 'nutrition-' + Date.now(),
+    source: 'ai',
+    createdAt: new Date().toISOString(),
+    isActive: true,
+    confidence: nutritionAiState.confidence,
+    rationale: cloneValue(nutritionAiState.rationale),
+    warnings: cloneValue(nutritionAiState.warnings)
+  }, 0);
+  const saved = saveNutritionPlans([newPlan, ...plans.map((plan) => ({ ...plan, isActive: false }))]);
+  if (!saved) {
+    nutritionAiState.error = 'Non riesco a salvare il piano alimentare sul dispositivo.';
+    nutritionAiState.status = '';
+    renderNutritionSection();
+    return;
+  }
+  nutritionAiState.phase = 'saved';
+  nutritionAiState.busy = false;
+  nutritionAiState.error = '';
+  nutritionAiState.status = 'Piano alimentare salvato e attivato.';
+  nutritionAiState.questions = [];
+  nutritionAiState.answers = {};
+  nutritionAiState.rationale = [];
+  nutritionAiState.warnings = [];
+  nutritionAiState.confidence = 0;
+  nutritionAiState.draftPlan = null;
+  nutritionAiState.refineMessages = [];
+  renderNutritionSection();
+}
+
+async function startNutritionPlanFlow() {
+  if (nutritionAiState.busy) return;
+  if (!ensureNutritionAiAvailable()) return;
+  const profile = saveNutritionProfileFromForm(true);
+  const workoutProfile = getUserProfile();
+  const context = buildNutritionAiContext();
+
+  nutritionAiState.busy = true;
+  nutritionAiState.phase = 'intake';
+  nutritionAiState.error = '';
+  nutritionAiState.status = 'Sto analizzando profilo nutrizione, scheda attiva e routine allenante.';
+  nutritionAiState.questions = [];
+  nutritionAiState.answers = {};
+  nutritionAiState.draftPlan = null;
+  nutritionAiState.refineMessages = [];
+  renderNutritionSection();
+
+  try {
+    const response = await fetch(getNutritionAiIntakeEndpoint(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profile, workoutProfile, context })
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || 'Nutrition Coach AI non disponibile in questo momento.');
+
+    nutritionAiState.questions = Array.isArray(payload.questions) ? payload.questions : [];
+    nutritionAiState.phase = nutritionAiState.questions.length ? 'questions' : 'ready';
+    nutritionAiState.status = nutritionAiState.questions.length
+      ? 'Ho ancora bisogno di poche conferme prima di creare il piano alimentare.'
+      : 'Profilo completo. Sto passando direttamente alla bozza del piano.';
+    nutritionAiState.error = '';
+  } catch (error) {
+    console.error('Errore intake Nutrition Coach AI', error);
+    nutritionAiState.error = error.message || 'Nutrition Coach AI non disponibile in questo momento.';
+    nutritionAiState.status = '';
+  } finally {
+    nutritionAiState.busy = false;
+    renderNutritionSection();
+  }
+
+  if (!nutritionAiState.error && !nutritionAiState.questions.length) {
+    requestNutritionPlanGeneration();
+  }
+}
+
+async function submitNutritionAnswers() {
+  if (nutritionAiState.busy) return;
+  nutritionAiState.answers = collectNutritionAnswers();
+  const missing = nutritionAiState.questions.some((question) => !cleanText(nutritionAiState.answers?.[question.id] || ''));
+  if (missing) {
+    nutritionAiState.error = 'Rispondi a tutte le domande essenziali prima di generare la bozza nutrizione.';
+    nutritionAiState.status = '';
+    renderNutritionSection();
+    return;
+  }
+  await requestNutritionPlanGeneration();
+}
+
+async function requestNutritionPlanGeneration() {
+  if (nutritionAiState.busy) return;
+  if (!ensureNutritionAiAvailable()) return;
+
+  const profile = saveNutritionProfileFromForm(true);
+  const workoutProfile = getUserProfile();
+  const context = buildNutritionAiContext();
+  const answers = nutritionAiState.questions.length ? nutritionAiState.answers : {};
+
+  nutritionAiState.busy = true;
+  nutritionAiState.phase = 'generating';
+  nutritionAiState.error = '';
+  nutritionAiState.status = 'Sto costruendo un piano alimentare pratico, diverso tra training day e rest day.';
+  renderNutritionSection();
+
+  try {
+    const response = await fetch(getNutritionAiGenerateEndpoint(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ profile, workoutProfile, context, answers })
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      if (Array.isArray(payload.questions) && payload.questions.length) {
+        nutritionAiState.questions = payload.questions;
+        nutritionAiState.phase = 'questions';
+      }
+      throw new Error(payload.error || 'Generazione piano alimentare non disponibile in questo momento.');
+    }
+
+    nutritionAiState.phase = 'review';
+    nutritionAiState.questions = [];
+    nutritionAiState.rationale = Array.isArray(payload.rationale) ? payload.rationale.map(cleanText).filter(Boolean) : [];
+    nutritionAiState.warnings = Array.isArray(payload.warnings) ? payload.warnings.map(cleanText).filter(Boolean) : [];
+    nutritionAiState.confidence = Math.max(0, Math.min(1, Number(payload.confidence) || 0));
+    nutritionAiState.draftPlan = cloneValue(payload.candidateNutritionPlan || null);
+    nutritionAiState.refineMessages = [createNutritionRefineSeedMessage()];
+    nutritionAiState.status = 'Bozza nutrizione pronta. Puoi rifinirla qui sotto oppure salvarla direttamente.';
+    nutritionAiState.error = '';
+  } catch (error) {
+    console.error('Errore generazione Nutrition Coach AI', error);
+    nutritionAiState.error = error.message || 'Generazione piano alimentare non disponibile in questo momento.';
+    nutritionAiState.status = '';
+  } finally {
+    nutritionAiState.busy = false;
+    renderNutritionSection();
+  }
+}
+
+async function sendNutritionRefinement() {
+  if (nutritionAiState.busy || !nutritionAiState.draftPlan) return;
+  if (!ensureNutritionAiAvailable()) return;
+
+  const promptEl = document.getElementById('nutrition-refine-input');
+  const requestText = cleanText(promptEl?.value || '');
+  if (!requestText) {
+    nutritionAiState.error = 'Scrivi prima cosa vuoi cambiare nella bozza nutrizione.';
+    nutritionAiState.status = '';
+    renderNutritionSection();
+    return;
+  }
+
+  const profile = saveNutritionProfileFromForm(true);
+  const workoutProfile = getUserProfile();
+  const context = buildNutritionAiContext();
+  nutritionAiState.refineMessages = Array.isArray(nutritionAiState.refineMessages) ? nutritionAiState.refineMessages.slice(-8) : [];
+  nutritionAiState.refineMessages.push({ role: 'user', content: requestText });
+  nutritionAiState.busy = true;
+  nutritionAiState.phase = 'refining';
+  nutritionAiState.error = '';
+  nutritionAiState.status = 'Sto aggiornando il piano alimentare in base alla tua richiesta.';
+  renderNutritionSection();
+
+  try {
+    const response = await fetch(getNutritionAiRefineEndpoint(), {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        profile,
+        workoutProfile,
+        context,
+        candidateNutritionPlan: nutritionAiState.draftPlan,
+        messages: nutritionAiState.refineMessages.slice(0, -1).slice(-7),
+        request: requestText
+      })
+    });
+    const payload = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(payload.error || 'Rifinitura piano alimentare non disponibile in questo momento.');
+
+    nutritionAiState.draftPlan = cloneValue(payload.candidateNutritionPlan || null);
+    nutritionAiState.rationale = Array.isArray(payload.rationale) ? payload.rationale.map(cleanText).filter(Boolean) : [];
+    nutritionAiState.warnings = Array.isArray(payload.warnings) ? payload.warnings.map(cleanText).filter(Boolean) : [];
+    nutritionAiState.confidence = Math.max(0, Math.min(1, Number(payload.confidence) || 0));
+    nutritionAiState.refineMessages.push({
+      role: 'assistant',
+      content: cleanText(payload.summary || 'Piano alimentare aggiornato. Controlla se ora rispecchia meglio quello che vuoi.')
+    });
+    nutritionAiState.refineMessages = nutritionAiState.refineMessages.slice(-10);
+    nutritionAiState.status = 'Bozza nutrizione aggiornata. Se ti convince, salvala come piano attivo.';
+    nutritionAiState.error = '';
+  } catch (error) {
+    console.error('Errore rifinitura Nutrition Coach AI', error);
+    nutritionAiState.error = error.message || 'Rifinitura piano alimentare non disponibile in questo momento.';
+    nutritionAiState.status = '';
+  } finally {
+    nutritionAiState.busy = false;
+    nutritionAiState.phase = 'review';
+    renderNutritionSection();
+  }
+}
+
+function renderNutritionTargets(targets) {
+  return `
+    <div class="nutrition-target-grid">
+      <div class="nutrition-target"><strong>Kcal</strong><span>${targets.calories}</span></div>
+      <div class="nutrition-target"><strong>Proteine</strong><span>${targets.proteinGrams} g</span></div>
+      <div class="nutrition-target"><strong>Carbo</strong><span>${targets.carbsGrams} g</span></div>
+      <div class="nutrition-target"><strong>Grassi</strong><span>${targets.fatsGrams} g</span></div>
+    </div>
+  `;
+}
+
+function renderNutritionMeals(meals, options = {}) {
+  const checkState = options.checkState && typeof options.checkState === 'object' ? options.checkState : {};
+  const interactive = Boolean(options.interactive);
+  return `
+    <div class="nutrition-meals">
+      ${meals.map((meal) => `
+        <div class="nutrition-meal">
+          <div class="nutrition-meal-top">
+            <div>
+              <div class="nutrition-meal-time">${escapeHtml(meal.timeHint || 'Pasto')}</div>
+              <h4>${escapeHtml(meal.label)}</h4>
+            </div>
+            ${interactive ? `<button class="nutrition-toggle-btn${checkState[meal.id] ? ' on' : ''}" type="button" onclick="toggleNutritionMealCheck('${escapeHtml(meal.id)}')">${checkState[meal.id] ? 'Fatto' : 'Segna'}</button>` : ''}
+          </div>
+          <div class="nutrition-food-list">
+            ${meal.foods.map((food) => `
+              <div class="nutrition-food">
+                <span>${escapeHtml(food.name)}</span>
+                <span>${food.grams} g</span>
+              </div>
+              ${food.notes ? `<div class="nutrition-food-note">${escapeHtml(food.notes)}</div>` : ''}
+            `).join('')}
+          </div>
+          ${meal.notes ? `<div class="nutrition-meal-note">${escapeHtml(meal.notes)}</div>` : ''}
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderNutritionSection() {
+  const root = document.getElementById('nutrition-root');
+  if (!root) return;
+  if (!nutritionSelectedDate) nutritionSelectedDate = getTodayDateKey();
+
+  const profile = getNutritionProfile();
+  const plans = getNutritionPlans();
+  const activePlan = plans.find((plan) => plan.isActive) || plans[0] || null;
+  const summary = buildNutritionSummary();
+  const selectedDate = nutritionSelectedDate;
+  const logEntry = getNutritionLogEntry(selectedDate, activePlan?.id || '');
+  const selectedDayType = activePlan ? logEntry.dayType : inferNutritionDayType(selectedDate);
+  const selectedTemplate = activePlan ? (selectedDayType === 'training' ? activePlan.trainingDay : activePlan.restDay) : null;
+  const statusClass = nutritionAiState.error ? 'coach-status error' : 'coach-status' + (nutritionAiState.status ? ' good' : '');
+  const questionHtml = nutritionAiState.questions.length ? nutritionAiState.questions.map(renderNutritionQuestionField).join('') : `
+    <div class="coach-empty">
+      Premi <strong>Analizza profilo nutrizione</strong> e il Nutrition Coach AI ti fara' solo le domande che mancano davvero.
+    </div>`;
+  const rationaleHtml = nutritionAiState.rationale.length ? `
+    <div class="coach-card">
+      <div class="surface-title">Perche' questo piano</div>
+      <div class="coach-rationale">
+        ${nutritionAiState.rationale.map((item, index) => `
+          <div class="coach-rationale-item">
+            <strong>Scelta ${index + 1}</strong>
+            <p>${escapeHtml(item)}</p>
+          </div>
+        `).join('')}
+      </div>
+    </div>` : '';
+  const warningsHtml = nutritionAiState.warnings.length ? `
+    <div class="coach-card">
+      <div class="surface-title">Punti da controllare</div>
+      <div class="coach-rationale">
+        ${nutritionAiState.warnings.map((item) => `
+          <div class="coach-rationale-item"><p>${escapeHtml(item)}</p></div>
+        `).join('')}
+      </div>
+    </div>` : '';
+  const draftHtml = nutritionAiState.draftPlan ? `
+    <div class="coach-draft-banner">
+      Ultima bozza pronta: <strong>${escapeHtml(nutritionAiState.draftPlan.title || 'Nuovo piano alimentare')}</strong>
+      ${nutritionAiState.confidence ? '<br>Confidenza stimata: ' + Math.round(nutritionAiState.confidence * 100) + '%' : ''}
+      <br>Prima di salvarla puoi rifinirla qui sotto parlando direttamente con il Nutrition Coach AI.
+    </div>` : '';
+  const refineCardHtml = nutritionAiState.draftPlan ? `
+    <div class="coach-card">
+      <div class="surface-title">Rifinisci la bozza con il Nutrition Coach AI</div>
+      <div class="nutrition-refine-note">Scrivi modifiche pratiche: piu' proteine, meno latticini, pasti piu' semplici, meno ingredienti o budget piu' snello.</div>
+      <div class="nutrition-refine-thread">${renderNutritionRefineMessages()}</div>
+      <div class="nutrition-refine-compose">
+        <textarea id="nutrition-refine-input" placeholder="Per esempio: voglio una colazione piu' proteica e spuntini piu' semplici da portare fuori."${nutritionAiState.busy ? ' disabled' : ''} onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendNutritionRefinement();}"></textarea>
+        <div class="nutrition-refine-actions">
+          <button class="hdr-btn" type="button" onclick="sendNutritionRefinement()"${nutritionAiState.busy ? ' disabled' : ''}>Applica modifica</button>
+          <button class="hdr-btn" type="button" onclick="saveNutritionDraftPlan()"${nutritionAiState.busy ? ' disabled' : ''}>Salva piano</button>
+          <button class="hdr-btn" type="button" onclick="resetNutritionRefinementChat()"${nutritionAiState.busy ? ' disabled' : ''}>Reset chat bozza</button>
+        </div>
+      </div>
+    </div>` : '';
+
+  const activePlanHtml = activePlan ? `
+    <div class="coach-card">
+      <div class="surface-title">Piano attivo</div>
+      <div class="mini-row">
+        <div class="mini-copy">
+          <strong>${escapeHtml(activePlan.title)}</strong>
+          <span>${escapeHtml(activePlan.subtitle || 'Piano alimentare Coach AI')}</span>
+        </div>
+        <span class="mini-pill">Attivo</span>
+      </div>
+      <div class="coach-inline-list" style="margin-top:10px">
+        <span>Acqua target ${activePlan.hydrationTargetMl} ml</span>
+        <span>${Math.round(activePlan.confidence * 100)}% confidenza</span>
+      </div>
+      <div class="nutrition-plan-grid" style="margin-top:14px">
+        <div class="nutrition-day-card">
+          <h3>Training day</h3>
+          ${renderNutritionTargets(activePlan.trainingDay.dailyTargets)}
+          ${renderNutritionMeals(activePlan.trainingDay.meals)}
+        </div>
+        <div class="nutrition-day-card">
+          <h3>Rest day</h3>
+          ${renderNutritionTargets(activePlan.restDay.dailyTargets)}
+          ${renderNutritionMeals(activePlan.restDay.meals)}
+        </div>
+      </div>
+    </div>` : `
+    <div class="coach-card">
+      <div class="surface-title">Piano attivo</div>
+      <div class="nutrition-empty">Nessun piano alimentare attivo ancora. Compila il profilo e lascia che il Nutrition Coach AI generi una bozza da rifinire.</div>
+    </div>`;
+
+  const todayCardHtml = activePlan && selectedTemplate ? `
+    <div class="coach-card">
+      <div class="surface-title">Oggi</div>
+      <div class="nutrition-today-top">
+        <div>
+          <strong>${escapeHtml(formatNutritionDateLabel(selectedDate))}</strong>
+          <div class="metric-sub">${selectedDate}</div>
+        </div>
+        <div class="nutrition-date-nav">
+          <button class="hdr-btn" type="button" onclick="setNutritionSelectedDateRelative(-1)">&larr;</button>
+          <button class="hdr-btn" type="button" onclick="resetNutritionDateToToday()">Oggi</button>
+          <button class="hdr-btn" type="button" onclick="setNutritionSelectedDateRelative(1)">&rarr;</button>
+        </div>
+      </div>
+      <div class="nutrition-toggle-row">
+        <button class="nutrition-toggle-btn${selectedDayType === 'training' ? ' on' : ''}" type="button" onclick="setNutritionDayType('training')">Training</button>
+        <button class="nutrition-toggle-btn${selectedDayType === 'rest' ? ' on' : ''}" type="button" onclick="setNutritionDayType('rest')">Rest</button>
+        <span class="nutrition-date-chip">${selectedDayType === 'training' ? 'Giorno di allenamento' : 'Giorno di recupero'}</span>
+      </div>
+      ${renderNutritionTargets(selectedTemplate.dailyTargets)}
+      ${renderNutritionMeals(selectedTemplate.meals, { interactive: true, checkState: logEntry.mealChecks })}
+      <div class="nutrition-adherence">
+        <button class="nutrition-toggle-btn${logEntry.adherence === 'alta' ? ' on' : ''}" type="button" onclick="setNutritionAdherence('alta')">Aderenza alta</button>
+        <button class="nutrition-toggle-btn${logEntry.adherence === 'parziale' ? ' on' : ''}" type="button" onclick="setNutritionAdherence('parziale')">Parziale</button>
+        <button class="nutrition-toggle-btn${logEntry.adherence === 'saltata' ? ' on' : ''}" type="button" onclick="setNutritionAdherence('saltata')">Saltata</button>
+      </div>
+      <div class="nutrition-log-grid">
+        <div class="nutrition-log-field">
+          <label>Peso</label>
+          <input type="number" inputmode="numeric" value="${logEntry.weightKg || ''}" placeholder="Kg" oninput="updateNutritionLogField('weightKg', this.value)">
+        </div>
+        <div class="nutrition-log-field">
+          <label>Acqua</label>
+          <input type="number" inputmode="numeric" value="${logEntry.waterMl || ''}" placeholder="ml" oninput="updateNutritionLogField('waterMl', this.value)">
+        </div>
+        <div class="nutrition-log-field full">
+          <label>Note</label>
+          <textarea oninput="updateNutritionLogField('notes', this.value)" placeholder="Come e' andata oggi?">${escapeHtml(logEntry.notes || '')}</textarea>
+        </div>
+      </div>
+    </div>` : `
+    <div class="coach-card">
+      <div class="surface-title">Oggi</div>
+      <div class="nutrition-empty">Appena attivi un piano alimentare, qui vedrai la giornata corrente con training/rest, pasti da seguire e tracking rapido.</div>
+    </div>`;
+
+  const historyCardHtml = `
+    <div class="coach-card">
+      <div class="surface-title">Storico rapido</div>
+      ${summary.entries.length ? `
+        <div class="nutrition-history-list">
+          ${summary.entries.map((entry) => `
+            <div class="mini-row">
+              <div class="mini-copy">
+                <strong>${escapeHtml(formatNutritionDateLabel(entry.date))}</strong>
+                <span>${escapeHtml(entry.dayType === 'training' ? 'Training' : 'Rest')} · ${escapeHtml(entry.adherence || 'Nessuna aderenza')}</span>
+              </div>
+              <span class="mini-pill">${entry.weightKg ? entry.weightKg + ' kg' : (entry.waterMl ? entry.waterMl + ' ml' : 'log')}</span>
+            </div>
+          `).join('')}
+        </div>` : '<div class="nutrition-empty">Quando inizi a tracciare aderenza, peso e acqua, qui compariranno gli ultimi giorni.</div>'}
+      <div class="coach-divider"></div>
+      <div class="surface-title">Piani salvati</div>
+      ${plans.length ? `
+        <div class="coach-context-list">
+          ${plans.slice(0, 5).map((plan) => `
+            <div class="mini-row">
+              <div class="mini-copy">
+                <strong>${escapeHtml(plan.title)}</strong>
+                <span>${escapeHtml(plan.subtitle || 'Piano alimentare')} · ${escapeHtml((plan.createdAt || '').slice(0, 10))}</span>
+              </div>
+              ${plan.isActive ? '<span class="mini-pill">Attivo</span>' : `<button class="hdr-btn" type="button" onclick="setActiveNutritionPlan('${escapeHtml(plan.id)}');renderNutritionSection();">Attiva</button>`}
+            </div>
+          `).join('')}
+        </div>` : '<div class="nutrition-empty">Nessun piano salvato ancora.</div>'}
+    </div>`;
+
+  root.innerHTML = `
+    <div class="coach-head">
+      <div>
+        <div class="section-badge">Nutrizione AI</div>
+        <h2 style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;line-height:1;margin-top:10px">Piano alimentare</h2>
+        <p style="font-size:13px;color:var(--tm);margin-top:6px;line-height:1.6;max-width:620px">Genera un piano alimentare realistico con training day e rest day, rifiniscilo in chat e traccia aderenza, peso e acqua direttamente nell'app.</p>
+      </div>
+    </div>
+    <div class="nutrition-grid">
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="coach-card">
+          <div class="surface-title">Profilo nutrizione</div>
+          <div class="coach-form-grid">
+            <div class="coach-field">
+              <label>Obiettivo</label>
+              <select id="nutrition-goal">
+                <option value="">Seleziona</option>
+                <option value="ipertrofia"${profile.goal === 'ipertrofia' ? ' selected' : ''}>Massa / Ipertrofia</option>
+                <option value="ricomposizione"${profile.goal === 'ricomposizione' ? ' selected' : ''}>Ricomposizione</option>
+                <option value="dimagrimento"${profile.goal === 'dimagrimento' ? ' selected' : ''}>Dimagrimento</option>
+                <option value="mantenimento"${profile.goal === 'mantenimento' ? ' selected' : ''}>Mantenimento</option>
+              </select>
+            </div>
+            <div class="coach-field">
+              <label>Peso attuale (kg)</label>
+              <input id="nutrition-current-weight" type="number" inputmode="numeric" value="${profile.currentWeightKg || ''}">
+            </div>
+            <div class="coach-field">
+              <label>Peso target (kg)</label>
+              <input id="nutrition-target-weight" type="number" inputmode="numeric" value="${profile.targetWeightKg || ''}">
+            </div>
+            <div class="coach-field">
+              <label>Altezza (cm)</label>
+              <input id="nutrition-height" type="number" inputmode="numeric" value="${profile.heightCm || ''}">
+            </div>
+            <div class="coach-field">
+              <label>Eta</label>
+              <input id="nutrition-age" type="number" inputmode="numeric" value="${profile.age || ''}">
+            </div>
+            <div class="coach-field">
+              <label>Sesso</label>
+              <select id="nutrition-sex">
+                <option value="">Seleziona</option>
+                <option value="uomo"${profile.sex === 'uomo' ? ' selected' : ''}>Uomo</option>
+                <option value="donna"${profile.sex === 'donna' ? ' selected' : ''}>Donna</option>
+                <option value="altro"${profile.sex === 'altro' ? ' selected' : ''}>Altro / preferisco non dirlo</option>
+              </select>
+            </div>
+            <div class="coach-field">
+              <label>Pasti al giorno</label>
+              <select id="nutrition-meals">
+                <option value="">Seleziona</option>
+                ${[3,4,5,6].map((value) => `<option value="${value}"${profile.mealsPerDay === value ? ' selected' : ''}>${value}</option>`).join('')}
+              </select>
+            </div>
+            <div class="coach-field">
+              <label>Stile alimentare</label>
+              <select id="nutrition-style">
+                <option value="">Seleziona</option>
+                ${[['onnivoro','Onnivoro'],['pescetariano','Pescetariano'],['vegetariano','Vegetariano'],['vegano','Vegano'],['flessibile','Flessibile']].map(([value, label]) => `<option value="${value}"${profile.dietStyle === value ? ' selected' : ''}>${label}</option>`).join('')}
+              </select>
+            </div>
+            <div class="coach-field">
+              <label>Budget</label>
+              <input id="nutrition-budget" type="text" value="${escapeHtml(profile.budgetStyle || '')}" placeholder="Es: smart, medio, libero">
+            </div>
+            <div class="coach-field">
+              <label>Tempo cucina</label>
+              <select id="nutrition-cooking">
+                <option value="">Seleziona</option>
+                ${[['molto_rapido','Molto rapido'],['medio','Medio'],['completo','Completo']].map(([value, label]) => `<option value="${value}"${profile.cookingTime === value ? ' selected' : ''}>${label}</option>`).join('')}
+              </select>
+            </div>
+            <div class="coach-field full">
+              <label>Allergie / intolleranze</label>
+              <input id="nutrition-allergies" type="text" value="${escapeHtml(profileListValue(profile.allergies))}" placeholder="Es: lattosio, nichel">
+            </div>
+            <div class="coach-field full">
+              <label>Cibi da evitare</label>
+              <input id="nutrition-excluded" type="text" value="${escapeHtml(profileListValue(profile.excludedFoods))}" placeholder="Es: tonno, yogurt, legumi la sera">
+            </div>
+            <div class="coach-field full">
+              <label>Cibi preferiti</label>
+              <input id="nutrition-preferred" type="text" value="${escapeHtml(profileListValue(profile.preferredFoods))}" placeholder="Es: riso, pollo, uova, avena">
+            </div>
+            <div class="coach-field full">
+              <label>Note</label>
+              <textarea id="nutrition-notes" placeholder="Es: colazione veloce, pranzi fuori casa, spuntini facili da portare">${escapeHtml(profile.notes || '')}</textarea>
+            </div>
+          </div>
+          <div class="nutrition-note">Il profilo nutrizione resta salvato sul dispositivo e viene incrociato con il tuo profilo allenamento, la scheda attiva e lo storico recente.</div>
+          <div class="coach-actions">
+            <button class="hdr-btn" type="button" onclick="saveNutritionProfileFromForm()"${nutritionAiState.busy ? ' disabled' : ''}>Salva profilo</button>
+            <button class="hdr-btn" type="button" onclick="startNutritionPlanFlow()"${nutritionAiState.busy ? ' disabled' : ''}>Analizza profilo nutrizione</button>
+            ${nutritionAiState.questions.length ? `<button class="hdr-btn" type="button" onclick="submitNutritionAnswers()"${nutritionAiState.busy ? ' disabled' : ''}>Genera bozza nutrizione</button>` : ''}
+            ${nutritionAiState.draftPlan ? `<button class="hdr-btn" type="button" onclick="saveNutritionDraftPlan()"${nutritionAiState.busy ? ' disabled' : ''}>Salva piano</button>` : ''}
+          </div>
+          ${(nutritionAiState.error || nutritionAiState.status) ? `<div class="${statusClass}">${escapeHtml(nutritionAiState.error || nutritionAiState.status)}</div>` : ''}
+          ${draftHtml}
+          ${refineCardHtml}
+        </div>
+        <div class="coach-card">
+          <div class="surface-title">${nutritionAiState.questions.length ? 'Domande mirate prima della bozza' : 'Wizard Nutrition Coach AI'}</div>
+          <div class="coach-questions">${questionHtml}</div>
+        </div>
+        ${rationaleHtml}
+        ${warningsHtml}
+      </div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        ${activePlanHtml}
+        ${todayCardHtml}
+        ${historyCardHtml}
+      </div>
+    </div>
+  `;
+}
+
 function openExerciseDemo(di, ei) {
   const exercise = getDays()?.[di]?.exercises?.[ei];
   if (!exercise) return;
@@ -2951,6 +4125,7 @@ function setAppSection(section) {
   const sectionMap = {
     today: 'home',
     plans: 'programs',
+    nutrition: 'nutrition',
     progress: 'progress',
     chat: 'coach'
   };
@@ -2963,6 +4138,7 @@ function setAppSection(section) {
   renderSectionNav();
   if (section === 'today') renderHome();
   if (section === 'plans') renderPrograms();
+  if (section === 'nutrition') renderNutritionSection();
   if (section === 'progress') renderProgressSection();
   if (section === 'chat') renderCoachSection();
   document.getElementById('app')?.scrollTo({ top: 0, behavior: 'smooth' });
@@ -3091,6 +4267,7 @@ async function loadPrograms() {
   renderPrograms();
   if (!currentProgram && currentSection === 'today') currentSection = 'plans';
   if (currentSection === 'today') renderHome();
+  if (currentSection === 'nutrition') renderNutritionSection();
   if (currentSection === 'progress') renderProgressSection();
   if (currentSection === 'chat') renderCoachSection();
   renderSectionNav();
@@ -4108,6 +5285,7 @@ syncAssistantInputHeight();
 renderAssistantThread();
 renderSectionNav();
 renderCoachSection();
+renderNutritionSection();
 setAppSection('plans');
 loadPrograms();
 </script>

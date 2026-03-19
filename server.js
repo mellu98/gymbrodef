@@ -23,6 +23,7 @@ const OPENAI_ASSISTANT_MODEL = process.env.OPENAI_ASSISTANT_MODEL || 'gpt-5-nano
 const CORS_ALLOWED_ORIGIN = (process.env.CORS_ALLOWED_ORIGIN || '').trim();
 const PARSER_VERSION = 'pt-pdf-v1';
 const COACH_AI_VERSION = 'coach-ai-v1';
+const NUTRITION_AI_VERSION = 'nutrition-ai-v1';
 const ASSISTANT_CHAT_VERSION = 'assistant-overlay-v1';
 const ROOT_DIR = __dirname;
 const ICONS_DIR = path.join(ROOT_DIR, 'icons');
@@ -219,6 +220,100 @@ const COACH_REFINEMENT_SCHEMA = {
   }
 };
 
+const NUTRITION_FOOD_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['name', 'grams', 'notes'],
+  properties: {
+    name: { type: 'string' },
+    grams: { type: 'integer', minimum: 1 },
+    notes: { type: 'string' }
+  }
+};
+
+const NUTRITION_MEAL_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['id', 'label', 'timeHint', 'foods', 'notes'],
+  properties: {
+    id: { type: 'string' },
+    label: { type: 'string' },
+    timeHint: { type: 'string' },
+    foods: {
+      type: 'array',
+      minItems: 1,
+      items: NUTRITION_FOOD_SCHEMA
+    },
+    notes: { type: 'string' }
+  }
+};
+
+const NUTRITION_DAY_TEMPLATE_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['dailyTargets', 'meals'],
+  properties: {
+    dailyTargets: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['calories', 'proteinGrams', 'carbsGrams', 'fatsGrams'],
+      properties: {
+        calories: { type: 'integer', minimum: 1 },
+        proteinGrams: { type: 'integer', minimum: 1 },
+        carbsGrams: { type: 'integer', minimum: 1 },
+        fatsGrams: { type: 'integer', minimum: 1 }
+      }
+    },
+    meals: {
+      type: 'array',
+      minItems: 1,
+      items: NUTRITION_MEAL_SCHEMA
+    }
+  }
+};
+
+const NUTRITION_PLAN_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['candidateNutritionPlan', 'rationale', 'warnings', 'confidence'],
+  properties: {
+    candidateNutritionPlan: {
+      type: 'object',
+      additionalProperties: false,
+      required: ['title', 'subtitle', 'hydrationTargetMl', 'trainingDay', 'restDay'],
+      properties: {
+        title: { type: 'string' },
+        subtitle: { type: 'string' },
+        hydrationTargetMl: { type: 'integer', minimum: 500 },
+        trainingDay: NUTRITION_DAY_TEMPLATE_SCHEMA,
+        restDay: NUTRITION_DAY_TEMPLATE_SCHEMA
+      }
+    },
+    rationale: {
+      type: 'array',
+      items: { type: 'string' }
+    },
+    warnings: {
+      type: 'array',
+      items: { type: 'string' }
+    },
+    confidence: { type: 'number', minimum: 0, maximum: 1 }
+  }
+};
+
+const NUTRITION_REFINEMENT_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['candidateNutritionPlan', 'summary', 'rationale', 'warnings', 'confidence'],
+  properties: {
+    candidateNutritionPlan: NUTRITION_PLAN_SCHEMA.properties.candidateNutritionPlan,
+    summary: { type: 'string' },
+    rationale: NUTRITION_PLAN_SCHEMA.properties.rationale,
+    warnings: NUTRITION_PLAN_SCHEMA.properties.warnings,
+    confidence: NUTRITION_PLAN_SCHEMA.properties.confidence
+  }
+};
+
 const SYSTEM_PROMPT = [
   'Sei un parser di schede allenamento in PDF per una PWA fitness.',
   'Leggi il PDF del personal trainer e restituisci solo i dati workout in JSON conforme allo schema.',
@@ -265,6 +360,29 @@ const COACH_REFINEMENT_SYSTEM_PROMPT = [
   'Nel campo summary descrivi in modo breve cosa hai cambiato concretamente.',
   'Nel campo rationale spiega perche` le modifiche hanno senso.',
   'Nel campo warnings segnala solo i punti che l\'utente dovrebbe ricontrollare prima di salvare.'
+].join(' ');
+
+const NUTRITION_PROGRAM_SYSTEM_PROMPT = [
+  'Sei il Nutrition Coach AI di Massi Gym.',
+  'Generi piani alimentari pratici, realistici e facili da seguire per utenti palestra.',
+  'Rispondi sempre in italiano e restituisci solo JSON valido conforme allo schema.',
+  'Il piano deve distinguere training day e rest day.',
+  'Ogni giorno deve avere target giornalieri e pasti concreti con cibi e grammi, senza ricette complesse.',
+  'Privilegia cibi comuni, facili da reperire e coerenti con preferenze, esclusioni, budget e tempo di preparazione.',
+  'Evita promesse mediche, diete estreme, tagli calorici aggressivi e numeri irrealistici.',
+  'Se alcuni dati sono mancanti, fai assunzioni prudenti e segnalale in warnings.'
+].join(' ');
+
+const NUTRITION_REFINEMENT_SYSTEM_PROMPT = [
+  'Sei il Nutrition Coach AI di Massi Gym nella fase di rifinitura bozza.',
+  'Ricevi una bozza di piano alimentare e una richiesta di modifica in linguaggio naturale.',
+  'Non rispondi con testo libero: restituisci solo JSON valido conforme allo schema.',
+  'Aggiorna la bozza esistente nel modo piu` fedele possibile alla richiesta dell\'utente.',
+  'Mantieni il piano realistico, semplice da seguire e coerente con obiettivo, preferenze, esclusioni e routine allenante.',
+  'Non stravolgere il piano se l\'utente chiede modifiche locali.',
+  'Nel campo summary descrivi in modo breve cosa hai cambiato concretamente.',
+  'Nel campo rationale spiega perche` le modifiche hanno senso.',
+  'Nel campo warnings segnala solo i punti da ricontrollare prima di salvare.'
 ].join(' ');
 
 function applyCors(req, res) {
@@ -621,6 +739,108 @@ function buildCoachContextText(profile, context) {
   return lines.join('\n');
 }
 
+function normalizeNutritionProfile(rawProfile, workoutProfile = null) {
+  const safe = rawProfile && typeof rawProfile === 'object' ? rawProfile : {};
+  const fallbackGoal = cleanString(workoutProfile?.goal || '');
+  return {
+    goal: cleanString(safe.goal || '') || fallbackGoal,
+    currentWeightKg: Math.max(0, parseInt(safe.currentWeightKg, 10) || 0),
+    targetWeightKg: Math.max(0, parseInt(safe.targetWeightKg, 10) || 0),
+    heightCm: Math.max(0, parseInt(safe.heightCm, 10) || 0),
+    age: Math.max(0, parseInt(safe.age, 10) || 0),
+    sex: cleanString(safe.sex || ''),
+    mealsPerDay: Math.max(0, parseInt(safe.mealsPerDay, 10) || 0),
+    dietStyle: cleanString(safe.dietStyle || ''),
+    allergies: normalizeStringList(safe.allergies || []),
+    excludedFoods: normalizeStringList(safe.excludedFoods || []),
+    preferredFoods: normalizeStringList(safe.preferredFoods || []),
+    budgetStyle: cleanString(safe.budgetStyle || ''),
+    cookingTime: cleanString(safe.cookingTime || ''),
+    notes: cleanString(safe.notes || '')
+  };
+}
+
+function normalizeNutritionContext(rawContext) {
+  const base = normalizeAiContext(rawContext);
+  const safe = rawContext && typeof rawContext === 'object' ? rawContext : {};
+  const nutritionSummary = safe.nutritionSummary && typeof safe.nutritionSummary === 'object' ? {
+    activePlanTitle: cleanString(safe.nutritionSummary.activePlanTitle || ''),
+    selectedDate: cleanString(safe.nutritionSummary.selectedDate || ''),
+    selectedDayType: ['training', 'rest'].includes(safe.nutritionSummary.selectedDayType) ? safe.nutritionSummary.selectedDayType : '',
+    adherenceLast7Days: cleanString(safe.nutritionSummary.adherenceLast7Days || ''),
+    lastWeightKg: cleanString(safe.nutritionSummary.lastWeightKg || ''),
+    averageWaterMl: Math.max(0, parseInt(safe.nutritionSummary.averageWaterMl, 10) || 0)
+  } : null;
+
+  return {
+    ...base,
+    nutritionSummary
+  };
+}
+
+function buildNutritionContextText(profile, workoutProfile, context) {
+  const lines = [];
+
+  if (profile.goal) lines.push('Obiettivo alimentare: ' + profile.goal);
+  if (profile.currentWeightKg) lines.push('Peso attuale: ' + profile.currentWeightKg + ' kg');
+  if (profile.targetWeightKg) lines.push('Peso target: ' + profile.targetWeightKg + ' kg');
+  if (profile.heightCm) lines.push('Altezza: ' + profile.heightCm + ' cm');
+  if (profile.age) lines.push('Eta`: ' + profile.age);
+  if (profile.sex) lines.push('Sesso dichiarato: ' + profile.sex);
+  if (profile.mealsPerDay) lines.push('Pasti al giorno desiderati: ' + profile.mealsPerDay);
+  if (profile.dietStyle) lines.push('Stile alimentare: ' + profile.dietStyle);
+  if (profile.allergies.length) lines.push('Allergie o intolleranze: ' + profile.allergies.join(', '));
+  if (profile.excludedFoods.length) lines.push('Cibi da evitare: ' + profile.excludedFoods.join(', '));
+  if (profile.preferredFoods.length) lines.push('Cibi preferiti: ' + profile.preferredFoods.join(', '));
+  if (profile.budgetStyle) lines.push('Budget alimentare: ' + profile.budgetStyle);
+  if (profile.cookingTime) lines.push('Tempo cucina preferito: ' + profile.cookingTime);
+  if (profile.notes) lines.push('Note nutrizione: ' + profile.notes);
+
+  if (workoutProfile.goal) lines.push('Obiettivo allenamento: ' + workoutProfile.goal);
+  if (workoutProfile.experience) lines.push('Livello allenamento: ' + workoutProfile.experience);
+  if (workoutProfile.daysPerWeek) lines.push('Allenamenti a settimana desiderati: ' + workoutProfile.daysPerWeek);
+  if (workoutProfile.sessionLength) lines.push('Durata media allenamento: ' + workoutProfile.sessionLength + ' minuti');
+  if (workoutProfile.equipment) lines.push('Attrezzatura: ' + workoutProfile.equipment);
+  if (workoutProfile.focusAreas.length) lines.push('Focus muscolari: ' + workoutProfile.focusAreas.join(', '));
+  if (workoutProfile.limitations) lines.push('Limitazioni da considerare: ' + workoutProfile.limitations);
+
+  if (context.currentProgram?.title) {
+    lines.push('Scheda attiva: ' + context.currentProgram.title);
+    if (context.currentProgram.dayLabels.length) lines.push('Split attuale: ' + context.currentProgram.dayLabels.join(', '));
+    if (context.currentProgram.currentWeek) {
+      lines.push(
+        'Settimana attiva: W' + context.currentProgram.currentWeek +
+        ' con ' + context.currentProgram.completedDaysThisWeek + '/' + context.currentProgram.totalDaysThisWeek + ' giorni completati'
+      );
+    }
+  }
+
+  if (context.historySummary.length) {
+    lines.push('Storico recente allenamenti: ' + context.historySummary.map((entry) => {
+      return [
+        entry.day || 'Sessione',
+        entry.week ? 'week ' + entry.week : '',
+        entry.date || ''
+      ].filter(Boolean).join(' Â· ');
+    }).join(' | '));
+  }
+
+  if (context.nutritionSummary?.activePlanTitle) {
+    lines.push('Piano alimentare attivo: ' + context.nutritionSummary.activePlanTitle);
+  }
+  if (context.nutritionSummary?.adherenceLast7Days) {
+    lines.push('Aderenza ultimi 7 giorni: ' + context.nutritionSummary.adherenceLast7Days);
+  }
+  if (context.nutritionSummary?.lastWeightKg) {
+    lines.push('Ultimo peso registrato: ' + context.nutritionSummary.lastWeightKg + ' kg');
+  }
+  if (context.nutritionSummary?.averageWaterMl) {
+    lines.push('Media acqua recente: ' + context.nutritionSummary.averageWaterMl + ' ml');
+  }
+
+  return lines.join('\n');
+}
+
 function createAiIntakeQuestions(profile, context) {
   const questions = [];
   if (!profile.goal) {
@@ -697,6 +917,102 @@ function createAiIntakeQuestions(profile, context) {
   return questions.slice(0, 6);
 }
 
+function createNutritionIntakeQuestions(profile, workoutProfile) {
+  const questions = [];
+  if (!profile.goal) {
+    questions.push({
+      id: 'goal',
+      label: 'Obiettivo',
+      question: 'Qual e` l\'obiettivo del piano alimentare?',
+      type: 'select',
+      options: [
+        { value: 'ipertrofia', label: 'Massa / Ipertrofia' },
+        { value: 'ricomposizione', label: 'Ricomposizione' },
+        { value: 'dimagrimento', label: 'Dimagrimento' },
+        { value: 'mantenimento', label: 'Mantenimento' }
+      ]
+    });
+  }
+  if (!profile.currentWeightKg) {
+    questions.push({
+      id: 'currentWeightKg',
+      label: 'Peso attuale',
+      question: 'Qual e` il tuo peso attuale in kg?',
+      type: 'text',
+      placeholder: 'Es: 82'
+    });
+  }
+  if (!profile.heightCm) {
+    questions.push({
+      id: 'heightCm',
+      label: 'Altezza',
+      question: 'Qual e` la tua altezza in cm?',
+      type: 'text',
+      placeholder: 'Es: 178'
+    });
+  }
+  if (!profile.age) {
+    questions.push({
+      id: 'age',
+      label: 'Eta`',
+      question: 'Quanti anni hai?',
+      type: 'text',
+      placeholder: 'Es: 29'
+    });
+  }
+  if (!profile.sex) {
+    questions.push({
+      id: 'sex',
+      label: 'Sesso',
+      question: 'Con quale riferimento vuoi che il piano venga calibrato?',
+      type: 'select',
+      options: [
+        { value: 'uomo', label: 'Uomo' },
+        { value: 'donna', label: 'Donna' },
+        { value: 'altro', label: 'Altro / preferisco non dirlo' }
+      ]
+    });
+  }
+  if (!profile.mealsPerDay) {
+    questions.push({
+      id: 'mealsPerDay',
+      label: 'Pasti al giorno',
+      question: 'Quanti pasti vuoi fare in media ogni giorno?',
+      type: 'select',
+      options: [3, 4, 5, 6].map((value) => ({ value: String(value), label: String(value) }))
+    });
+  }
+  if (!profile.dietStyle) {
+    questions.push({
+      id: 'dietStyle',
+      label: 'Stile alimentare',
+      question: 'Che stile alimentare vuoi seguire?',
+      type: 'select',
+      options: [
+        { value: 'onnivoro', label: 'Onnivoro' },
+        { value: 'pescetariano', label: 'Pescetariano' },
+        { value: 'vegetariano', label: 'Vegetariano' },
+        { value: 'vegano', label: 'Vegano' },
+        { value: 'flessibile', label: 'Flessibile' }
+      ]
+    });
+  }
+  if (!profile.cookingTime && !workoutProfile.sessionLength) {
+    questions.push({
+      id: 'cookingTime',
+      label: 'Tempo cucina',
+      question: 'Quanto tempo vuoi dedicare alla preparazione dei pasti?',
+      type: 'select',
+      options: [
+        { value: 'molto_rapido', label: 'Molto rapido' },
+        { value: 'medio', label: 'Medio' },
+        { value: 'completo', label: 'Completo' }
+      ]
+    });
+  }
+  return questions.slice(0, 7);
+}
+
 function normalizeDraftProgramForAi(rawProgram) {
   const normalized = normalizeCandidateProgram({
     athleteName: '',
@@ -769,6 +1085,97 @@ function validateAiRefinedProgram(result, profile) {
   return {
     ...validated,
     summary: cleanString(result?.summary || 'Bozza aggiornata.')
+  };
+}
+
+function normalizeNutritionDailyTargets(rawTargets) {
+  const safe = rawTargets && typeof rawTargets === 'object' ? rawTargets : {};
+  return {
+    calories: Math.max(0, parseInt(safe.calories, 10) || 0),
+    proteinGrams: Math.max(0, parseInt(safe.proteinGrams, 10) || 0),
+    carbsGrams: Math.max(0, parseInt(safe.carbsGrams, 10) || 0),
+    fatsGrams: Math.max(0, parseInt(safe.fatsGrams, 10) || 0)
+  };
+}
+
+function normalizeNutritionFoods(rawFoods) {
+  return (Array.isArray(rawFoods) ? rawFoods : []).map((food, index) => ({
+    name: cleanString(food?.name || '') || 'Alimento ' + (index + 1),
+    grams: Math.max(1, parseInt(food?.grams, 10) || 0),
+    notes: cleanString(food?.notes || '')
+  })).filter((food) => food.name && food.grams > 0);
+}
+
+function normalizeNutritionMeals(rawMeals, prefix) {
+  return (Array.isArray(rawMeals) ? rawMeals : []).map((meal, index) => ({
+    id: cleanString(meal?.id || '') || (prefix + '-meal-' + (index + 1)),
+    label: cleanString(meal?.label || '') || 'Pasto ' + (index + 1),
+    timeHint: cleanString(meal?.timeHint || ''),
+    foods: normalizeNutritionFoods(meal?.foods),
+    notes: cleanString(meal?.notes || '')
+  })).filter((meal) => meal.foods.length > 0);
+}
+
+function normalizeNutritionDayTemplate(rawTemplate, prefix) {
+  const safe = rawTemplate && typeof rawTemplate === 'object' ? rawTemplate : {};
+  return {
+    dailyTargets: normalizeNutritionDailyTargets(safe.dailyTargets),
+    meals: normalizeNutritionMeals(safe.meals, prefix)
+  };
+}
+
+function normalizeNutritionPlanCandidate(rawPlan) {
+  const safe = rawPlan && typeof rawPlan === 'object' ? rawPlan : {};
+  return {
+    title: cleanString(safe.title || '') || 'Coach AI Â· Piano alimentare',
+    subtitle: cleanString(safe.subtitle || '') || 'Piano alimentare generato dal Coach AI',
+    hydrationTargetMl: Math.max(500, parseInt(safe.hydrationTargetMl, 10) || 2500),
+    trainingDay: normalizeNutritionDayTemplate(safe.trainingDay, 'training'),
+    restDay: normalizeNutritionDayTemplate(safe.restDay, 'rest')
+  };
+}
+
+function validateNutritionTemplate(template, label) {
+  if (!template.meals.length) {
+    const error = new Error('Il piano alimentare non contiene pasti validi per il ' + label + '.');
+    error.statusCode = 502;
+    throw error;
+  }
+  const targets = template.dailyTargets;
+  if (!targets.calories || !targets.proteinGrams || !targets.carbsGrams || !targets.fatsGrams) {
+    const error = new Error('Target giornalieri incompleti per il ' + label + '.');
+    error.statusCode = 502;
+    throw error;
+  }
+}
+
+function validateAiGeneratedNutritionPlan(result, profile) {
+  const safe = result && typeof result === 'object' ? result : {};
+  const plan = normalizeNutritionPlanCandidate(safe.candidateNutritionPlan);
+  validateNutritionTemplate(plan.trainingDay, 'training day');
+  validateNutritionTemplate(plan.restDay, 'rest day');
+
+  const warnings = (Array.isArray(safe.warnings) ? safe.warnings : []).map(cleanString).filter(Boolean);
+  if (profile.mealsPerDay && plan.trainingDay.meals.length !== profile.mealsPerDay) {
+    warnings.push('Il training day ha ' + plan.trainingDay.meals.length + ' pasti invece dei ' + profile.mealsPerDay + ' richiesti: controllalo prima di salvarlo.');
+  }
+  if (profile.mealsPerDay && plan.restDay.meals.length !== profile.mealsPerDay) {
+    warnings.push('Il rest day ha ' + plan.restDay.meals.length + ' pasti invece dei ' + profile.mealsPerDay + ' richiesti: controllalo prima di salvarlo.');
+  }
+
+  return {
+    candidateNutritionPlan: plan,
+    rationale: (Array.isArray(safe.rationale) ? safe.rationale : []).map(cleanString).filter(Boolean).slice(0, 6),
+    warnings,
+    confidence: Math.max(0, Math.min(1, Number(safe.confidence) || 0))
+  };
+}
+
+function validateAiRefinedNutritionPlan(result, profile) {
+  const validated = validateAiGeneratedNutritionPlan(result, profile);
+  return {
+    ...validated,
+    summary: cleanString(result?.summary || 'Piano alimentare aggiornato.')
   };
 }
 
@@ -1204,6 +1611,161 @@ async function refineAiProgram(profileInput, contextInput, candidateProgramInput
   return validateAiRefinedProgram(parsed, profile);
 }
 
+async function generateNutritionPlan(profileInput, workoutProfileInput, contextInput, answersInput) {
+  if (!client) {
+    const error = new Error('OPENAI_API_KEY mancante sul server.');
+    error.statusCode = 500;
+    throw error;
+  }
+
+  const context = normalizeNutritionContext(contextInput);
+  const workoutProfile = normalizeAiProfile(workoutProfileInput, context);
+  const profile = normalizeNutritionProfile({ ...(profileInput || {}), ...(answersInput || {}) }, workoutProfile);
+  const missingQuestions = createNutritionIntakeQuestions(profile, workoutProfile);
+  if (missingQuestions.length) {
+    const error = new Error('Mancano ancora alcune informazioni prima di generare il piano alimentare.');
+    error.statusCode = 422;
+    error.questions = missingQuestions;
+    throw error;
+  }
+
+  const response = await client.responses.create({
+    model: OPENAI_MODEL,
+    max_output_tokens: 3200,
+    input: [
+      {
+        role: 'system',
+        content: [
+          { type: 'input_text', text: NUTRITION_PROGRAM_SYSTEM_PROMPT }
+        ]
+      },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'input_text',
+            text: [
+              'Usa il seguente contesto per generare un piano alimentare JSON compatibile con Massi Gym.',
+              '',
+              'Contesto nutrizione e allenamento:',
+              buildNutritionContextText(profile, workoutProfile, context),
+              '',
+              'Regole operative:',
+              '- crea un training day e un rest day distinti',
+              '- il numero pasti ideale e` ' + (profile.mealsPerDay || Math.max(3, workoutProfile.daysPerWeek || 4)),
+              '- usa cibi realistici, facili da trovare e con grammature precise',
+              '- evita ricette elaborate: meglio combinazioni pratiche e ripetibili',
+              '- i target giornalieri devono essere coerenti con obiettivo e routine allenante',
+              '- hydrationTargetMl deve essere un numero realistico e semplice da seguire',
+              '- title e subtitle devono far capire che si tratta di un piano alimentare Coach AI'
+            ].join('\n')
+          }
+        ]
+      }
+    ],
+    text: {
+      format: {
+        type: 'json_schema',
+        name: 'nutrition_ai_plan_generation',
+        strict: true,
+        schema: NUTRITION_PLAN_SCHEMA
+      }
+    }
+  });
+
+  if (!response.output_text) {
+    const error = new Error('Risposta Nutrition Coach AI vuota.');
+    error.statusCode = 502;
+    throw error;
+  }
+
+  const parsed = JSON.parse(response.output_text);
+  return validateAiGeneratedNutritionPlan(parsed, profile);
+}
+
+async function refineNutritionPlan(profileInput, workoutProfileInput, contextInput, candidatePlanInput, messagesInput, requestInput) {
+  if (!client) {
+    const error = new Error('OPENAI_API_KEY mancante sul server.');
+    error.statusCode = 500;
+    throw error;
+  }
+
+  const requestText = cleanString(requestInput || '');
+  if (!requestText) {
+    const error = new Error('Scrivi cosa vuoi cambiare nella bozza del piano alimentare.');
+    error.statusCode = 400;
+    throw error;
+  }
+
+  const context = normalizeNutritionContext(contextInput);
+  const workoutProfile = normalizeAiProfile(workoutProfileInput, context);
+  const profile = normalizeNutritionProfile(profileInput, workoutProfile);
+  const draftPlan = normalizeNutritionPlanCandidate(candidatePlanInput);
+  validateNutritionTemplate(draftPlan.trainingDay, 'training day');
+  validateNutritionTemplate(draftPlan.restDay, 'rest day');
+  const chatHistory = buildCoachRefinementHistoryText(messagesInput);
+
+  const response = await client.responses.create({
+    model: OPENAI_MODEL,
+    max_output_tokens: 3200,
+    input: [
+      {
+        role: 'system',
+        content: [
+          { type: 'input_text', text: NUTRITION_REFINEMENT_SYSTEM_PROMPT }
+        ]
+      },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'input_text',
+            text: [
+              'Aggiorna la seguente bozza di piano alimentare senza rompere il formato JSON compatibile con Massi Gym.',
+              '',
+              'Contesto nutrizione e allenamento:',
+              buildNutritionContextText(profile, workoutProfile, context),
+              '',
+              'Bozza attuale:',
+              JSON.stringify(draftPlan, null, 2),
+              '',
+              'Cronologia breve della rifinitura:',
+              chatHistory || 'Nessuna cronologia precedente.',
+              '',
+              'Richiesta finale dell\'utente:',
+              requestText,
+              '',
+              'Regole operative:',
+              '- modifica la bozza esistente, non crearne una completamente diversa salvo richiesta esplicita',
+              '- mantieni training day e rest day entrambi presenti',
+              '- se l\'utente chiede pasti piu` semplici, riduci complessita` e ingredienti',
+              '- se chiede piu` proteine o meno latticini, applica la modifica in modo concreto ai pasti e ai target',
+              '- summary deve dire in breve cosa hai cambiato davvero'
+            ].join('\n')
+          }
+        ]
+      }
+    ],
+    text: {
+      format: {
+        type: 'json_schema',
+        name: 'nutrition_ai_plan_refinement',
+        strict: true,
+        schema: NUTRITION_REFINEMENT_SCHEMA
+      }
+    }
+  });
+
+  if (!response.output_text) {
+    const error = new Error('Risposta Nutrition Coach AI vuota durante la rifinitura.');
+    error.statusCode = 502;
+    throw error;
+  }
+
+  const parsed = JSON.parse(response.output_text);
+  return validateAiRefinedNutritionPlan(parsed, profile);
+}
+
 app.use((req, res, next) => {
   applyCors(req, res);
   if (req.method === 'OPTIONS') {
@@ -1218,6 +1780,7 @@ app.get('/healthz', (_req, res) => {
     ok: true,
     parserVersion: PARSER_VERSION,
     coachAiVersion: COACH_AI_VERSION,
+    nutritionAiVersion: NUTRITION_AI_VERSION,
     assistantChatVersion: ASSISTANT_CHAT_VERSION,
     assistantModel: OPENAI_ASSISTANT_MODEL
   });
@@ -1317,6 +1880,71 @@ app.post('/api/ai/refine-program', async (req, res) => {
     const statusCode = error.statusCode || 500;
     const message = statusCode >= 500
       ? 'Rifinitura bozza non disponibile in questo momento. Riprova tra poco.'
+      : error.message;
+    sendJsonError(res, statusCode, message);
+  }
+});
+
+app.post('/api/ai/nutrition/intake', async (req, res) => {
+  try {
+    const context = normalizeNutritionContext(req.body?.context);
+    const workoutProfile = normalizeAiProfile(req.body?.workoutProfile, context);
+    const profile = normalizeNutritionProfile(req.body?.profile, workoutProfile);
+    res.json({
+      questions: createNutritionIntakeQuestions(profile, workoutProfile),
+      nutritionAiVersion: NUTRITION_AI_VERSION
+    });
+  } catch (error) {
+    console.error('Nutrition AI intake error:', error);
+    const statusCode = error.statusCode || 500;
+    const message = statusCode >= 500
+      ? 'Nutrition Coach AI non disponibile in questo momento. Riprova tra poco.'
+      : error.message;
+    sendJsonError(res, statusCode, message);
+  }
+});
+
+app.post('/api/ai/nutrition/generate-plan', async (req, res) => {
+  try {
+    const generated = await generateNutritionPlan(
+      req.body?.profile,
+      req.body?.workoutProfile,
+      req.body?.context,
+      req.body?.answers
+    );
+    res.json({
+      ...generated,
+      parserVersion: NUTRITION_AI_VERSION
+    });
+  } catch (error) {
+    console.error('Nutrition AI generate error:', error);
+    const statusCode = error.statusCode || 500;
+    const message = statusCode >= 500
+      ? 'Generazione piano alimentare non disponibile in questo momento. Riprova tra poco.'
+      : error.message;
+    sendJsonError(res, statusCode, message, error.questions ? { questions: error.questions } : {});
+  }
+});
+
+app.post('/api/ai/nutrition/refine-plan', async (req, res) => {
+  try {
+    const refined = await refineNutritionPlan(
+      req.body?.profile,
+      req.body?.workoutProfile,
+      req.body?.context,
+      req.body?.candidateNutritionPlan,
+      req.body?.messages,
+      req.body?.request
+    );
+    res.json({
+      ...refined,
+      parserVersion: NUTRITION_AI_VERSION
+    });
+  } catch (error) {
+    console.error('Nutrition AI refine error:', error);
+    const statusCode = error.statusCode || 500;
+    const message = statusCode >= 500
+      ? 'Rifinitura piano alimentare non disponibile in questo momento. Riprova tra poco.'
       : error.message;
     sendJsonError(res, statusCode, message);
   }

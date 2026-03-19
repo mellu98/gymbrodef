@@ -39,6 +39,9 @@ Endpoint:
 - POST /api/ai/intake -> legge profilo + contesto e restituisce solo le domande mancanti per creare una nuova scheda
 - POST /api/ai/generate-program -> genera una scheda JSON compatibile con l'app partendo da profilo, storico e risposte finali
 - POST /api/ai/refine-program -> modifica una bozza Coach AI esistente in base a richieste testuali dell'utente
+- POST /api/ai/nutrition/intake -> legge profilo nutrizione + contesto allenamento e restituisce solo le domande mancanti per il piano alimentare
+- POST /api/ai/nutrition/generate-plan -> genera una bozza di piano alimentare training/rest day compatibile con la sezione Nutrizione
+- POST /api/ai/nutrition/refine-plan -> modifica una bozza nutrizione esistente in base a richieste testuali dell'utente
 - GET /healthz -> healthcheck semplice
 
 Coach AI fase 1:
@@ -48,6 +51,16 @@ Coach AI fase 1:
 - La bozza generata resta prima nel tab Coach, dove puo' essere rifinita via chat
 - Quando la bozza convince, si apre nello stesso editor/review usato per l'import PDF
 - Le schede salvate dal Coach AI restano schede utente normali con origin = ai
+
+Nutrition Coach AI:
+- La sezione Nutrizione e` separata dall'allenamento ma usa comunque il contesto reale della scheda attiva e della frequenza recente
+- Il profilo nutrizione viene salvato in localStorage con chiave massi_user_nutrition_profile
+- I piani alimentari vengono salvati in localStorage con chiave massi_user_nutrition_plans
+- Il tracking giornaliero viene salvato in localStorage con chiave massi_nutrition_log_v1
+- Ogni piano distingue training day e rest day con pasti, cibi, grammi e target giornalieri
+- La bozza del piano resta nella sezione Nutrizione e puo' essere rifinita via chat prima del salvataggio
+- Solo un piano alimentare alla volta puo' essere attivo, ma quelli precedenti restano consultabili
+- Il tracking v1 include checklist pasti, aderenza, peso, acqua e note per data reale
 
 Assistente AI flottante:
 - Il pulsante robot apre una mini chat overlay separata dal tab Coach
