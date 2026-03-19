@@ -922,8 +922,9 @@ function createAiIntakeQuestions(profile, context) {
   return questions.slice(0, 6);
 }
 
-function createNutritionIntakeQuestions(profile, workoutProfile) {
+function createNutritionIntakeQuestions(profile, workoutProfile, answersInput = {}) {
   const questions = [];
+  const sessionAnswers = answersInput && typeof answersInput === 'object' ? answersInput : {};
   if (!profile.goal) {
     questions.push({
       id: 'goal',
@@ -1015,7 +1016,74 @@ function createNutritionIntakeQuestions(profile, workoutProfile) {
       ]
     });
   }
-  return questions.slice(0, 7);
+  if (!cleanString(sessionAnswers.varietyPreference || '')) {
+    questions.push({
+      id: 'varietyPreference',
+      label: 'Varieta` pasti',
+      question: 'Quanto vuoi variare i pasti durante la settimana?',
+      type: 'select',
+      options: [
+        { value: 'alta', label: 'Alta varieta`' },
+        { value: 'media', label: 'Varieta` media' },
+        { value: 'bassa', label: 'Pochi pasti ripetibili' }
+      ]
+    });
+  }
+  if (!cleanString(sessionAnswers.mealStylePriority || '')) {
+    questions.push({
+      id: 'mealStylePriority',
+      label: 'Priorita` pasti',
+      question: 'Cosa conta di piu` in questo piano?',
+      type: 'select',
+      options: [
+        { value: 'semplicita', label: 'Semplicita`' },
+        { value: 'performance', label: 'Performance in palestra' },
+        { value: 'sazieta', label: 'Sazieta`' },
+        { value: 'gusto', label: 'Gusto e piacere' }
+      ]
+    });
+  }
+  if (!cleanString(sessionAnswers.outsideMeals || '')) {
+    questions.push({
+      id: 'outsideMeals',
+      label: 'Pasti fuori casa',
+      question: 'Quanti pasti al giorno fai spesso fuori casa o al volo?',
+      type: 'select',
+      options: [
+        { value: '0', label: 'Quasi nessuno' },
+        { value: '1', label: 'Uno' },
+        { value: '2', label: 'Due' },
+        { value: '3+', label: 'Tre o piu`' }
+      ]
+    });
+  }
+  return questions.slice(0, 8);
+}
+
+function buildNutritionAnswerContext(answersInput) {
+  const answers = answersInput && typeof answersInput === 'object' ? answersInput : {};
+  const lines = [];
+  const varietyLabels = {
+    alta: 'L\'utente vuole alta varieta` nei pasti durante la settimana.',
+    media: 'L\'utente vuole una varieta` media: pasti diversi ma senza eccessiva complessita`.',
+    bassa: 'L\'utente accetta una struttura piu` ripetibile con pochi pasti base.'
+  };
+  const priorityLabels = {
+    semplicita: 'La priorita` e` la semplicita` pratica dei pasti.',
+    performance: 'La priorita` e` sostenere bene l\'allenamento e la performance.',
+    sazieta: 'La priorita` e` mantenere buona sazieta` durante la giornata.',
+    gusto: 'La priorita` e` avere pasti piu` gustosi e appaganti.'
+  };
+  const outsideMealLabels = {
+    '0': 'Quasi tutti i pasti possono essere gestiti con calma.',
+    '1': 'Almeno un pasto al giorno e` spesso fuori casa o al volo.',
+    '2': 'Due pasti al giorno sono spesso fuori casa o al volo.',
+    '3+': 'Gran parte della giornata richiede pasti veloci o fuori casa.'
+  };
+  if (varietyLabels[answers.varietyPreference]) lines.push(varietyLabels[answers.varietyPreference]);
+  if (priorityLabels[answers.mealStylePriority]) lines.push(priorityLabels[answers.mealStylePriority]);
+  if (outsideMealLabels[answers.outsideMeals]) lines.push(outsideMealLabels[answers.outsideMeals]);
+  return lines;
 }
 
 function normalizeDraftProgramForAi(rawProgram) {
@@ -1770,7 +1838,8 @@ async function generateNutritionPlan(profileInput, workoutProfileInput, contextI
   const context = normalizeNutritionContext(contextInput);
   const workoutProfile = normalizeAiProfile(workoutProfileInput, context);
   const profile = normalizeNutritionProfile({ ...(profileInput || {}), ...(answersInput || {}) }, workoutProfile);
-  const missingQuestions = createNutritionIntakeQuestions(profile, workoutProfile);
+  const answerContext = buildNutritionAnswerContext(answersInput);
+  const missingQuestions = createNutritionIntakeQuestions(profile, workoutProfile, answersInput);
   if (missingQuestions.length) {
     const error = new Error('Mancano ancora alcune informazioni prima di generare il piano alimentare.');
     error.statusCode = 422;
@@ -1799,6 +1868,9 @@ async function generateNutritionPlan(profileInput, workoutProfileInput, contextI
               'Contesto nutrizione e allenamento:',
               buildNutritionContextText(profile, workoutProfile, context),
               '',
+              answerContext.length ? 'Preferenze extra per questa generazione:' : '',
+              answerContext.length ? answerContext.join('\n') : '',
+              answerContext.length ? '' : '',
               'Regole operative:',
               '- crea un training day e un rest day distinti',
               '- il numero pasti ideale e` ' + (profile.mealsPerDay || Math.max(3, workoutProfile.daysPerWeek || 4)),

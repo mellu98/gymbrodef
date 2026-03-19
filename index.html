@@ -3959,7 +3959,7 @@ function renderNutritionSection() {
   const statusClass = nutritionAiState.error ? 'coach-status error' : 'coach-status' + (nutritionAiState.status ? ' good' : '');
   const questionHtml = nutritionAiState.questions.length ? nutritionAiState.questions.map(renderNutritionQuestionField).join('') : `
     <div class="coach-empty">
-      Premi <strong>Analizza profilo nutrizione</strong> e il Nutrition Coach AI ti fara' solo le domande che mancano davvero.
+      Premi <strong>Analizza profilo nutrizione</strong>: il Nutrition Coach AI ti fara' sempre 2-3 conferme pratiche, oltre agli eventuali dati mancanti, prima di generare la bozza.
     </div>`;
   const rationaleHtml = nutritionAiState.rationale.length ? `
     <div class="coach-card">
