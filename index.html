@@ -1305,6 +1305,70 @@ function getChatEndpoint() {
   return buildApiUrl('/api/chat');
 }
 
+function normalizeRepToken(value) {
+  return cleanText(String(value || ''))
+    .replace(/(\d)\s*\/\s*(\d)/g, '$1-$2')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function deriveRepsPlan(reps, series, explicitPlan = []) {
+  const targetSeries = Math.max(1, parseInt(series, 10) || 1);
+  const fromExplicit = (Array.isArray(explicitPlan) ? explicitPlan : []).map(normalizeRepToken).filter(Boolean);
+  if (fromExplicit.length) {
+    const plan = fromExplicit.slice(0, targetSeries);
+    while (plan.length < targetSeries) plan.push(plan[plan.length - 1] || normalizeRepToken(reps) || '-');
+    return plan;
+  }
+
+  const raw = normalizeRepToken(reps);
+  if (!raw) return Array.from({ length: targetSeries }, () => '-');
+
+  const commaParts = raw.split(/\s*,\s*/).map((part) => part.trim()).filter(Boolean);
+  if (commaParts.length > 1) {
+    const expanded = [];
+    let valid = true;
+    commaParts.forEach((part) => {
+      const match = part.match(/^(?:(\d+)\s*x\s*)?(.+)$/i);
+      if (!match || !normalizeRepToken(match[2])) {
+        valid = false;
+        return;
+      }
+      const count = Math.max(1, parseInt(match[1], 10) || 1);
+      const token = normalizeRepToken(match[2]);
+      for (let i = 0; i < count; i++) expanded.push(token);
+    });
+    if (valid && expanded.length) {
+      const plan = expanded.slice(0, targetSeries);
+      while (plan.length < targetSeries) plan.push(plan[plan.length - 1] || raw);
+      return plan;
+    }
+  }
+
+  const repeated = raw.match(/^(\d+)\s*x\s*(.+)$/i);
+  if (repeated && normalizeRepToken(repeated[2])) {
+    const count = Math.max(1, parseInt(repeated[1], 10) || 1);
+    const token = normalizeRepToken(repeated[2]);
+    if (count === targetSeries) {
+      return Array.from({ length: targetSeries }, () => token);
+    }
+  }
+
+  return Array.from({ length: targetSeries }, () => raw);
+}
+
+function getSeriesRepLabel(exercise, seriesIndex) {
+  const plan = deriveRepsPlan(exercise?.reps, exercise?.series, exercise?.repsPlan);
+  return normalizeRepToken(plan[seriesIndex] || plan[plan.length - 1] || exercise?.reps || '-');
+}
+
+function getExerciseRepsSummary(exercise) {
+  const plan = deriveRepsPlan(exercise?.reps, exercise?.series, exercise?.repsPlan);
+  if (!plan.length) return normalizeRepToken(exercise?.reps || '-');
+  const allSame = plan.every((item) => item === plan[0]);
+  return allSame ? plan[0] : plan.join(' · ');
+}
+
 function normalizePrograms(programs, sourceFallback = 'bundled') {
   return (Array.isArray(programs) ? programs : []).map((program, pi) => ({
     id: String(program?.id || 'program-' + (pi + 1)).replace(/[^a-zA-Z0-9_-]/g, '_'),
@@ -1328,6 +1392,7 @@ function normalizePrograms(programs, sourceFallback = 'bundled') {
         name: cleanText(ex?.name || 'Esercizio ' + (ei + 1)),
         series: Math.max(0, parseInt(ex?.series, 10) || 0),
         reps: cleanText(String(ex?.reps ?? '-')),
+        repsPlan: deriveRepsPlan(ex?.reps, ex?.series, ex?.repsPlan),
         note: cleanText(ex?.note || '')
       }))
     }))
@@ -2192,7 +2257,7 @@ function buildAssistantContext() {
       context.currentExercise = {
         name: cleanText(currentExercise.name),
         series: Math.max(0, parseInt(currentExercise.series, 10) || 0),
-        reps: cleanText(currentExercise.reps || ''),
+        reps: getExerciseRepsSummary(currentExercise),
         note: cleanText(currentExercise.note || '')
       };
     }
@@ -2200,7 +2265,7 @@ function buildAssistantContext() {
       context.nextExercise = {
         name: cleanText(nextExercise.name),
         series: Math.max(0, parseInt(nextExercise.series, 10) || 0),
-        reps: cleanText(nextExercise.reps || ''),
+        reps: getExerciseRepsSummary(nextExercise),
         note: cleanText(nextExercise.note || '')
       };
     }
@@ -3205,10 +3270,11 @@ function renderListView(di) {
     // Build series grid html
     let seriesHtml = '<div class="series-grid">';
     for (let s = 0; s < ex.series; s++) {
+      const seriesReps = getSeriesRepLabel(ex, s);
       seriesHtml += `
         <div class="serie-box${sd.seriesDone[s]?' done':''}" id="sb-${ei}-${s}" onclick="toggleSerie(${di},${ei},${s})">
           <div class="sb-lbl">Serie ${s+1}</div>
-          <div class="sb-reps">${ex.reps}</div>
+          <div class="sb-reps">${seriesReps}</div>
           <div class="sb-kg" id="sb-kg-${ei}-${s}">${sd.kg[s]||''}</div>
           <input class="kg-inp" id="kg-${ei}-${s}" type="number" inputmode="decimal" placeholder="kg"
             value="${sd.kg[s]||''}"
@@ -3221,11 +3287,11 @@ function renderListView(di) {
 
     card.innerHTML = `
       <div class="ex-card-hdr" onclick="toggleCard(${ei})">
-        <div class="ex-idx">${ei+1}</div>
-        <div class="ex-info">
-          <div class="ex-name">${ex.name}</div>
-          <div class="ex-meta">${ex.series} serie - ${ex.reps} reps</div>
-        </div>
+      <div class="ex-idx">${ei+1}</div>
+      <div class="ex-info">
+        <div class="ex-name">${ex.name}</div>
+          <div class="ex-meta">${ex.series} serie - ${getExerciseRepsSummary(ex)} reps</div>
+      </div>
         <div class="ex-chk${sd.exDone?' on':''}" id="echk-${ei}" onclick="event.stopPropagation();toggleExDone(${di},${ei})">
           <span class="chk-icon">&#10003;</span>
         </div>
@@ -3300,10 +3366,11 @@ function renderFocusView(di, ei) {
   // Build series rows
   let seriesHtml = `<div class="fc-series-lbl">Serie</div>`;
   for (let s = 0; s < ex.series; s++) {
+    const seriesReps = getSeriesRepLabel(ex, s);
     seriesHtml += `
       <div class="fc-serie-row">
         <div class="fsr-num">${s+1}</div>
-        <div class="fsr-reps">${ex.reps} reps</div>
+        <div class="fsr-reps">${seriesReps} reps</div>
         <div class="fsr-kg">
           <input type="number" inputmode="decimal" placeholder="kg"
             value="${sd.kg[s]||''}"
@@ -3321,7 +3388,7 @@ function renderFocusView(di, ei) {
       <div class="fc-next-copy">
         <div class="fc-next-kicker">Subito dopo</div>
         <div class="fc-next-name">${escapeHtml(nextExercise.name)}</div>
-        <div class="fc-next-meta">Esercizio ${ei + 2} di ${days[di].exercises.length} · ${escapeHtml(nextExercise.series)} serie · ${escapeHtml(nextExercise.reps)} reps</div>
+        <div class="fc-next-meta">Esercizio ${ei + 2} di ${days[di].exercises.length} · ${escapeHtml(nextExercise.series)} serie · ${escapeHtml(getExerciseRepsSummary(nextExercise))} reps</div>
       </div>
       <button class="fc-next-btn" type="button" onclick="focusNav(1)">Vai</button>
     </div>` : `
@@ -3337,7 +3404,7 @@ function renderFocusView(di, ei) {
     <div class="focus-top">
       <div class="fc-head">
         <div class="fc-name">${ex.name}</div>
-        <div class="fc-meta">${ex.series} serie - ${ex.reps} reps</div>
+        <div class="fc-meta">${ex.series} serie - ${getExerciseRepsSummary(ex)} reps</div>
       </div>
       <button class="hdr-btn fc-demo-btn" type="button" onclick="openExerciseDemo(${di},${ei})">DEMO</button>
     </div>
@@ -3844,8 +3911,8 @@ function renderImportReview(validationError = '') {
                 <input type="number" min="1" value="${escapeHtml(exercise.series)}" oninput="updateImportExerciseField(${di}, ${ei}, 'series', this.value)">
               </div>
               <div class="imp-field">
-                <label>Reps</label>
-                <input type="text" value="${escapeHtml(exercise.reps)}" oninput="updateImportExerciseField(${di}, ${ei}, 'reps', this.value)">
+                <label>Reps / schema serie</label>
+                <input type="text" placeholder="Es: 2x8, 1x8/12" value="${escapeHtml(exercise.reps)}" oninput="updateImportExerciseField(${di}, ${ei}, 'reps', this.value)">
               </div>
             </div>
             <div class="imp-field" style="margin-top:10px">
@@ -3917,8 +3984,12 @@ function updateImportExerciseField(dayIndex, exerciseIndex, field, value) {
   if (!exercise) return;
   if (field === 'series') {
     exercise[field] = Math.max(1, parseInt(value, 10) || 1);
+    exercise.repsPlan = deriveRepsPlan(exercise.reps, exercise.series, exercise.repsPlan);
   } else {
     exercise[field] = field === 'note' ? String(value || '') : cleanText(value);
+    if (field === 'reps') {
+      exercise.repsPlan = deriveRepsPlan(exercise.reps, exercise.series, []);
+    }
   }
 }
 
@@ -3927,7 +3998,7 @@ function addImportDay() {
   importDraft.days.push({
     name: 'Day ' + (importDraft.days.length + 1),
     label: '',
-    exercises: [{ name: '', series: 3, reps: '', note: '' }]
+    exercises: [{ name: '', series: 3, reps: '', repsPlan: [], note: '' }]
   });
   renderImportReview();
 }
@@ -3940,7 +4011,7 @@ function removeImportDay(dayIndex) {
 
 function addImportExercise(dayIndex) {
   if (!importDraft?.days[dayIndex]) return;
-  importDraft.days[dayIndex].exercises.push({ name: '', series: 3, reps: '', note: '' });
+  importDraft.days[dayIndex].exercises.push({ name: '', series: 3, reps: '', repsPlan: [], note: '' });
   renderImportReview();
 }
 

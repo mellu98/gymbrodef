@@ -75,6 +75,10 @@ const IMPORT_SCHEMA = {
                 name: { type: 'string' },
                 series: { type: 'integer', minimum: 1 },
                 reps: { type: 'string' },
+                repsPlan: {
+                  type: 'array',
+                  items: { type: 'string' }
+                },
                 note: { type: 'string' }
               }
             }
@@ -119,6 +123,10 @@ const COACH_PROGRAM_SCHEMA = {
                     name: { type: 'string' },
                     series: { type: 'integer', minimum: 1 },
                     reps: { type: 'string' },
+                    repsPlan: {
+                      type: 'array',
+                      items: { type: 'string' }
+                    },
                     note: { type: 'string' }
                   }
                 }
@@ -160,6 +168,9 @@ const SYSTEM_PROMPT = [
   'Ignora blocchi informativi non workout come "INFORMAZIONI UTILI", saluti, cardio generico o note fuori dalla scheda.',
   'Correggi i caratteri corrotti o strani quando il significato e` evidente, per esempio virgolette al posto di simboli errati e parole tronche dovute a encoding.',
   'Per ogni esercizio separa nome, numero serie, reps e note.',
+  'Mantieni interi i nomi esercizio, inclusi qualificatori finali come "alla Scott", "presa inversa", "al multipower", "su inclinata", "su panca 30".',
+  'Non spostare parti del nome esercizio dentro le note se fanno ancora parte del movimento.',
+  'Quando il PDF usa schemi reps diversi per serie, per esempio "2x8, 1x8/12", conserva reps in forma compatta e compila anche repsPlan serie-per-serie, per esempio ["8","8","8-12"].',
   'Se il PDF non e` una scheda workout o non e` leggibile come PDF testuale, segnalo chiaramente con i flag di rifiuto.',
   'Mantieni il testo in italiano quando presente nel documento.',
   'Non inventare giorni o esercizi mancanti: se qualcosa e` ambiguo, fai la miglior stima ma aggiungi un warning.'
@@ -226,6 +237,58 @@ function cleanString(value) {
     .trim();
   cleaned = cleaned.replace(/ ?· ?/g, ' · ');
   return cleaned;
+}
+
+function normalizeRepToken(value) {
+  return cleanString(String(value || ''))
+    .replace(/(\d)\s*\/\s*(\d)/g, '$1-$2')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function deriveRepsPlan(reps, series, explicitPlan = []) {
+  const targetSeries = Math.max(1, parseInt(series, 10) || 1);
+  const fromExplicit = (Array.isArray(explicitPlan) ? explicitPlan : []).map(normalizeRepToken).filter(Boolean);
+  if (fromExplicit.length) {
+    const plan = fromExplicit.slice(0, targetSeries);
+    while (plan.length < targetSeries) plan.push(plan[plan.length - 1] || normalizeRepToken(reps) || '-');
+    return plan;
+  }
+
+  const raw = normalizeRepToken(reps);
+  if (!raw) return Array.from({ length: targetSeries }, () => '-');
+
+  const commaParts = raw.split(/\s*,\s*/).map((part) => part.trim()).filter(Boolean);
+  if (commaParts.length > 1) {
+    const expanded = [];
+    let valid = true;
+    commaParts.forEach((part) => {
+      const match = part.match(/^(?:(\d+)\s*x\s*)?(.+)$/i);
+      if (!match || !normalizeRepToken(match[2])) {
+        valid = false;
+        return;
+      }
+      const count = Math.max(1, parseInt(match[1], 10) || 1);
+      const token = normalizeRepToken(match[2]);
+      for (let i = 0; i < count; i++) expanded.push(token);
+    });
+    if (valid && expanded.length) {
+      const plan = expanded.slice(0, targetSeries);
+      while (plan.length < targetSeries) plan.push(plan[plan.length - 1] || raw);
+      return plan;
+    }
+  }
+
+  const repeated = raw.match(/^(\d+)\s*x\s*(.+)$/i);
+  if (repeated && normalizeRepToken(repeated[2])) {
+    const count = Math.max(1, parseInt(repeated[1], 10) || 1);
+    const token = normalizeRepToken(repeated[2]);
+    if (count === targetSeries) {
+      return Array.from({ length: targetSeries }, () => token);
+    }
+  }
+
+  return Array.from({ length: targetSeries }, () => raw);
 }
 
 function slugify(value) {
@@ -630,7 +693,8 @@ function normalizeCandidateProgram(raw, filename) {
     const exercises = Array.isArray(day.exercises) ? day.exercises.map((exercise, exerciseIndex) => ({
       name: cleanString(exercise.name) || 'Esercizio ' + (exerciseIndex + 1),
       series: Math.max(1, Number.parseInt(exercise.series, 10) || 1),
-      reps: cleanString(String(exercise.reps ?? '')),
+      reps: normalizeRepToken(String(exercise.reps ?? '')),
+      repsPlan: deriveRepsPlan(exercise.reps, exercise.series, exercise.repsPlan),
       note: cleanString(exercise.note)
     })).filter((exercise) => exercise.name && exercise.reps) : [];
     return {
@@ -725,8 +789,9 @@ async function parseWorkoutPdf(file) {
   const userPrompt = [
     'Estrai questa scheda PDF in formato compatibile con una app palestra.',
     'Usa il nome file come contesto: ' + filename + '.',
-    'Restituisci giorni, label dei day, esercizi, serie, reps, note, durata del ciclo e nome atleta se presente.',
+    'Restituisci giorni, label dei day, esercizi, serie, reps, repsPlan, note, durata del ciclo e nome atleta se presente.',
     'Se trovi righe miste nome+serie+note, separale correttamente.',
+    'Se trovi righe come "2x8, 1x8/12", il nome esercizio deve restare completo e repsPlan deve esplodere le serie in ordine.',
     'Se il documento non e` una scheda workout o e` una scansione/foto difficilmente leggibile, rifiuta.',
     'Ogni day deve avere un name tipo "Day 1" e una label leggibile.'
   ].join(' ');
