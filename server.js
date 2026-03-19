@@ -369,6 +369,9 @@ const NUTRITION_PROGRAM_SYSTEM_PROMPT = [
   'Il piano deve distinguere training day e rest day.',
   'Ogni giorno deve avere target giornalieri e pasti concreti con cibi e grammi, senza ricette complesse.',
   'Privilegia cibi comuni, facili da reperire e coerenti con preferenze, esclusioni, budget e tempo di preparazione.',
+  'I cibi preferiti sono un riferimento, non devono monopolizzare il piano.',
+  'Ogni cibo preferito puo` comparire al massimo in un solo pasto per ciascun day template.',
+  'Varia molto le fonti proteiche, glucidiche e gli alimenti base tra i pasti, cosi` il piano sembra realistico e sostenibile.',
   'Evita promesse mediche, diete estreme, tagli calorici aggressivi e numeri irrealistici.',
   'Se alcuni dati sono mancanti, fai assunzioni prudenti e segnalale in warnings.'
 ].join(' ');
@@ -379,6 +382,8 @@ const NUTRITION_REFINEMENT_SYSTEM_PROMPT = [
   'Non rispondi con testo libero: restituisci solo JSON valido conforme allo schema.',
   'Aggiorna la bozza esistente nel modo piu` fedele possibile alla richiesta dell\'utente.',
   'Mantieni il piano realistico, semplice da seguire e coerente con obiettivo, preferenze, esclusioni e routine allenante.',
+  'I cibi preferiti non devono dominare tutto il piano: al massimo una presenza per day template.',
+  'Mantieni alta la varieta` quotidiana e non ripetere lo stesso alimento base in troppi pasti della stessa giornata.',
   'Non stravolgere il piano se l\'utente chiede modifiche locali.',
   'Nel campo summary descrivi in modo breve cosa hai cambiato concretamente.',
   'Nel campo rationale spiega perche` le modifiche hanno senso.',
@@ -1135,6 +1140,75 @@ function normalizeNutritionPlanCandidate(rawPlan) {
   };
 }
 
+function normalizeFoodMatchKey(value) {
+  return cleanString(value || '')
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function foodMatchesPreference(foodName, preference) {
+  const foodKey = normalizeFoodMatchKey(foodName);
+  const prefKey = normalizeFoodMatchKey(preference);
+  if (!foodKey || !prefKey) return false;
+  return foodKey.includes(prefKey) || prefKey.includes(foodKey);
+}
+
+function analyzeNutritionTemplateVariety(template, label, profile) {
+  const issues = [];
+  const preferredFoods = Array.isArray(profile?.preferredFoods) ? profile.preferredFoods : [];
+  const preferenceMealHits = new Map();
+  const foodMealHits = new Map();
+
+  template.meals.forEach((meal) => {
+    const seenInMeal = new Set();
+    meal.foods.forEach((food) => {
+      const foodKey = normalizeFoodMatchKey(food.name);
+      if (!foodKey) return;
+      if (!foodMealHits.has(foodKey)) foodMealHits.set(foodKey, new Set());
+      foodMealHits.get(foodKey).add(meal.id);
+      seenInMeal.add(foodKey);
+
+      preferredFoods.forEach((preferredFood) => {
+        if (!foodMatchesPreference(food.name, preferredFood)) return;
+        const prefKey = normalizeFoodMatchKey(preferredFood);
+        if (!preferenceMealHits.has(prefKey)) preferenceMealHits.set(prefKey, new Set());
+        preferenceMealHits.get(prefKey).add(meal.id);
+      });
+    });
+
+    if (seenInMeal.size === 1 && meal.foods.length === 1) {
+      issues.push(label + ': il pasto "' + meal.label + '" e` troppo minimale, prova a renderlo piu` realistico.');
+    }
+  });
+
+  preferenceMealHits.forEach((mealIds, preferredFood) => {
+    if (mealIds.size > 1) {
+      issues.push(label + ': il cibo preferito "' + preferredFood + '" compare in piu` pasti della stessa giornata.');
+    }
+  });
+
+  foodMealHits.forEach((mealIds, foodKey) => {
+    if (mealIds.size > 2) {
+      issues.push(label + ': l\'alimento base "' + foodKey + '" si ripete in troppi pasti della stessa giornata.');
+    }
+  });
+
+  if (foodMealHits.size && foodMealHits.size < Math.max(4, template.meals.length + 1)) {
+    issues.push(label + ': la varieta` degli alimenti e` bassa, aumenta la rotazione tra i pasti.');
+  }
+
+  return issues;
+}
+
+function getNutritionVarietyIssues(plan, profile) {
+  return [
+    ...analyzeNutritionTemplateVariety(plan.trainingDay, 'Training day', profile),
+    ...analyzeNutritionTemplateVariety(plan.restDay, 'Rest day', profile)
+  ];
+}
+
 function validateNutritionTemplate(template, label) {
   if (!template.meals.length) {
     const error = new Error('Il piano alimentare non contiene pasti validi per il ' + label + '.');
@@ -1162,6 +1236,9 @@ function validateAiGeneratedNutritionPlan(result, profile) {
   if (profile.mealsPerDay && plan.restDay.meals.length !== profile.mealsPerDay) {
     warnings.push('Il rest day ha ' + plan.restDay.meals.length + ' pasti invece dei ' + profile.mealsPerDay + ' richiesti: controllalo prima di salvarlo.');
   }
+  getNutritionVarietyIssues(plan, profile).forEach((issue) => {
+    if (!warnings.includes(issue)) warnings.push(issue);
+  });
 
   return {
     candidateNutritionPlan: plan,
@@ -1177,6 +1254,78 @@ function validateAiRefinedNutritionPlan(result, profile) {
     ...validated,
     summary: cleanString(result?.summary || 'Piano alimentare aggiornato.')
   };
+}
+
+async function repairNutritionVarietyIfNeeded(planResult, profile, workoutProfile, context, modeLabel, requestText = '') {
+  const issues = getNutritionVarietyIssues(planResult.candidateNutritionPlan, profile);
+  if (!issues.length) return planResult;
+
+  const response = await client.responses.create({
+    model: OPENAI_MODEL,
+    max_output_tokens: 3200,
+    input: [
+      {
+        role: 'system',
+        content: [
+          { type: 'input_text', text: NUTRITION_REFINEMENT_SYSTEM_PROMPT }
+        ]
+      },
+      {
+        role: 'user',
+        content: [
+          {
+            type: 'input_text',
+            text: [
+              'Correggi la seguente bozza di piano alimentare per aumentare la varieta` e ridurre la ripetizione dei cibi preferiti.',
+              '',
+              'Contesto nutrizione e allenamento:',
+              buildNutritionContextText(profile, workoutProfile, context),
+              '',
+              'Bozza attuale:',
+              JSON.stringify(planResult.candidateNutritionPlan, null, 2),
+              '',
+              'Problemi da correggere obbligatoriamente:',
+              issues.map((issue) => '- ' + issue).join('\n'),
+              '',
+              'Vincoli obbligatori:',
+              '- ogni cibo preferito puo` comparire al massimo in un solo pasto del training day e in un solo pasto del rest day',
+              '- aumenta la varieta` reale del piano',
+              '- non ripetere lo stesso alimento base in troppi pasti della stessa giornata',
+              '- mantieni il piano pratico, realistico e coerente con il profilo',
+              requestText ? ('- preserva anche questa richiesta utente: ' + requestText) : '',
+              modeLabel ? ('- contesto fase: ' + modeLabel) : '',
+              '',
+              'Restituisci solo JSON valido nello stesso formato.'
+            ].filter(Boolean).join('\n')
+          }
+        ]
+      }
+    ],
+    text: {
+      format: {
+        type: 'json_schema',
+        name: 'nutrition_ai_variety_repair',
+        strict: true,
+        schema: NUTRITION_REFINEMENT_SCHEMA
+      }
+    }
+  });
+
+  if (!response.output_text) {
+    return planResult;
+  }
+
+  const repaired = JSON.parse(response.output_text);
+  const validated = validateAiRefinedNutritionPlan(repaired, profile);
+  const remainingIssues = getNutritionVarietyIssues(validated.candidateNutritionPlan, profile);
+  if (remainingIssues.length) {
+    remainingIssues.forEach((issue) => {
+      if (!validated.warnings.includes(issue)) validated.warnings.push(issue);
+    });
+  } else {
+    validated.warnings = validated.warnings.filter((warning) => !issues.includes(warning));
+  }
+  return validated;
 }
 
 function normalizeCandidateProgram(raw, filename) {
@@ -1680,7 +1829,8 @@ async function generateNutritionPlan(profileInput, workoutProfileInput, contextI
   }
 
   const parsed = JSON.parse(response.output_text);
-  return validateAiGeneratedNutritionPlan(parsed, profile);
+  const validated = validateAiGeneratedNutritionPlan(parsed, profile);
+  return repairNutritionVarietyIfNeeded(validated, profile, workoutProfile, context, 'generazione iniziale');
 }
 
 async function refineNutritionPlan(profileInput, workoutProfileInput, contextInput, candidatePlanInput, messagesInput, requestInput) {
@@ -1763,7 +1913,8 @@ async function refineNutritionPlan(profileInput, workoutProfileInput, contextInp
   }
 
   const parsed = JSON.parse(response.output_text);
-  return validateAiRefinedNutritionPlan(parsed, profile);
+  const validated = validateAiRefinedNutritionPlan(parsed, profile);
+  return repairNutritionVarietyIfNeeded(validated, profile, workoutProfile, context, 'rifinitura bozza', requestText);
 }
 
 app.use((req, res, next) => {
