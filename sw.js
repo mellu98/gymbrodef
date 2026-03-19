@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gym-bro-massi-v12';
+const CACHE_NAME = 'hypercore-ai-v13';
 const APP_SHELL = [
   './',
   './index.html',
@@ -7,7 +7,7 @@ const APP_SHELL = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
-  './icons/logo-header-v2.png'
+  './icons/hypercore-wordmark.svg'
 ];
 
 self.addEventListener('install', (event) => {

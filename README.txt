@@ -1,4 +1,4 @@
-MASSI GYM - PWA CON IMPORT PDF PT
+HYPERCORE AI - PWA FITNESS CON COACH AI
 
 Contenuto:
 - index.html -> app principale

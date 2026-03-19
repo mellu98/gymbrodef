@@ -1,8 +1,8 @@
 {
   "id": "./",
-  "name": "Massi Gym Schede",
-  "short_name": "Massi Gym",
-  "description": "Schede di allenamento interattive con giorni, serie, carichi, note, timer e storico locale.",
+  "name": "HyperCore AI",
+  "short_name": "HyperCore",
+  "description": "Allenamento, nutrizione, progressi e Coach AI in un'unica app fitness interattiva.",
   "lang": "it",
   "start_url": "./",
   "scope": "./",

@@ -330,7 +330,7 @@ const SYSTEM_PROMPT = [
 ].join(' ');
 
 const CHAT_SYSTEM_PROMPT = [
-  'Sei l\'Assistente AI rapido di Massi Gym, una mini chat flottante sempre disponibile durante la consultazione della scheda e durante il workout.',
+  'Sei l\'Assistente AI rapido di HyperCore AI, una mini chat flottante sempre disponibile durante la consultazione della scheda e durante il workout.',
   'Rispondi sempre in italiano con tono pratico, operativo e rassicurante.',
   'Sei specializzato in chiarimenti veloci su esercizi, ordine della scheda, recupero, gestione dei carichi, progressione settimana per settimana e dubbi rapidi durante l\'allenamento.',
   'Usa il contesto della schermata corrente quando presente, senza ripeterlo in blocco e senza inventare dati mancanti.',
@@ -340,7 +340,7 @@ const CHAT_SYSTEM_PROMPT = [
 ].join(' ');
 
 const COACH_PROGRAM_SYSTEM_PROMPT = [
-  'Sei il Coach AI di Massi Gym e lavori come un personal trainer pratico.',
+  'Sei il Coach AI di HyperCore AI e lavori come un personal trainer pratico.',
   'Generi nuove schede palestra realistiche e progressive usando prima lo storico reale dell\'utente e poi le sue preferenze.',
   'Mantieni continuita` con le schede precedenti quando ha senso, a meno che il contesto chieda un cambio netto.',
   'Rispondi sempre in italiano e restituisci solo JSON valido conforme allo schema.',
@@ -351,7 +351,7 @@ const COACH_PROGRAM_SYSTEM_PROMPT = [
 ].join(' ');
 
 const COACH_REFINEMENT_SYSTEM_PROMPT = [
-  'Sei il Coach AI di Massi Gym nella fase di rifinitura bozza.',
+  'Sei il Coach AI di HyperCore AI nella fase di rifinitura bozza.',
   'Ricevi una scheda gia` generata e una richiesta di modifica in linguaggio naturale.',
   'Non rispondi con spiegazioni libere: restituisci solo JSON valido conforme allo schema.',
   'Il tuo compito e` aggiornare la bozza esistente nel modo piu` fedele possibile alla richiesta dell\'utente.',
@@ -363,7 +363,7 @@ const COACH_REFINEMENT_SYSTEM_PROMPT = [
 ].join(' ');
 
 const NUTRITION_PROGRAM_SYSTEM_PROMPT = [
-  'Sei il Nutrition Coach AI di Massi Gym.',
+  'Sei il Nutrition Coach AI di HyperCore AI.',
   'Generi piani alimentari pratici, realistici e facili da seguire per utenti palestra.',
   'Rispondi sempre in italiano e restituisci solo JSON valido conforme allo schema.',
   'Il piano deve distinguere training day e rest day.',
@@ -377,7 +377,7 @@ const NUTRITION_PROGRAM_SYSTEM_PROMPT = [
 ].join(' ');
 
 const NUTRITION_REFINEMENT_SYSTEM_PROMPT = [
-  'Sei il Nutrition Coach AI di Massi Gym nella fase di rifinitura bozza.',
+  'Sei il Nutrition Coach AI di HyperCore AI nella fase di rifinitura bozza.',
   'Ricevi una bozza di piano alimentare e una richiesta di modifica in linguaggio naturale.',
   'Non rispondi con testo libero: restituisci solo JSON valido conforme allo schema.',
   'Aggiorna la bozza esistente nel modo piu` fedele possibile alla richiesta dell\'utente.',
@@ -1710,7 +1710,7 @@ async function generateAiProgram(profileInput, contextInput, answersInput) {
           {
             type: 'input_text',
             text: [
-              'Usa il seguente contesto per generare una nuova scheda JSON compatibile con Massi Gym.',
+              'Usa il seguente contesto per generare una nuova scheda JSON compatibile con HyperCore AI.',
               '',
               'Profilo e memoria utente:',
               buildCoachContextText(profile, context),
@@ -1783,7 +1783,7 @@ async function refineAiProgram(profileInput, contextInput, candidateProgramInput
           {
             type: 'input_text',
             text: [
-              'Aggiorna la seguente bozza Coach AI senza rompere il formato JSON compatibile con Massi Gym.',
+              'Aggiorna la seguente bozza Coach AI senza rompere il formato JSON compatibile con HyperCore AI.',
               '',
               'Profilo e memoria utente:',
               buildCoachContextText(profile, context),
@@ -1863,7 +1863,7 @@ async function generateNutritionPlan(profileInput, workoutProfileInput, contextI
           {
             type: 'input_text',
             text: [
-              'Usa il seguente contesto per generare un piano alimentare JSON compatibile con Massi Gym.',
+              'Usa il seguente contesto per generare un piano alimentare JSON compatibile con HyperCore AI.',
               '',
               'Contesto nutrizione e allenamento:',
               buildNutritionContextText(profile, workoutProfile, context),
@@ -1943,7 +1943,7 @@ async function refineNutritionPlan(profileInput, workoutProfileInput, contextInp
           {
             type: 'input_text',
             text: [
-              'Aggiorna la seguente bozza di piano alimentare senza rompere il formato JSON compatibile con Massi Gym.',
+              'Aggiorna la seguente bozza di piano alimentare senza rompere il formato JSON compatibile con HyperCore AI.',
               '',
               'Contesto nutrizione e allenamento:',
               buildNutritionContextText(profile, workoutProfile, context),
@@ -2205,5 +2205,5 @@ app.use((error, _req, res, _next) => {
 });
 
 app.listen(PORT, () => {
-  console.log('Massi Gym server attivo su http://localhost:' + PORT);
+  console.log('HyperCore AI server attivo su http://localhost:' + PORT);
 });
