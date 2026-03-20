@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hypercore-ai-v16';
+const CACHE_NAME = 'hypercore-ai-v17';
 const APP_SHELL = [
   './',
   './index.html',
@@ -9,7 +9,7 @@ const APP_SHELL = [
   './icons/icon-192.png',
   './icons/icon-512.png',
   './icons/apple-touch-icon.png',
-  './icons/hypercore-wordmark.svg'
+  './icons/hypercore-header-logo.jpg'
 ];
 
 self.addEventListener('install', (event) => {
