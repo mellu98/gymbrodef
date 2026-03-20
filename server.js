@@ -346,6 +346,7 @@ const COACH_PROGRAM_SYSTEM_PROMPT = [
   'Mantieni continuita` con le schede precedenti quando ha senso, a meno che il contesto chieda un cambio netto.',
   'Rispondi sempre in italiano e restituisci solo JSON valido conforme allo schema.',
   'La scheda deve essere adatta al livello dichiarato, all\'attrezzatura disponibile, alla durata media della seduta e ai giorni a settimana.',
+  'Interpreta home_gym come casa con manubri ma senza panca. Interpreta bodyweight_home come allenamento a corpo libero in casa, senza manubri e senza panca.',
   'Usa esercizi comprensibili e note brevi, concrete e non prolisse.',
   'Evita programmi estremi, volumi irrealistici o esercizi incompatibili con limitazioni e attrezzatura.',
   'Se alcuni dati sono mancanti, fai assunzioni prudenti e segnala quei punti in warnings.'
@@ -373,6 +374,7 @@ const NUTRITION_PROGRAM_SYSTEM_PROMPT = [
   'I cibi preferiti sono un riferimento, non devono monopolizzare il piano.',
   'Ogni cibo preferito puo` comparire al massimo in un solo pasto per ciascun day template.',
   'Varia molto le fonti proteiche, glucidiche e gli alimenti base tra i pasti, cosi` il piano sembra realistico e sostenibile.',
+  'Se il profilo e` parziale, non fermarti a chiedere altro: fai inferenze prudenti dal contesto e segnala le assunzioni in warnings.',
   'Evita promesse mediche, diete estreme, tagli calorici aggressivi e numeri irrealistici.',
   'Se alcuni dati sono mancanti, fai assunzioni prudenti e segnalale in warnings.'
 ].join(' ');
@@ -383,6 +385,7 @@ const NUTRITION_REFINEMENT_SYSTEM_PROMPT = [
   'Non rispondi con testo libero: restituisci solo JSON valido conforme allo schema.',
   'Aggiorna la bozza esistente nel modo piu` fedele possibile alla richiesta dell\'utente.',
   'Mantieni il piano realistico, semplice da seguire e coerente con obiettivo, preferenze, esclusioni e routine allenante.',
+  'Se il profilo e` incompleto, lavora comunque con le informazioni presenti e usa assunzioni prudenti invece di bloccare il risultato.',
   'I cibi preferiti non devono dominare tutto il piano: al massimo una presenza per day template.',
   'Mantieni alta la varieta` quotidiana e non ripetere lo stesso alimento base in troppi pasti della stessa giornata.',
   'Non stravolgere il piano se l\'utente chiede modifiche locali.',
@@ -619,6 +622,29 @@ function normalizeStringList(value) {
   return source.map(cleanString).filter(Boolean).slice(0, 12);
 }
 
+function normalizeCoachEquipmentValue(value) {
+  const key = cleanString(value || '').toLowerCase();
+  if (!key) return '';
+  if (['palestra completa', 'palestra_completa', 'full gym', 'full_gym'].includes(key)) return 'palestra_completa';
+  if (['palestra essenziale', 'palestra_essenziale', 'basic gym', 'basic_gym'].includes(key)) return 'basic_gym';
+  if (['home gym', 'home_gym', 'home gym con manubri', 'casa con manubri', 'manubri a casa'].includes(key)) return 'home_gym';
+  if (['corpo libero a casa', 'bodyweight home', 'bodyweight_home', 'calisthenics home', 'calisthenics_home', 'calistenico', 'calisthenics'].includes(key)) {
+    return 'bodyweight_home';
+  }
+  return cleanString(value || '');
+}
+
+function formatCoachEquipmentLabel(value) {
+  const labels = {
+    palestra_completa: 'Palestra completa',
+    basic_gym: 'Palestra essenziale',
+    home_gym: 'Home gym con manubri, senza panca',
+    bodyweight_home: 'Corpo libero a casa'
+  };
+  const key = normalizeCoachEquipmentValue(value);
+  return labels[key] || cleanString(value || '');
+}
+
 function normalizeAiProfile(rawProfile, context = null) {
   const safe = rawProfile && typeof rawProfile === 'object' ? rawProfile : {};
   const inferredDays = Math.max(
@@ -634,7 +660,7 @@ function normalizeAiProfile(rawProfile, context = null) {
     experience: cleanString(safe.experience || ''),
     daysPerWeek: inferredDays,
     sessionLength: cleanString(safe.sessionLength || ''),
-    equipment: cleanString(safe.equipment || ''),
+    equipment: normalizeCoachEquipmentValue(safe.equipment || ''),
     focusAreas: normalizeStringList(safe.focusAreas || []),
     avoidExercises: normalizeStringList(safe.avoidExercises || []),
     limitations: cleanString(safe.limitations || ''),
@@ -689,7 +715,7 @@ function buildCoachContextText(profile, context) {
   if (profile.experience) lines.push('Livello: ' + profile.experience);
   if (profile.daysPerWeek) lines.push('Giorni richiesti a settimana: ' + profile.daysPerWeek);
   if (profile.sessionLength) lines.push('Durata media seduta: ' + profile.sessionLength + ' minuti');
-  if (profile.equipment) lines.push('Attrezzatura disponibile: ' + profile.equipment);
+  if (profile.equipment) lines.push('Attrezzatura disponibile: ' + formatCoachEquipmentLabel(profile.equipment));
   if (profile.focusAreas.length) lines.push('Focus desiderati: ' + profile.focusAreas.join(', '));
   if (profile.avoidExercises.length) lines.push('Esercizi da evitare: ' + profile.avoidExercises.join(', '));
   if (profile.limitations) lines.push('Limitazioni o fastidi: ' + profile.limitations);
@@ -786,15 +812,20 @@ function normalizeNutritionContext(rawContext) {
 
 function buildNutritionContextText(profile, workoutProfile, context) {
   const lines = [];
+  const missingSignals = [];
 
   if (profile.goal) lines.push('Obiettivo alimentare: ' + profile.goal);
+  else missingSignals.push('obiettivo alimentare');
   if (profile.currentWeightKg) lines.push('Peso attuale: ' + profile.currentWeightKg + ' kg');
+  else missingSignals.push('peso attuale');
   if (profile.targetWeightKg) lines.push('Peso target: ' + profile.targetWeightKg + ' kg');
   if (profile.heightCm) lines.push('Altezza: ' + profile.heightCm + ' cm');
   if (profile.age) lines.push('Eta`: ' + profile.age);
   if (profile.sex) lines.push('Sesso dichiarato: ' + profile.sex);
   if (profile.mealsPerDay) lines.push('Pasti al giorno desiderati: ' + profile.mealsPerDay);
+  else missingSignals.push('numero pasti giornalieri');
   if (profile.dietStyle) lines.push('Stile alimentare: ' + profile.dietStyle);
+  else missingSignals.push('stile alimentare');
   if (profile.allergies.length) lines.push('Allergie o intolleranze: ' + profile.allergies.join(', '));
   if (profile.excludedFoods.length) lines.push('Cibi da evitare: ' + profile.excludedFoods.join(', '));
   if (profile.preferredFoods.length) lines.push('Cibi preferiti: ' + profile.preferredFoods.join(', '));
@@ -806,7 +837,7 @@ function buildNutritionContextText(profile, workoutProfile, context) {
   if (workoutProfile.experience) lines.push('Livello allenamento: ' + workoutProfile.experience);
   if (workoutProfile.daysPerWeek) lines.push('Allenamenti a settimana desiderati: ' + workoutProfile.daysPerWeek);
   if (workoutProfile.sessionLength) lines.push('Durata media allenamento: ' + workoutProfile.sessionLength + ' minuti');
-  if (workoutProfile.equipment) lines.push('Attrezzatura: ' + workoutProfile.equipment);
+  if (workoutProfile.equipment) lines.push('Attrezzatura: ' + formatCoachEquipmentLabel(workoutProfile.equipment));
   if (workoutProfile.focusAreas.length) lines.push('Focus muscolari: ' + workoutProfile.focusAreas.join(', '));
   if (workoutProfile.limitations) lines.push('Limitazioni da considerare: ' + workoutProfile.limitations);
 
@@ -843,6 +874,11 @@ function buildNutritionContextText(profile, workoutProfile, context) {
   if (context.nutritionSummary?.averageWaterMl) {
     lines.push('Media acqua recente: ' + context.nutritionSummary.averageWaterMl + ' ml');
   }
+
+  if (missingSignals.length) {
+    lines.push('Dati mancanti o non confermati: ' + missingSignals.join(', '));
+  }
+  lines.push('Regola operativa: se il profilo e` parziale, fai inferenze prudenti basate sui dati disponibili e non bloccare la generazione con ulteriori domande se puoi comunque costruire un piano sensato.');
 
   return lines.join('\n');
 }
@@ -907,7 +943,8 @@ function createAiIntakeQuestions(profile, context) {
       options: [
         { value: 'palestra_completa', label: 'Palestra completa' },
         { value: 'basic_gym', label: 'Palestra essenziale' },
-        { value: 'home_gym', label: 'Home gym' }
+        { value: 'home_gym', label: 'Home gym con manubri, senza panca' },
+        { value: 'bodyweight_home', label: 'Corpo libero a casa' }
       ]
     });
   }
@@ -925,7 +962,22 @@ function createAiIntakeQuestions(profile, context) {
 
 function createNutritionIntakeQuestions(profile, workoutProfile, answersInput = {}) {
   const questions = [];
-  const sessionAnswers = answersInput && typeof answersInput === 'object' ? answersInput : {};
+  const knownCoreSignals = [
+    profile.goal,
+    profile.currentWeightKg,
+    profile.mealsPerDay,
+    profile.dietStyle,
+    profile.excludedFoods.length || profile.allergies.length,
+    workoutProfile.goal,
+    workoutProfile.experience,
+    workoutProfile.daysPerWeek,
+    workoutProfile.equipment
+  ].filter(Boolean).length;
+
+  if (knownCoreSignals >= 2) {
+    return [];
+  }
+
   if (!profile.goal) {
     questions.push({
       id: 'goal',
@@ -949,37 +1001,6 @@ function createNutritionIntakeQuestions(profile, workoutProfile, answersInput = 
       placeholder: 'Es: 82'
     });
   }
-  if (!profile.heightCm) {
-    questions.push({
-      id: 'heightCm',
-      label: 'Altezza',
-      question: 'Qual e` la tua altezza in cm?',
-      type: 'text',
-      placeholder: 'Es: 178'
-    });
-  }
-  if (!profile.age) {
-    questions.push({
-      id: 'age',
-      label: 'Eta`',
-      question: 'Quanti anni hai?',
-      type: 'text',
-      placeholder: 'Es: 29'
-    });
-  }
-  if (!profile.sex) {
-    questions.push({
-      id: 'sex',
-      label: 'Sesso',
-      question: 'Con quale riferimento vuoi che il piano venga calibrato?',
-      type: 'select',
-      options: [
-        { value: 'uomo', label: 'Uomo' },
-        { value: 'donna', label: 'Donna' },
-        { value: 'altro', label: 'Altro / preferisco non dirlo' }
-      ]
-    });
-  }
   if (!profile.mealsPerDay) {
     questions.push({
       id: 'mealsPerDay',
@@ -989,7 +1010,7 @@ function createNutritionIntakeQuestions(profile, workoutProfile, answersInput = 
       options: [3, 4, 5, 6].map((value) => ({ value: String(value), label: String(value) }))
     });
   }
-  if (!profile.dietStyle) {
+  if (!profile.dietStyle && questions.length < 3) {
     questions.push({
       id: 'dietStyle',
       label: 'Stile alimentare',
@@ -1004,61 +1025,7 @@ function createNutritionIntakeQuestions(profile, workoutProfile, answersInput = 
       ]
     });
   }
-  if (!profile.cookingTime && !workoutProfile.sessionLength) {
-    questions.push({
-      id: 'cookingTime',
-      label: 'Tempo cucina',
-      question: 'Quanto tempo vuoi dedicare alla preparazione dei pasti?',
-      type: 'select',
-      options: [
-        { value: 'molto_rapido', label: 'Molto rapido' },
-        { value: 'medio', label: 'Medio' },
-        { value: 'completo', label: 'Completo' }
-      ]
-    });
-  }
-  if (!cleanString(sessionAnswers.varietyPreference || '')) {
-    questions.push({
-      id: 'varietyPreference',
-      label: 'Varieta` pasti',
-      question: 'Quanto vuoi variare i pasti durante la settimana?',
-      type: 'select',
-      options: [
-        { value: 'alta', label: 'Alta varieta`' },
-        { value: 'media', label: 'Varieta` media' },
-        { value: 'bassa', label: 'Pochi pasti ripetibili' }
-      ]
-    });
-  }
-  if (!cleanString(sessionAnswers.mealStylePriority || '')) {
-    questions.push({
-      id: 'mealStylePriority',
-      label: 'Priorita` pasti',
-      question: 'Cosa conta di piu` in questo piano?',
-      type: 'select',
-      options: [
-        { value: 'semplicita', label: 'Semplicita`' },
-        { value: 'performance', label: 'Performance in palestra' },
-        { value: 'sazieta', label: 'Sazieta`' },
-        { value: 'gusto', label: 'Gusto e piacere' }
-      ]
-    });
-  }
-  if (!cleanString(sessionAnswers.outsideMeals || '')) {
-    questions.push({
-      id: 'outsideMeals',
-      label: 'Pasti fuori casa',
-      question: 'Quanti pasti al giorno fai spesso fuori casa o al volo?',
-      type: 'select',
-      options: [
-        { value: '0', label: 'Quasi nessuno' },
-        { value: '1', label: 'Uno' },
-        { value: '2', label: 'Due' },
-        { value: '3+', label: 'Tre o piu`' }
-      ]
-    });
-  }
-  return questions.slice(0, 8);
+  return questions.slice(0, 3);
 }
 
 function buildNutritionAnswerContext(answersInput) {
@@ -1841,11 +1808,13 @@ async function generateNutritionPlan(profileInput, workoutProfileInput, contextI
   const profile = normalizeNutritionProfile({ ...(profileInput || {}), ...(answersInput || {}) }, workoutProfile);
   const answerContext = buildNutritionAnswerContext(answersInput);
   const missingQuestions = createNutritionIntakeQuestions(profile, workoutProfile, answersInput);
+  const readinessWarnings = [];
   if (missingQuestions.length) {
-    const error = new Error('Mancano ancora alcune informazioni prima di generare il piano alimentare.');
-    error.statusCode = 422;
-    error.questions = missingQuestions;
-    throw error;
+    readinessWarnings.push(
+      'Profilo nutrizione parziale: il piano e` stato generato con inferenze prudenti su ' +
+      missingQuestions.slice(0, 3).map((question) => question.label).join(', ') +
+      '.'
+    );
   }
 
   const response = await client.responses.create({
@@ -1868,6 +1837,8 @@ async function generateNutritionPlan(profileInput, workoutProfileInput, contextI
               '',
               'Contesto nutrizione e allenamento:',
               buildNutritionContextText(profile, workoutProfile, context),
+              '',
+              missingQuestions.length ? 'Nota: il profilo e` incompleto ma la generazione deve proseguire comunque con assunzioni prudenti.' : '',
               '',
               answerContext.length ? 'Preferenze extra per questa generazione:' : '',
               answerContext.length ? answerContext.join('\n') : '',
@@ -1903,6 +1874,9 @@ async function generateNutritionPlan(profileInput, workoutProfileInput, contextI
 
   const parsed = JSON.parse(response.output_text);
   const validated = validateAiGeneratedNutritionPlan(parsed, profile);
+  if (readinessWarnings.length) {
+    validated.warnings = [...readinessWarnings, ...validated.warnings];
+  }
   return repairNutritionVarietyIfNeeded(validated, profile, workoutProfile, context, 'generazione iniziale');
 }
 
