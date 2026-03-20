@@ -724,7 +724,7 @@ body{font-family:'DM Sans',sans-serif;background:
     --hdr-bottom-gap:7px;
     padding:calc(var(--hdr-top-gap) + var(--safe-top)) calc(14px + var(--safe-right)) var(--hdr-bottom-gap) calc(14px + var(--safe-left))
   }
-.hdr-logo{height:clamp(35px,4.7vw,41px);max-width:min(51vw,220px)}
+  .hdr-logo{height:clamp(33px,4.4vw,38px);max-width:min(47vw,204px)}
   .hdr-menu-btn{width:38px;height:38px;border-radius:12px}
   .hdr-dropdown{left:0;right:auto;min-width:min(248px,calc(100vw - 28px))}
   .hdr-actions{gap:6px;flex-wrap:wrap;justify-content:flex-end}
