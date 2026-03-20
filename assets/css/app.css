@@ -358,6 +358,7 @@ body{font-family:'DM Sans',sans-serif;background:
 .coach-field textarea{resize:vertical;min-height:92px;line-height:1.5}
 .coach-field input:focus,.coach-field select:focus,.coach-field textarea:focus{border-color:var(--g)}
 .coach-note{margin-top:12px;font-size:12px;color:var(--tm);line-height:1.7}
+.coach-field-tip{font-size:11px;line-height:1.55;color:var(--tm);margin-top:2px}
 .coach-summary{display:flex;flex-direction:column;gap:10px}
 .coach-summary-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #171717}
 .coach-summary-item:first-child{padding-top:0}
@@ -437,6 +438,18 @@ body{font-family:'DM Sans',sans-serif;background:
 .coach-refine-compose textarea:focus{border-color:var(--g)}
 .coach-refine-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
 .coach-refine-actions .hdr-btn[disabled]{opacity:.5;cursor:not-allowed}
+.nutrition-wizard-card{
+  background:linear-gradient(180deg,rgba(0,230,118,.06),rgba(255,255,255,.02));
+  border-color:rgba(0,230,118,.14)
+}
+.nutrition-wizard-copy{font-size:12px;color:var(--tm);line-height:1.7;margin-top:8px}
+.nutrition-wizard-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.nutrition-wizard-chips span{
+  font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--t);
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);
+  border-radius:999px;padding:6px 9px
+}
+.nutrition-wizard-note{margin-top:10px;font-size:11px;line-height:1.6;color:var(--tm)}
 
 /* NUTRITION */
 .nutrition-shell{max-width:1040px;margin:0 auto}
@@ -478,6 +491,9 @@ body{font-family:'DM Sans',sans-serif;background:
 .nutrition-history-list{display:flex;flex-direction:column;gap:10px}
 .nutrition-empty{font-size:12px;color:var(--tm);line-height:1.7}
 .nutrition-refine-note{font-size:12px;color:var(--tm);line-height:1.7;margin-bottom:12px}
+.nutrition-question-note{
+  font-size:11px;line-height:1.55;color:var(--tm);margin:-4px 0 8px;
+}
 .nutrition-refine-thread{display:flex;flex-direction:column;gap:10px;min-height:180px;max-height:320px;overflow-y:auto;padding:2px 2px 2px 0}
 .nutrition-refine-msg{max-width:92%;padding:12px 14px;border-radius:18px;border:1px solid rgba(255,255,255,.08);font-size:13px;line-height:1.7;white-space:pre-wrap;word-break:break-word}
 .nutrition-refine-msg.user{align-self:flex-end;background:linear-gradient(180deg,rgba(0,230,118,.14),rgba(0,200,83,.08));border-color:rgba(0,230,118,.18)}

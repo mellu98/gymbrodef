@@ -982,7 +982,7 @@ function normalizeUserProfile(rawProfile = {}) {
     experience: cleanText(safe.experience || ''),
     daysPerWeek: Math.max(0, parseInt(safe.daysPerWeek, 10) || inferredDays || 0),
     sessionLength: cleanText(safe.sessionLength || ''),
-    equipment: cleanText(safe.equipment || ''),
+    equipment: normalizeCoachEquipmentValue(safe.equipment || ''),
     focusAreas: normalizeTextList(safe.focusAreas || []),
     avoidExercises: normalizeTextList(safe.avoidExercises || []),
     limitations: cleanText(safe.limitations || ''),
@@ -1014,6 +1014,64 @@ function saveUserProfile(profile) {
 
 function profileListValue(values) {
   return (Array.isArray(values) ? values : []).map(cleanText).filter(Boolean).join(', ');
+}
+
+function normalizeCoachEquipmentValue(value) {
+  const safe = cleanText(value || '');
+  const aliases = {
+    palestra_completa: 'palestra_completa',
+    'Palestra completa': 'palestra_completa',
+    basic_gym: 'basic_gym',
+    'Palestra essenziale': 'basic_gym',
+    home_gym: 'home_gym',
+    'Home gym': 'home_gym',
+    'Home gym con manubri, senza panca': 'home_gym',
+    bodyweight_home: 'bodyweight_home',
+    'Corpo libero a casa': 'bodyweight_home',
+    'Calistenico a corpo libero in casa': 'bodyweight_home'
+  };
+  return aliases[safe] || safe;
+}
+
+function getCoachEquipmentLabel(value) {
+  const safe = normalizeCoachEquipmentValue(value || '');
+  const labels = {
+    palestra_completa: 'Palestra completa',
+    basic_gym: 'Palestra essenziale',
+    home_gym: 'Home gym con manubri, senza panca',
+    bodyweight_home: 'Corpo libero a casa'
+  };
+  return labels[safe] || safe;
+}
+
+function buildNutritionProfileSnapshot(profile = {}) {
+  const known = [];
+  const missing = [];
+  const addText = (label, value) => {
+    const cleaned = cleanText(value || '');
+    if (cleaned) known.push(`${label}: ${cleaned}`);
+    else missing.push(label);
+  };
+  const addNumber = (label, value, suffix = '') => {
+    const parsed = Math.max(0, parseInt(value, 10) || 0);
+    if (parsed > 0) known.push(`${label}: ${parsed}${suffix}`);
+    else missing.push(label);
+  };
+  addText('Obiettivo', profile.goal);
+  addNumber('Peso attuale', profile.currentWeightKg, ' kg');
+  addNumber('Peso target', profile.targetWeightKg, ' kg');
+  addNumber('Pasti', profile.mealsPerDay);
+  addText('Stile', profile.dietStyle);
+  addText('Preferiti', profileListValue(profile.preferredFoods));
+  addText('Da evitare', profileListValue(profile.excludedFoods));
+  addText('Budget', profile.budgetStyle);
+  addText('Tempo cucina', profile.cookingTime);
+  return {
+    known,
+    missing,
+    hasBase: known.length > 0,
+    headline: known.slice(0, 3).join(' · ') || 'Profilo ancora vuoto'
+  };
 }
 
 function getCoachFieldValue(id) {
@@ -1084,6 +1142,7 @@ function buildAiProgressionSummary() {
 }
 
 function buildAiContext() {
+  const profile = getUserProfile();
   const recentPrograms = PROGRAMS.slice(0, 4).map((program) => {
     const stats = getProgramStats(program);
     return {
@@ -1117,6 +1176,17 @@ function buildAiContext() {
       totalDaysThisWeek: getDays().length,
       dayLabels: getDays().map((day) => cleanText(day.label || day.name)).filter(Boolean)
     } : null,
+    userProfile: {
+      name: profile.name,
+      goal: profile.goal,
+      experience: profile.experience,
+      daysPerWeek: profile.daysPerWeek,
+      sessionLength: profile.sessionLength,
+      equipment: profile.equipment,
+      equipmentLabel: getCoachEquipmentLabel(profile.equipment),
+      focusAreas: profile.focusAreas,
+      avoidExercises: profile.avoidExercises
+    },
     recentPrograms,
     historySummary,
     progressionSummary: buildAiProgressionSummary()
@@ -1432,8 +1502,10 @@ function buildNutritionAiContext() {
   const summary = buildNutritionSummary();
   const selectedDate = nutritionSelectedDate || getTodayDateKey();
   const selectedEntry = getNutritionLogEntry(selectedDate, summary.activePlan?.id || '');
+  const profile = getNutritionProfile();
   return {
     ...workoutContext,
+    nutritionProfileSummary: buildNutritionProfileSnapshot(profile),
     nutritionSummary: {
       activePlanTitle: cleanText(summary.activePlan?.title || ''),
       selectedDate,
@@ -1955,8 +2027,10 @@ function renderCoachSection() {
               <option value="">Seleziona</option>
               <option value="palestra_completa"${profile.equipment === 'palestra_completa' ? ' selected' : ''}>Palestra completa</option>
               <option value="basic_gym"${profile.equipment === 'basic_gym' ? ' selected' : ''}>Palestra essenziale</option>
-              <option value="home_gym"${profile.equipment === 'home_gym' ? ' selected' : ''}>Home gym</option>
+              <option value="home_gym"${profile.equipment === 'home_gym' ? ' selected' : ''}>Home gym con manubri, senza panca</option>
+              <option value="bodyweight_home"${profile.equipment === 'bodyweight_home' ? ' selected' : ''}>Corpo libero a casa</option>
             </select>
+            <div class="coach-field-tip">Home gym = manubri, niente panca. Corpo libero = allenamento calistenico a casa, senza manubri.</div>
           </div>
           <div class="coach-field full">
             <label>Gruppi su cui vuoi spingere</label>
@@ -2273,6 +2347,7 @@ function renderNutritionQuestionField(question) {
     <div class="coach-question">
       <div class="coach-question-title">${escapeHtml(question.label || 'Domanda')}</div>
       <div class="coach-question-copy">${escapeHtml(question.question || '')}</div>
+      <div class="nutrition-question-note">Facoltativa: puoi lasciarla vuota e andare avanti comunque.</div>
       <div class="coach-question-field">${controlHtml}</div>
     </div>
   `;
@@ -2412,7 +2487,7 @@ async function startNutritionPlanFlow() {
   nutritionAiState.busy = true;
   nutritionAiState.phase = 'intake';
   nutritionAiState.error = '';
-  nutritionAiState.status = 'Sto analizzando profilo nutrizione, scheda attiva e routine allenante.';
+  nutritionAiState.status = 'Sto analizzando profilo nutrizione, scheda attiva e routine allenante. Se mancano dati, continuo comunque con quello che ho.';
   nutritionAiState.questions = [];
   nutritionAiState.answers = {};
   nutritionAiState.draftPlan = null;
@@ -2431,8 +2506,8 @@ async function startNutritionPlanFlow() {
     nutritionAiState.questions = Array.isArray(payload.questions) ? payload.questions : [];
     nutritionAiState.phase = nutritionAiState.questions.length ? 'questions' : 'ready';
     nutritionAiState.status = nutritionAiState.questions.length
-      ? 'Ho ancora bisogno di poche conferme prima di creare il piano alimentare.'
-      : 'Profilo completo. Sto passando direttamente alla bozza del piano.';
+      ? 'Ti lascio poche domande utili, ma puoi anche lasciarne alcune vuote: continuo con il profilo che ho.'
+      : 'Ho gia` abbastanza dati. Sto passando direttamente alla bozza del piano.';
     nutritionAiState.error = '';
   } catch (error) {
     console.error('Errore intake Nutrition Coach AI', error);
@@ -2451,13 +2526,9 @@ async function startNutritionPlanFlow() {
 async function submitNutritionAnswers() {
   if (nutritionAiState.busy) return;
   nutritionAiState.answers = collectNutritionAnswers();
-  const missing = nutritionAiState.questions.some((question) => !cleanText(nutritionAiState.answers?.[question.id] || ''));
-  if (missing) {
-    nutritionAiState.error = 'Rispondi a tutte le domande essenziali prima di generare la bozza nutrizione.';
-    nutritionAiState.status = '';
-    renderNutritionSection();
-    return;
-  }
+  nutritionAiState.error = '';
+  nutritionAiState.status = 'Uso le risposte che hai compilato e il resto del profilo per generare la bozza.';
+  renderNutritionSection();
   await requestNutritionPlanGeneration();
 }
 
@@ -2626,10 +2697,20 @@ function renderNutritionSection() {
   const logEntry = getNutritionLogEntry(selectedDate, activePlan?.id || '');
   const selectedDayType = activePlan ? logEntry.dayType : inferNutritionDayType(selectedDate);
   const selectedTemplate = activePlan ? (selectedDayType === 'training' ? activePlan.trainingDay : activePlan.restDay) : null;
+  const profileSnapshot = buildNutritionProfileSnapshot(profile);
   const statusClass = nutritionAiState.error ? 'coach-status error' : 'coach-status' + (nutritionAiState.status ? ' good' : '');
   const questionHtml = nutritionAiState.questions.length ? nutritionAiState.questions.map(renderNutritionQuestionField).join('') : `
     <div class="coach-empty">
-      Premi <strong>Analizza profilo nutrizione</strong>: il Nutrition Coach AI ti fara' sempre 2-3 conferme pratiche, oltre agli eventuali dati mancanti, prima di generare la bozza.
+      Premi <strong>Analizza profilo nutrizione</strong>: il Nutrition Coach AI usa subito i dati che hai gia' salvato e, se serve, aggiunge solo poche conferme utili.
+    </div>`;
+  const wizardIntroHtml = `
+    <div class="coach-card nutrition-wizard-card">
+      <div class="surface-title">Wizard Nutrition Coach AI</div>
+      <div class="nutrition-wizard-copy">Non serve compilare tutto. Analizza anche con profilo parziale: il coach parte da quello che hai gia' e completa il resto con poche domande mirate, ma non bloccanti.</div>
+      <div class="nutrition-wizard-chips">
+        ${profileSnapshot.known.length ? profileSnapshot.known.slice(0, 5).map((item) => `<span>${escapeHtml(item)}</span>`).join('') : '<span>Profilo ancora vuoto</span>'}
+      </div>
+      <div class="nutrition-wizard-note">${profileSnapshot.missing.length ? 'Ancora da rifinire: ' + escapeHtml(profileSnapshot.missing.slice(0, 4).join(' · ')) + '. Ma puoi partire lo stesso.' : "Hai gia' abbastanza dati per partire subito."}</div>
     </div>`;
   const rationaleHtml = nutritionAiState.rationale.length ? `
     <div class="coach-card">
@@ -2661,7 +2742,7 @@ function renderNutritionSection() {
   const refineCardHtml = nutritionAiState.draftPlan ? `
     <div class="coach-card">
       <div class="surface-title">Rifinisci la bozza con il Nutrition Coach AI</div>
-      <div class="nutrition-refine-note">Scrivi modifiche pratiche: piu' proteine, meno latticini, pasti piu' semplici, meno ingredienti o budget piu' snello.</div>
+      <div class="nutrition-refine-note">Scrivi modifiche pratiche: piu' proteine, meno latticini, pasti piu' semplici, meno ingredienti o budget piu' snello. Le modifiche restano nella bozza e non bloccano il resto.</div>
       <div class="nutrition-refine-thread">${renderNutritionRefineMessages()}</div>
       <div class="nutrition-refine-compose">
         <textarea id="nutrition-refine-input" placeholder="Per esempio: voglio una colazione piu' proteica e spuntini piu' semplici da portare fuori."${nutritionAiState.busy ? ' disabled' : ''} onkeydown="if(event.key==='Enter' && !event.shiftKey){event.preventDefault();sendNutritionRefinement();}"></textarea>
@@ -2702,7 +2783,7 @@ function renderNutritionSection() {
     </div>` : `
     <div class="coach-card">
       <div class="surface-title">Piano attivo</div>
-      <div class="nutrition-empty">Nessun piano alimentare attivo ancora. Compila il profilo e lascia che il Nutrition Coach AI generi una bozza da rifinire.</div>
+      <div class="nutrition-empty">Nessun piano alimentare attivo ancora. Compila il profilo in modo libero, poi premi Analizza: il Nutrition Coach AI usera' quello che hai e ti aiutera' a completarlo.</div>
     </div>`;
 
   const todayCardHtml = activePlan && selectedTemplate ? `
@@ -2748,7 +2829,7 @@ function renderNutritionSection() {
     </div>` : `
     <div class="coach-card">
       <div class="surface-title">Oggi</div>
-      <div class="nutrition-empty">Appena attivi un piano alimentare, qui vedrai la giornata corrente con training/rest, pasti da seguire e tracking rapido.</div>
+      <div class="nutrition-empty">Appena attivi un piano alimentare, qui vedrai la giornata corrente con training/rest, pasti da seguire e tracking rapido. Puoi anche cambiare giorno e tipo giorno manualmente.</div>
     </div>`;
 
   const historyCardHtml = `
@@ -2792,6 +2873,7 @@ function renderNutritionSection() {
     </div>
     <div class="nutrition-grid">
       <div style="display:flex;flex-direction:column;gap:12px">
+        ${wizardIntroHtml}
         <div class="coach-card">
           <div class="surface-title">Profilo nutrizione</div>
           <div class="coach-form-grid">
@@ -2876,7 +2958,7 @@ function renderNutritionSection() {
           <div class="coach-actions">
             <button class="hdr-btn" type="button" onclick="saveNutritionProfileFromForm()"${nutritionAiState.busy ? ' disabled' : ''}>Salva profilo</button>
             <button class="hdr-btn" type="button" onclick="startNutritionPlanFlow()"${nutritionAiState.busy ? ' disabled' : ''}>Analizza profilo nutrizione</button>
-            ${nutritionAiState.questions.length ? `<button class="hdr-btn" type="button" onclick="submitNutritionAnswers()"${nutritionAiState.busy ? ' disabled' : ''}>Genera bozza nutrizione</button>` : ''}
+            ${nutritionAiState.questions.length ? `<button class="hdr-btn" type="button" onclick="submitNutritionAnswers()"${nutritionAiState.busy ? ' disabled' : ''}>Genera bozza con i dati presenti</button>` : ''}
             ${nutritionAiState.draftPlan ? `<button class="hdr-btn" type="button" onclick="saveNutritionDraftPlan()"${nutritionAiState.busy ? ' disabled' : ''}>Salva piano</button>` : ''}
           </div>
           ${(nutritionAiState.error || nutritionAiState.status) ? `<div class="${statusClass}">${escapeHtml(nutritionAiState.error || nutritionAiState.status)}</div>` : ''}
@@ -2884,8 +2966,9 @@ function renderNutritionSection() {
           ${refineCardHtml}
         </div>
         <div class="coach-card">
-          <div class="surface-title">${nutritionAiState.questions.length ? 'Domande mirate prima della bozza' : 'Wizard Nutrition Coach AI'}</div>
+          <div class="surface-title">${nutritionAiState.questions.length ? 'Domande mirate prima della bozza' : 'Domande facoltative'}</div>
           <div class="coach-questions">${questionHtml}</div>
+          ${nutritionAiState.questions.length ? '<div class="nutrition-wizard-note">Puoi rispondere a tutte, ad alcune o a nessuna: il coach analizza comunque quello che hai gia` nel profilo.</div>' : ''}
         </div>
         ${rationaleHtml}
         ${warningsHtml}
