@@ -30,7 +30,7 @@ body{font-family:'DM Sans',sans-serif;background:
 }
 .hdr-left{display:flex;align-items:center;justify-content:flex-start;min-width:0}
 .hdr-brand{display:flex;align-items:center;justify-content:center;min-width:0;justify-self:center}
-.hdr-logo{display:block;height:clamp(40px,5.2vw,48px);width:auto;max-width:min(56vw,260px);object-fit:contain;filter:drop-shadow(0 8px 18px rgba(0,0,0,.28))}
+.hdr-logo{display:block;height:clamp(36px,4.8vw,44px);width:auto;max-width:min(54vw,248px);object-fit:contain;filter:drop-shadow(0 8px 18px rgba(0,0,0,.28))}
 .hdr-actions{display:flex;align-items:center;gap:8px;justify-self:end}
 .hdr-menu-wrap{position:relative;display:flex;align-items:center}
 .hdr-menu-btn{
@@ -740,7 +740,7 @@ body{font-family:'DM Sans',sans-serif;background:
     --hdr-bottom-gap:7px;
     padding:calc(var(--hdr-top-gap) + var(--safe-top)) calc(14px + var(--safe-right)) var(--hdr-bottom-gap) calc(14px + var(--safe-left))
   }
-  .hdr-logo{height:clamp(33px,4.4vw,38px);max-width:min(47vw,204px)}
+  .hdr-logo{height:clamp(30px,4vw,35px);max-width:min(45vw,188px)}
   .hdr-menu-btn{width:38px;height:38px;border-radius:12px}
   .hdr-dropdown{left:0;right:auto;min-width:min(248px,calc(100vw - 28px))}
   .hdr-actions{gap:6px;flex-wrap:wrap;justify-content:flex-end}
