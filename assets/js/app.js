@@ -200,10 +200,62 @@ function getSeriesRepLabel(exercise, seriesIndex) {
 }
 
 function getExerciseRepsSummary(exercise) {
+  if (isSupersetExercise(exercise)) {
+    const items = getSupersetItems(exercise);
+    return items.map((item) => item.reps ? item.name + ' ' + item.reps : item.name).join(' + ') || 'Circuito';
+  }
   const plan = deriveRepsPlan(exercise?.reps, exercise?.series, exercise?.repsPlan);
   if (!plan.length) return normalizeRepToken(exercise?.reps || '-');
   const allSame = plan.every((item) => item === plan[0]);
   return allSame ? plan[0] : plan.join(' · ');
+}
+
+function getSupersetItems(exercise) {
+  return (Array.isArray(exercise?.supersetItems) ? exercise.supersetItems : [])
+    .map((item) => ({
+      name: cleanText(item?.name || ''),
+      reps: normalizeRepToken(item?.reps || ''),
+      note: cleanText(item?.note || '')
+    }))
+    .filter((item) => item.name || item.reps || item.note);
+}
+
+function isSupersetExercise(exercise) {
+  return exercise?.type === 'superset' || getSupersetItems(exercise).length >= 2;
+}
+
+function getSeriesKindLabel(exercise) {
+  return isSupersetExercise(exercise) ? 'Round' : 'Serie';
+}
+
+function getSeriesRepDisplay(exercise, seriesIndex) {
+  if (isSupersetExercise(exercise)) return 'Circuito ' + (seriesIndex + 1);
+  return getSeriesRepLabel(exercise, seriesIndex);
+}
+
+function getExerciseMetaLabel(exercise) {
+  const count = Math.max(1, parseInt(exercise?.series, 10) || 1);
+  return isSupersetExercise(exercise)
+    ? count + ' round · superset'
+    : count + ' serie - ' + getExerciseRepsSummary(exercise) + ' reps';
+}
+
+function renderSupersetItemsHtml(exercise, mode = 'list') {
+  const items = getSupersetItems(exercise);
+  if (!items.length) return '';
+  const className = mode === 'focus' ? 'fc-superset' : 'ex-superset';
+  return `
+    <div class="${className}">
+      <div class="${className}-kicker">Mini circuito · pausa dopo l'ultimo esercizio</div>
+      ${items.map((item, index) => `
+        <div class="${className}-item">
+          <span>${index + 1}</span>
+          <strong>${escapeHtml(item.name)}</strong>
+          <em>${escapeHtml(item.reps || 'reps come da scheda')}</em>
+          ${item.note ? `<small>${escapeHtml(item.note)}</small>` : ''}
+        </div>
+      `).join('')}
+    </div>`;
 }
 
 function normalizePrograms(programs, sourceFallback = 'bundled') {
@@ -225,13 +277,23 @@ function normalizePrograms(programs, sourceFallback = 'bundled') {
     days: (Array.isArray(program?.days) ? program.days : []).map((day, di) => ({
       name: cleanText(day?.name || 'Day ' + (di + 1)),
       label: cleanText(day?.label || ''),
-      exercises: (Array.isArray(day?.exercises) ? day.exercises : []).map((ex, ei) => ({
-        name: cleanText(ex?.name || 'Esercizio ' + (ei + 1)),
-        series: Math.max(0, parseInt(ex?.series, 10) || 0),
-        reps: cleanText(String(ex?.reps ?? '-')),
-        repsPlan: deriveRepsPlan(ex?.reps, ex?.series, ex?.repsPlan),
-        note: cleanText(ex?.note || '')
-      }))
+      exercises: (Array.isArray(day?.exercises) ? day.exercises : []).map((ex, ei) => {
+        const supersetItems = getSupersetItems(ex);
+        const type = ex?.type === 'superset' || supersetItems.length >= 2 ? 'superset' : 'exercise';
+        const series = Math.max(0, parseInt(ex?.series, 10) || 0);
+        const reps = cleanText(String(ex?.reps ?? (type === 'superset' ? 'Circuito' : '-')));
+        return {
+          type,
+          name: cleanText(ex?.name || (type === 'superset' ? 'Superset' : 'Esercizio ' + (ei + 1))),
+          series,
+          reps,
+          repsPlan: type === 'superset'
+            ? Array.from({ length: Math.max(1, series || 1) }, (_, index) => 'Round ' + (index + 1))
+            : deriveRepsPlan(ex?.reps, ex?.series, ex?.repsPlan),
+          note: cleanText(ex?.note || ''),
+          supersetItems
+        };
+      })
     }))
   }));
 }
@@ -3317,10 +3379,10 @@ function renderListView(di) {
     // Build series grid html
     let seriesHtml = '<div class="series-grid">';
     for (let s = 0; s < ex.series; s++) {
-      const seriesReps = getSeriesRepLabel(ex, s);
+      const seriesReps = getSeriesRepDisplay(ex, s);
       seriesHtml += `
         <div class="serie-box${sd.seriesDone[s]?' done':''}" id="sb-${ei}-${s}" onclick="toggleSerie(${di},${ei},${s})">
-          <div class="sb-lbl">Serie ${s+1}</div>
+          <div class="sb-lbl">${getSeriesKindLabel(ex)} ${s+1}</div>
           <div class="sb-reps">${seriesReps}</div>
           <div class="sb-kg" id="sb-kg-${ei}-${s}">${sd.kg[s]||''}</div>
           <input class="kg-inp" id="kg-${ei}-${s}" type="number" inputmode="decimal" placeholder="kg"
@@ -3337,13 +3399,14 @@ function renderListView(di) {
       <div class="ex-idx">${ei+1}</div>
       <div class="ex-info">
         <div class="ex-name">${ex.name}</div>
-          <div class="ex-meta">${ex.series} serie - ${getExerciseRepsSummary(ex)} reps</div>
+          <div class="ex-meta">${getExerciseMetaLabel(ex)}</div>
       </div>
         <div class="ex-chk${sd.exDone?' on':''}" id="echk-${ei}" onclick="event.stopPropagation();toggleExDone(${di},${ei})">
           <span class="chk-icon">&#10003;</span>
         </div>
       </div>
       <div class="ex-body" id="ex-body-${ei}" style="display:none">
+        ${renderSupersetItemsHtml(ex, 'list')}
         ${ex.note ? `<div class="ex-note-box">${ex.note}</div>` : ''}
         ${seriesHtml}
         <textarea class="note-inp" id="note-${ei}" rows="2" placeholder="Note esercizio..."
@@ -3411,13 +3474,13 @@ function renderFocusView(di, ei) {
   document.getElementById('fnav-next').disabled = ei === days[di].exercises.length - 1;
 
   // Build series rows
-  let seriesHtml = `<div class="fc-series-lbl">Serie</div>`;
+  let seriesHtml = `<div class="fc-series-lbl">${isSupersetExercise(ex) ? 'Round superset' : 'Serie'}</div>`;
   for (let s = 0; s < ex.series; s++) {
-    const seriesReps = getSeriesRepLabel(ex, s);
+    const seriesReps = getSeriesRepDisplay(ex, s);
     seriesHtml += `
       <div class="fc-serie-row">
         <div class="fsr-num">${s+1}</div>
-        <div class="fsr-reps">${seriesReps} reps</div>
+        <div class="fsr-reps">${seriesReps}${isSupersetExercise(ex) ? '' : ' reps'}</div>
         <div class="fsr-kg">
           <input type="number" inputmode="decimal" placeholder="kg"
             value="${sd.kg[s]||''}"
@@ -3435,7 +3498,7 @@ function renderFocusView(di, ei) {
       <div class="fc-next-copy">
         <div class="fc-next-kicker">Subito dopo</div>
         <div class="fc-next-name">${escapeHtml(nextExercise.name)}</div>
-        <div class="fc-next-meta">Esercizio ${ei + 2} di ${days[di].exercises.length} · ${escapeHtml(nextExercise.series)} serie · ${escapeHtml(getExerciseRepsSummary(nextExercise))} reps</div>
+        <div class="fc-next-meta">Esercizio ${ei + 2} di ${days[di].exercises.length} · ${escapeHtml(getExerciseMetaLabel(nextExercise))}</div>
       </div>
       <button class="fc-next-btn" type="button" onclick="focusNav(1)">Vai</button>
     </div>` : `
@@ -3451,10 +3514,11 @@ function renderFocusView(di, ei) {
     <div class="focus-top">
       <div class="fc-head">
         <div class="fc-name">${ex.name}</div>
-        <div class="fc-meta">${ex.series} serie - ${getExerciseRepsSummary(ex)} reps</div>
+        <div class="fc-meta">${getExerciseMetaLabel(ex)}</div>
       </div>
       <button class="hdr-btn fc-demo-btn" type="button" onclick="openExerciseDemo(${di},${ei})">DEMO</button>
     </div>
+    ${renderSupersetItemsHtml(ex, 'focus')}
     ${ex.note ? `<div class="fc-note">${ex.note}</div>` : ''}
     ${nextHtml}
     <div class="chrono-row">
@@ -3895,6 +3959,7 @@ function validateImportDraft(draft) {
       if (!cleanText(ex.name)) return 'Compila il nome dell\'esercizio ' + (ei + 1) + ' del giorno ' + (di + 1) + '.';
       if ((parseInt(ex.series, 10) || 0) < 1) return 'Le serie di ' + cleanText(ex.name || ('esercizio ' + (ei + 1))) + ' devono essere almeno 1.';
       if (!cleanText(ex.reps)) return 'Compila le reps di ' + cleanText(ex.name || ('esercizio ' + (ei + 1))) + '.';
+      if (isSupersetExercise(ex) && getSupersetItems(ex).length < 2) return 'Il superset ' + cleanText(ex.name) + ' deve contenere almeno 2 esercizi.';
     }
   }
   return '';
@@ -3945,9 +4010,18 @@ function renderImportReview(validationError = '') {
         ${day.exercises.length ? day.exercises.map((exercise, ei) => `
           <div class="imp-ex">
             <div class="imp-ex-top">
-              <div class="imp-ex-title">Esercizio ${ei + 1}</div>
+              <div class="imp-ex-title">${isSupersetExercise(exercise) ? 'Superset' : 'Esercizio'} ${ei + 1}</div>
               <button class="imp-mini-btn danger" type="button" onclick="removeImportExercise(${di}, ${ei})">Rimuovi</button>
             </div>
+            ${isSupersetExercise(exercise) ? `
+              <div class="imp-superset-preview">
+                <strong>Mini circuito</strong>
+                <span>Esegui gli esercizi in ordine, senza pausa interna. Recupero solo dopo l'ultimo.</span>
+                ${getSupersetItems(exercise).map((item, itemIndex) => `
+                  <div><b>${itemIndex + 1}. ${escapeHtml(item.name)}</b> ${escapeHtml(item.reps || '')}${item.note ? ' · ' + escapeHtml(item.note) : ''}</div>
+                `).join('')}
+              </div>
+            ` : ''}
             <div class="imp-ex-grid">
               <div class="imp-field">
                 <label>Nome</label>
@@ -4045,7 +4119,7 @@ function addImportDay() {
   importDraft.days.push({
     name: 'Day ' + (importDraft.days.length + 1),
     label: '',
-    exercises: [{ name: '', series: 3, reps: '', repsPlan: [], note: '' }]
+    exercises: [{ type: 'exercise', name: '', series: 3, reps: '', repsPlan: [], note: '', supersetItems: [] }]
   });
   renderImportReview();
 }
@@ -4058,7 +4132,7 @@ function removeImportDay(dayIndex) {
 
 function addImportExercise(dayIndex) {
   if (!importDraft?.days[dayIndex]) return;
-  importDraft.days[dayIndex].exercises.push({ name: '', series: 3, reps: '', repsPlan: [], note: '' });
+  importDraft.days[dayIndex].exercises.push({ type: 'exercise', name: '', series: 3, reps: '', repsPlan: [], note: '', supersetItems: [] });
   renderImportReview();
 }
 

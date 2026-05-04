@@ -21,7 +21,7 @@ const OPENAI_MODEL = process.env.OPENAI_MODEL || 'gpt-4.1';
 const OPENAI_PDF_MODEL = process.env.OPENAI_PDF_MODEL || 'gpt-5.1';
 const OPENAI_ASSISTANT_MODEL = process.env.OPENAI_ASSISTANT_MODEL || 'gpt-5-nano';
 const CORS_ALLOWED_ORIGIN = (process.env.CORS_ALLOWED_ORIGIN || '').trim();
-const PARSER_VERSION = 'pt-pdf-v1';
+const PARSER_VERSION = 'pt-pdf-v2';
 const COACH_AI_VERSION = 'coach-ai-v1';
 const NUTRITION_AI_VERSION = 'nutrition-ai-v2';
 const ASSISTANT_CHAT_VERSION = 'assistant-overlay-v1';
@@ -30,6 +30,17 @@ const ICONS_DIR = path.join(ROOT_DIR, 'icons');
 const ASSETS_DIR = path.join(ROOT_DIR, 'assets');
 
 const client = process.env.OPENAI_API_KEY ? new OpenAI({ apiKey: process.env.OPENAI_API_KEY }) : null;
+
+const SUPERSET_ITEM_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['name', 'reps', 'note'],
+  properties: {
+    name: { type: 'string' },
+    reps: { type: 'string' },
+    note: { type: 'string' }
+  }
+};
 
 const IMPORT_SCHEMA = {
   type: 'object',
@@ -73,8 +84,9 @@ const IMPORT_SCHEMA = {
             items: {
               type: 'object',
               additionalProperties: false,
-              required: ['name', 'series', 'reps', 'repsPlan', 'note'],
+              required: ['type', 'name', 'series', 'reps', 'repsPlan', 'note', 'supersetItems'],
               properties: {
+                type: { type: 'string', enum: ['exercise', 'superset'] },
                 name: { type: 'string' },
                 series: { type: 'integer', minimum: 1 },
                 reps: { type: 'string' },
@@ -82,7 +94,11 @@ const IMPORT_SCHEMA = {
                   type: 'array',
                   items: { type: 'string' }
                 },
-                note: { type: 'string' }
+                note: { type: 'string' },
+                supersetItems: {
+                  type: 'array',
+                  items: SUPERSET_ITEM_SCHEMA
+                }
               }
             }
           }
@@ -325,6 +341,10 @@ const SYSTEM_PROMPT = [
   'Mantieni interi i nomi esercizio, inclusi qualificatori finali come "alla Scott", "presa inversa", "al multipower", "su inclinata", "su panca 30".',
   'Non spostare parti del nome esercizio dentro le note se fanno ancora parte del movimento.',
   'Quando il PDF usa schemi reps diversi per serie, per esempio "2x8, 1x8/12", conserva reps in forma compatta e compila anche repsPlan serie-per-serie, per esempio ["8","8","8-12"].',
+  'Quando trovi un blocco Superset, SS o circuito, non dividerlo in esercizi indipendenti: crea un unico esercizio con type "superset".',
+  'Per un superset usa series come numero di round/giri, reps come riepilogo compatto, repsPlan con un valore per ogni round, note con la pausa dopo l ultimo esercizio, e supersetItems con gli esercizi in ordine.',
+  'Esempio: "Superset" seguito da "Curl cavo basso x10..." e "Push down x10..." e poi "3 rounds 1 rest" deve diventare un solo blocco: prima Curl, subito dopo Push down, poi pausa, poi si ricomincia.',
+  'Per esercizi normali usa type "exercise" e supersetItems vuoto.',
   'Se il PDF non e` una scheda workout o non e` leggibile come PDF testuale, segnalo chiaramente con i flag di rifiuto.',
   'Mantieni il testo in italiano quando presente nel documento.',
   'Non inventare giorni o esercizi mancanti: se qualcosa e` ambiguo, fai la miglior stima ma aggiungi un warning.'
@@ -474,6 +494,129 @@ function deriveRepsPlan(reps, series, explicitPlan = []) {
   }
 
   return Array.from({ length: targetSeries }, () => raw);
+}
+
+function normalizeSupersetItems(items) {
+  return (Array.isArray(items) ? items : [])
+    .map((item) => ({
+      name: cleanString(item?.name || ''),
+      reps: normalizeRepToken(String(item?.reps ?? '')),
+      note: cleanString(item?.note || '')
+    }))
+    .filter((item) => item.name || item.reps || item.note);
+}
+
+function isSupersetMarkerExercise(exercise) {
+  const text = [exercise?.name, exercise?.reps, exercise?.note].map(cleanString).join(' ').toLowerCase();
+  return /(^|\s)(superset|super\s*set|ss|mini\s*circuito|circuito)(\s|$)/i.test(text) && !normalizeSupersetItems(exercise?.supersetItems).length;
+}
+
+function isSupersetMetaExercise(exercise) {
+  const name = cleanString(exercise?.name || '').toLowerCase();
+  const reps = cleanString(exercise?.reps || '').toLowerCase();
+  const note = cleanString(exercise?.note || '').toLowerCase();
+  const text = [name, reps, note].join(' ');
+  return /\b\d+\s*(rounds?|giri)\b/i.test(text) || (/rest|recupero|pausa/i.test(text) && !/[a-zà-ù]{4,}.*\d+\s*x/i.test(text));
+}
+
+function extractSupersetRounds(...values) {
+  const text = values.map(cleanString).filter(Boolean).join(' ');
+  const match = text.match(/\b(\d+)\s*(?:rounds?|giri)\b/i);
+  return match ? Math.max(1, Number.parseInt(match[1], 10) || 1) : 0;
+}
+
+function extractSupersetRest(...values) {
+  const text = values.map(cleanString).filter(Boolean).join(' ');
+  const restMatch = text.match(/(?:rest|recupero|pausa)\s*(?:da\s*)?([0-9]+(?:['’"]| ?sec| ?s| ?min| ?m)?)/i);
+  if (restMatch) return cleanString(restMatch[1]).replace(/'/g, '’');
+  const compact = text.match(/\b([0-9]+(?:['’"]| ?sec| ?s| ?min| ?m))\s*(?:rest|recupero|pausa)\b/i);
+  return compact ? cleanString(compact[1]).replace(/'/g, '’') : '';
+}
+
+function createSupersetBlock(items, rounds, rest, marker = {}) {
+  const safeItems = normalizeSupersetItems(items).slice(0, 5);
+  const safeRounds = Math.max(1, Number.parseInt(rounds, 10) || 1);
+  const itemSummary = safeItems.map((item) => {
+    const reps = item.reps ? ' ' + item.reps : '';
+    return item.name + reps;
+  }).join(' + ');
+  const restText = rest ? ' Pausa dopo l ultimo esercizio: ' + rest + '.' : ' Pausa solo dopo aver completato tutti gli esercizi del blocco.';
+  return {
+    type: 'superset',
+    name: cleanString(marker.name) && !isSupersetMarkerExercise(marker) ? cleanString(marker.name) : 'Superset: ' + safeItems.map((item) => item.name).join(' + '),
+    series: safeRounds,
+    reps: itemSummary || 'Circuito',
+    repsPlan: Array.from({ length: safeRounds }, (_, index) => 'Round ' + (index + 1)),
+    note: cleanString(marker.note || '') || ('Esegui in sequenza senza pausa tra gli esercizi.' + restText),
+    supersetItems: safeItems
+  };
+}
+
+function normalizeExerciseEntry(exercise, exerciseIndex) {
+  const supersetItems = normalizeSupersetItems(exercise?.supersetItems);
+  const type = exercise?.type === 'superset' || supersetItems.length >= 2 ? 'superset' : 'exercise';
+  const series = Math.max(1, Number.parseInt(exercise?.series, 10) || 1);
+  const reps = normalizeRepToken(String(exercise?.reps ?? ''));
+  if (type === 'superset') {
+    const rounds = extractSupersetRounds(exercise?.name, exercise?.reps, exercise?.note) || series || 1;
+    const rest = extractSupersetRest(exercise?.name, exercise?.reps, exercise?.note);
+    return createSupersetBlock(supersetItems, rounds, rest, {
+      name: cleanString(exercise?.name || ''),
+      note: cleanString(exercise?.note || '')
+    });
+  }
+  return {
+    type: 'exercise',
+    name: cleanString(exercise?.name) || 'Esercizio ' + (exerciseIndex + 1),
+    series,
+    reps,
+    repsPlan: deriveRepsPlan(exercise?.reps, exercise?.series, exercise?.repsPlan),
+    note: cleanString(exercise?.note),
+    supersetItems: []
+  };
+}
+
+function mergeSupersetExercises(exercises) {
+  const merged = [];
+  for (let index = 0; index < exercises.length; index++) {
+    const current = exercises[index];
+    if (current.type === 'superset') {
+      merged.push(current);
+      continue;
+    }
+
+    if (isSupersetMarkerExercise(current)) {
+      const items = [];
+      const metaParts = [current.name, current.reps, current.note];
+      let cursor = index + 1;
+      while (cursor < exercises.length && items.length < 4) {
+        const candidate = exercises[cursor];
+        if (isSupersetMetaExercise(candidate)) {
+          metaParts.push(candidate.name, candidate.reps, candidate.note);
+          cursor++;
+          break;
+        }
+        if (candidate.type === 'exercise' && candidate.name && candidate.reps) {
+          items.push({ name: candidate.name, reps: candidate.reps, note: candidate.note });
+          metaParts.push(candidate.name, candidate.reps, candidate.note);
+          cursor++;
+          continue;
+        }
+        break;
+      }
+
+      if (items.length >= 2) {
+        const rounds = extractSupersetRounds(...metaParts) || Math.max(...items.map((item) => Number.parseInt(item.series, 10) || 1), 3);
+        const rest = extractSupersetRest(...metaParts);
+        merged.push(createSupersetBlock(items, rounds, rest, current));
+        index = cursor - 1;
+        continue;
+      }
+    }
+
+    if (current.name && current.reps) merged.push(current);
+  }
+  return merged;
 }
 
 function slugify(value) {
@@ -1453,13 +1596,13 @@ function normalizeCandidateProgram(raw, filename) {
   const warnings = Array.isArray(raw.warnings) ? raw.warnings.map(cleanString).filter(Boolean) : [];
   const confidence = Math.max(0, Math.min(1, Number(raw.confidence) || 0));
   const days = Array.isArray(raw.days) ? raw.days.map((day, dayIndex) => {
-    const exercises = Array.isArray(day.exercises) ? day.exercises.map((exercise, exerciseIndex) => ({
-      name: cleanString(exercise.name) || 'Esercizio ' + (exerciseIndex + 1),
-      series: Math.max(1, Number.parseInt(exercise.series, 10) || 1),
-      reps: normalizeRepToken(String(exercise.reps ?? '')),
-      repsPlan: deriveRepsPlan(exercise.reps, exercise.series, exercise.repsPlan),
-      note: cleanString(exercise.note)
-    })).filter((exercise) => exercise.name && exercise.reps) : [];
+    const normalizedExercises = Array.isArray(day.exercises)
+      ? day.exercises.map((exercise, exerciseIndex) => normalizeExerciseEntry(exercise, exerciseIndex))
+      : [];
+    const exercises = mergeSupersetExercises(normalizedExercises).filter((exercise) => {
+      if (exercise.type === 'superset') return normalizeSupersetItems(exercise.supersetItems).length >= 2;
+      return exercise.name && exercise.reps;
+    });
     return {
       name: cleanString(day.name) || 'Day ' + (dayIndex + 1),
       label: cleanString(day.label),
@@ -1524,6 +1667,8 @@ function validateCandidateProgram(parsed, originalFilename) {
       }
       exercise.note = cleanString(exercise.note);
       exercise.name = cleanString(exercise.name) || 'Esercizio ' + (exerciseIndex + 1);
+      exercise.type = exercise.type === 'superset' ? 'superset' : 'exercise';
+      exercise.supersetItems = normalizeSupersetItems(exercise.supersetItems);
     });
   });
 
@@ -1552,9 +1697,11 @@ async function parseWorkoutPdf(file) {
   const userPrompt = [
     'Estrai questa scheda PDF in formato compatibile con una app palestra.',
     'Usa il nome file come contesto: ' + filename + '.',
-    'Restituisci giorni, label dei day, esercizi, serie, reps, repsPlan, note, durata del ciclo e nome atleta se presente.',
+    'Restituisci giorni, label dei day, esercizi, type, serie, reps, repsPlan, note, supersetItems, durata del ciclo e nome atleta se presente.',
     'Se trovi righe miste nome+serie+note, separale correttamente.',
     'Se trovi righe come "2x8, 1x8/12", il nome esercizio deve restare completo e repsPlan deve esplodere le serie in ordine.',
+    'Se trovi un blocco Superset, crea un solo esercizio type="superset": series deve essere il numero di rounds/giri, supersetItems deve contenere gli esercizi in ordine, e la pausa va in note dopo l ultimo esercizio del blocco.',
+    'Nel caso "Superset / Curl cavo basso... / Push down... / 3 rounds 1 rest", NON creare due esercizi separati: crea un unico blocco superset con 3 round.',
     'Se il documento non e` una scheda workout o e` una scansione/foto difficilmente leggibile, rifiuta.',
     'Ogni day deve avere un name tipo "Day 1" e una label leggibile.'
   ].join(' ');

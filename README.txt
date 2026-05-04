@@ -13,6 +13,7 @@ Flusso schede:
 - Le schede bundled restano in programs.json
 - Le schede importate dal PDF vengono salvate in localStorage come schede utente
 - Ogni import PDF crea una nuova scheda, senza sostituire quelle esistenti
+- Il parser PDF v2 riconosce anche i blocchi superset come mini circuiti: esercizi in sequenza, pausa solo dopo l'ultimo, round tracciati come una singola card
 
 Variabili ambiente backend:
 - OPENAI_API_KEY -> obbligatoria per import PDF e Coach AI
