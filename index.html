@@ -18,53 +18,10 @@
 
 <!-- HEADER -->
 <div class="hdr" id="main-hdr">
-  <div class="hdr-left">
-    <div class="hdr-menu-wrap" id="hdr-menu-wrap">
-      <button class="hdr-menu-btn" id="hdr-menu-btn" type="button" aria-label="Apri menu" aria-expanded="false" onclick="toggleHeaderMenu(event)">☰</button>
-      <div class="hdr-dropdown" id="hdr-dropdown" aria-hidden="true">
-        <div class="hdr-menu-list">
-          <button class="hdr-menu-item" id="hdr-menu-plans" type="button" data-section="plans" onclick="navigateFromHeaderMenu('plans')">
-            <div class="hdr-menu-copy">
-              <strong>Schede</strong>
-              <span>Apri, importa o scegli la scheda attiva</span>
-            </div>
-            <span class="hdr-menu-pill">🗂️</span>
-          </button>
-          <button class="hdr-menu-item" id="hdr-menu-today" type="button" data-section="today" onclick="navigateFromHeaderMenu('today')">
-            <div class="hdr-menu-copy">
-              <strong>Settimana attiva</strong>
-              <span>Vai ai giorni della scheda attuale</span>
-            </div>
-            <span class="hdr-menu-pill">📆</span>
-          </button>
-          <button class="hdr-menu-item" id="hdr-menu-nutrition" type="button" data-section="nutrition" onclick="navigateFromHeaderMenu('nutrition')">
-            <div class="hdr-menu-copy">
-              <strong>Nutrizione</strong>
-              <span>Piano alimentare, oggi e tracking</span>
-            </div>
-            <span class="hdr-menu-pill">🥗</span>
-          </button>
-          <button class="hdr-menu-item" id="hdr-menu-progress" type="button" data-section="progress" onclick="navigateFromHeaderMenu('progress')">
-            <div class="hdr-menu-copy">
-              <strong>Progressi</strong>
-              <span>Storico, report e memoria carichi</span>
-            </div>
-            <span class="hdr-menu-pill">📈</span>
-          </button>
-          <button class="hdr-menu-item" id="hdr-menu-chat" type="button" data-section="chat" onclick="navigateFromHeaderMenu('chat')">
-            <div class="hdr-menu-copy">
-              <strong>Coach AI</strong>
-              <span>Crea o rifinisci una scheda con l'AI</span>
-            </div>
-            <span class="hdr-menu-pill" style="font-family:'JetBrains Mono',monospace;font-size:13px">AI</span>
-          </button>
-        </div>
-      </div>
-    </div>
+  <div class="hdr-left"></div>
+  <div class="hdr-brand">
+    <img class="hdr-logo" src="./icons/hypercore-header-logo.png" alt="HyperCore AI logo">
   </div>
-      <div class="hdr-brand">
-        <img class="hdr-logo" src="./icons/hypercore-header-logo.png" alt="HyperCore AI logo">
-      </div>
   <div class="hdr-actions">
     <button class="hdr-btn" id="history-btn" onclick="openHist()" style="display:none">Storico</button>
     <button class="hdr-btn" id="importBtn" onclick="triggerPdfImport()">Importa PDF</button>
@@ -72,19 +29,35 @@
   </div>
 </div>
 
-<div class="section-shell" id="section-shell">
+<div class="section-shell" id="section-shell" role="navigation" aria-label="Navigazione principale">
   <div class="section-shell-row">
     <div class="section-dock">
-      <button class="section-tab on" id="section-tab-plans" type="button" onclick="setAppSection('plans')">
-        <span class="section-tab-ico emoji">🗂️</span>
+      <button class="section-tab on" id="section-tab-plans" type="button" onclick="setAppSection('plans')" aria-label="Schede">
+        <span class="section-tab-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg>
+        </span>
         <span class="section-tab-label">Schede</span>
       </button>
-      <button class="section-tab" id="section-tab-progress" type="button" onclick="setAppSection('progress')">
-        <span class="section-tab-ico emoji">📈</span>
+      <button class="section-tab" id="section-tab-today" type="button" onclick="setAppSection('today')" aria-label="Settimana attiva">
+        <span class="section-tab-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        </span>
+        <span class="section-tab-label">Settimana</span>
+      </button>
+      <button class="section-tab" id="section-tab-nutrition" type="button" onclick="setAppSection('nutrition')" aria-label="Nutrizione">
+        <span class="section-tab-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4 0-7 3-7 7 0 5 4 9 7 11 3-2 7-6 7-11 0-4-3-7-7-7z"/><path d="M12 8v8M9 11h6"/></svg>
+        </span>
+        <span class="section-tab-label">Nutrizione</span>
+      </button>
+      <button class="section-tab" id="section-tab-progress" type="button" onclick="setAppSection('progress')" aria-label="Progressi">
+        <span class="section-tab-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 4 4 7-8"/><path d="M14 8h5v5"/></svg>
+        </span>
         <span class="section-tab-label">Progressi</span>
       </button>
-      <button class="section-tab" id="section-tab-chat" type="button" onclick="setAppSection('chat')">
-        <span class="section-tab-ico">AI</span>
+      <button class="section-tab" id="section-tab-chat" type="button" onclick="setAppSection('chat')" aria-label="Coach AI">
+        <span class="section-tab-ico section-tab-ico-text" aria-hidden="true">AI</span>
         <span class="section-tab-label">Coach</span>
       </button>
     </div>

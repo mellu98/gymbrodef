@@ -1,4 +1,4 @@
-const CACHE_NAME = 'hypercore-ai-v24';
+const CACHE_NAME = 'hypercore-ai-v25';
 const APP_SHELL = [
   './',
   './index.html',

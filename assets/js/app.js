@@ -868,11 +868,10 @@ function getCurrentProgramHistoryPreview(limit = 4) {
 }
 
 function renderSectionNav() {
-  const activeSection = currentSection === 'today' ? 'plans' : currentSection;
-  ['plans', 'progress', 'chat'].forEach((section) => {
+  ['plans', 'today', 'nutrition', 'progress', 'chat'].forEach((section) => {
     const button = document.getElementById('section-tab-' + section);
     if (!button) return;
-    button.classList.toggle('on', activeSection === section);
+    button.classList.toggle('on', currentSection === section);
   });
 }
 
@@ -4359,8 +4358,25 @@ document.getElementById('assistant-input').addEventListener('keydown', (event) =
   }
 });
 document.addEventListener('keydown', (event) => {
-  if (event.key === 'Escape' && assistantOpen) closeAssistantOverlay();
-  if (event.key === 'Escape' && headerMenuOpen) closeHeaderMenu();
+  if (event.key === 'Escape') {
+    if (assistantOpen) { closeAssistantOverlay(); return; }
+    if (headerMenuOpen) { closeHeaderMenu(); return; }
+    const importModal = document.getElementById('import-modal');
+    if (importModal && importModal.classList.contains('show')) { closeImportModal(); return; }
+    const weekModal = document.getElementById('week-modal');
+    if (weekModal && weekModal.classList.contains('show')) { closeWeekReport(); return; }
+    const histModal = document.getElementById('hist-modal');
+    if (histModal && histModal.classList.contains('show')) { closeHist(); return; }
+    const timerOv = document.getElementById('timer-ov');
+    if (timerOv && timerOv.classList.contains('show')) { closeTimer(); return; }
+  }
+  if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') {
+    const active = document.activeElement;
+    if (active && active.id === 'assistant-input') {
+      event.preventDefault();
+      sendAssistantMessage();
+    }
+  }
 });
 document.addEventListener('click', (event) => {
   const menuWrap = document.getElementById('hdr-menu-wrap');
