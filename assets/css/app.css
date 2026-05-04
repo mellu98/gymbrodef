@@ -547,8 +547,14 @@ body{font-family:'DM Sans',sans-serif;background:
 .ex-superset-item strong,.fc-superset-item strong{color:#f5f5f5}
 .ex-superset-item em,.fc-superset-item em{grid-column:2;color:var(--tm);font-style:normal}
 .ex-superset-item small,.fc-superset-item small{grid-column:2;color:var(--amber)}
+.ex-superset-kg,.fc-superset-kg{display:grid;gap:7px;margin-top:8px;text-align:left}
+.ex-superset-kg-row,.fc-superset-kg-row{display:grid;grid-template-columns:minmax(0,1fr) 68px;align-items:center;gap:8px;font-size:11px;color:var(--tm)}
+.ex-superset-kg-row span,.fc-superset-kg-row span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ex-superset-kg-row input,.fc-superset-kg-row input{width:68px;background:var(--s3);border:1px solid var(--td);color:var(--t);border-radius:7px;padding:6px 8px;font-family:'JetBrains Mono',monospace;font-size:12px;text-align:center;outline:none}
+.ex-superset-kg-row input:focus,.fc-superset-kg-row input:focus{border-color:var(--g)}
 .series-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(72px,1fr));gap:8px;margin:8px 0}
 .serie-box{background:var(--s2);border:1px solid var(--td);border-radius:10px;padding:8px 6px;text-align:center;cursor:pointer;transition:all .2s}
+.serie-box.superset-box{grid-column:span 2;min-width:170px;padding:10px}
 .serie-box.done{background:rgba(0,230,118,.1);border-color:var(--g)}
 .sb-lbl{font-size:9px;color:var(--tm);text-transform:uppercase;letter-spacing:1px}
 .sb-reps{font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;margin:2px 0}
@@ -592,7 +598,9 @@ body{font-family:'DM Sans',sans-serif;background:
 .fc-next.last .fc-next-btn{display:none}
 .fc-series-lbl{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--tm);margin-bottom:8px}
 .fc-serie-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid #161616}
+.fc-serie-row.superset-round{display:block;padding:12px 0}
 .fc-serie-row:last-child{border-bottom:none}
+.fc-serie-main{display:flex;align-items:center;gap:10px;width:100%}
 .fsr-num{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gdim);min-width:26px}
 .fsr-reps{font-size:13px;font-weight:600;flex:1}
 .fsr-kg input{width:72px;background:var(--s3);border:1px solid var(--td);color:var(--t);border-radius:7px;padding:6px 8px;font-family:'JetBrains Mono',monospace;font-size:12px;text-align:center;outline:none}

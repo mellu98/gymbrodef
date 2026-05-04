@@ -224,6 +224,47 @@ function isSupersetExercise(exercise) {
   return exercise?.type === 'superset' || getSupersetItems(exercise).length >= 2;
 }
 
+function normalizeKgValue(value) {
+  if (value === 0) return '0';
+  return String(value ?? '').trim();
+}
+
+function getSeedKg(seedData) {
+  return Array.isArray(seedData) ? seedData : (Array.isArray(seedData?.kg) ? seedData.kg : []);
+}
+
+function getSeedSupersetKg(seedData) {
+  return seedData && !Array.isArray(seedData) && Array.isArray(seedData.supersetKg) ? seedData.supersetKg : [];
+}
+
+function normalizeSupersetKgMatrix(value, exercise, seedValue = []) {
+  const rounds = Math.max(1, parseInt(exercise?.series, 10) || 1);
+  const itemCount = getSupersetItems(exercise).length;
+  const storedRows = Array.isArray(value) ? value : [];
+  const seedRows = Array.isArray(seedValue) ? seedValue : [];
+  return Array.from({ length: rounds }, (_, roundIndex) => (
+    Array.from({ length: itemCount }, (_, itemIndex) => {
+      const current = storedRows?.[roundIndex]?.[itemIndex];
+      if (current === 0 || String(current ?? '').trim() !== '') return normalizeKgValue(current);
+      const seeded = seedRows?.[roundIndex]?.[itemIndex];
+      return normalizeKgValue(seeded);
+    })
+  ));
+}
+
+function getExerciseKgValues(exerciseState, exercise = null) {
+  if (isSupersetExercise(exercise) && Array.isArray(exerciseState?.supersetKg)) {
+    return exerciseState.supersetKg.flat();
+  }
+  return Array.isArray(exerciseState?.kg) ? exerciseState.kg : [];
+}
+
+function getSupersetItemKgValues(exerciseState, itemIndex) {
+  return (Array.isArray(exerciseState?.supersetKg) ? exerciseState.supersetKg : [])
+    .map((roundValues) => roundValues?.[itemIndex])
+    .filter((value) => value !== undefined && value !== null && String(value).trim() !== '');
+}
+
 function getSeriesKindLabel(exercise) {
   return isSupersetExercise(exercise) ? 'Round' : 'Serie';
 }
@@ -256,6 +297,38 @@ function renderSupersetItemsHtml(exercise, mode = 'list') {
         </div>
       `).join('')}
     </div>`;
+}
+
+function renderSupersetKgInputs(exercise, state, di, ei, roundIndex, mode = 'list') {
+  const items = getSupersetItems(exercise);
+  if (!items.length) return '';
+  const prefix = mode === 'focus' ? 'fc' : 'ex';
+  return `
+    <div class="${prefix}-superset-kg">
+      ${items.map((item, itemIndex) => `
+        <label class="${prefix}-superset-kg-row">
+          <span>${escapeHtml(item.name)}</span>
+          <input type="number" inputmode="decimal" placeholder="kg"
+            value="${escapeHtml(state?.supersetKg?.[roundIndex]?.[itemIndex] || '')}"
+            onclick="event.stopPropagation()"
+            onchange="saveSupersetKg(${di},${ei},${roundIndex},${itemIndex},this.value)"
+            oninput="saveSupersetKg(${di},${ei},${roundIndex},${itemIndex},this.value)">
+        </label>
+      `).join('')}
+    </div>`;
+}
+
+function formatSupersetKgForHistory(exercise, state) {
+  const items = getSupersetItems(exercise);
+  const rows = [];
+  (Array.isArray(state?.supersetKg) ? state.supersetKg : []).forEach((roundValues, roundIndex) => {
+    const parts = items.map((item, itemIndex) => {
+      const kg = cleanText(roundValues?.[itemIndex] || '');
+      return kg ? item.name + ': ' + kg + 'kg' : '';
+    }).filter(Boolean);
+    if (parts.length) rows.push('R' + (roundIndex + 1) + ' ' + parts.join(', '));
+  });
+  return rows.join(' | ');
 }
 
 function normalizePrograms(programs, sourceFallback = 'bundled') {
@@ -356,30 +429,36 @@ function parseConfiguredWeeks(program = currentProgram) {
   return value > 0 ? value : 0;
 }
 
-function createExerciseState(exercise, seedKg = []) {
+function createExerciseState(exercise, seedData = []) {
+  const seedKg = getSeedKg(seedData);
+  const seedSupersetKg = getSeedSupersetKg(seedData);
   return {
     seriesDone: Array(exercise.series).fill(false),
     kg: Array.from({ length: exercise.series }, (_, index) => {
       const seeded = seedKg?.[index];
-      return seeded === 0 ? '0' : String(seeded ?? '').trim();
+      return normalizeKgValue(seeded);
     }),
+    supersetKg: isSupersetExercise(exercise) ? normalizeSupersetKgMatrix([], exercise, seedSupersetKg) : [],
     note: '',
     exDone: false
   };
 }
 
-function normalizeExerciseState(storedExercise, exercise, seedKg = []) {
+function normalizeExerciseState(storedExercise, exercise, seedData = []) {
   const safe = storedExercise && typeof storedExercise === 'object' ? storedExercise : {};
+  const seedKg = getSeedKg(seedData);
+  const seedSupersetKg = getSeedSupersetKg(seedData);
   const storedSeriesDone = Array.isArray(safe.seriesDone) ? safe.seriesDone : [];
   const storedKg = Array.isArray(safe.kg) ? safe.kg : [];
   return {
     seriesDone: Array.from({ length: exercise.series }, (_, index) => Boolean(storedSeriesDone[index])),
     kg: Array.from({ length: exercise.series }, (_, index) => {
       const current = storedKg[index];
-      if (current === 0 || String(current ?? '').trim() !== '') return String(current ?? '').trim();
+      if (current === 0 || String(current ?? '').trim() !== '') return normalizeKgValue(current);
       const seeded = seedKg?.[index];
-      return seeded === 0 ? '0' : String(seeded ?? '').trim();
+      return normalizeKgValue(seeded);
     }),
+    supersetKg: isSupersetExercise(exercise) ? normalizeSupersetKgMatrix(safe.supersetKg, exercise, seedSupersetKg) : [],
     note: String(safe.note || ''),
     exDone: Boolean(safe.exDone)
   };
@@ -425,8 +504,8 @@ function createWeekState(weekNumber, seedWeek = null) {
   getDays().forEach((day, di) => {
     exerciseData[di] = {};
     day.exercises.forEach((exercise, ei) => {
-      const seedKg = seedWeek?.exerciseData?.[di]?.[ei]?.kg || [];
-      exerciseData[di][ei] = createExerciseState(exercise, seedKg);
+      const seedExerciseState = seedWeek?.exerciseData?.[di]?.[ei] || null;
+      exerciseData[di][ei] = createExerciseState(exercise, seedExerciseState);
     });
   });
   return {
@@ -625,40 +704,55 @@ function buildWeekReport(weekNumber = currentWeek) {
 
   getDays().forEach((day, di) => {
     day.exercises.forEach((exercise, ei) => {
-      const currentStats = summarizeKg(weekState.exerciseData?.[di]?.[ei]?.kg || []);
-      if (!currentStats) return;
+      const currentExerciseState = weekState.exerciseData?.[di]?.[ei] || {};
+      const previousExerciseState = previousWeekState?.exerciseData?.[di]?.[ei] || {};
+      const trackedLoads = isSupersetExercise(exercise)
+        ? getSupersetItems(exercise).map((item, itemIndex) => ({
+          name: cleanText(exercise.name + ' · ' + item.name),
+          current: getSupersetItemKgValues(currentExerciseState, itemIndex),
+          previous: getSupersetItemKgValues(previousExerciseState, itemIndex)
+        }))
+        : [{
+          name: cleanText(exercise.name),
+          current: getExerciseKgValues(currentExerciseState, exercise),
+          previous: getExerciseKgValues(previousExerciseState, exercise)
+        }];
 
-      const previousStats = previousWeekState ? summarizeKg(previousWeekState.exerciseData?.[di]?.[ei]?.kg || []) : null;
-      let trend = 'new';
-      let deltaMax = null;
-      let summary = 'Primo riferimento salvato per questo esercizio.';
+      trackedLoads.forEach((tracked) => {
+        const currentStats = summarizeKg(tracked.current);
+        if (!currentStats) return;
+        const previousStats = previousWeekState ? summarizeKg(tracked.previous) : null;
+        let trend = 'new';
+        let deltaMax = null;
+        let summary = 'Primo riferimento salvato per questo esercizio.';
 
-      if (previousStats) {
-        deltaMax = Number((currentStats.max - previousStats.max).toFixed(1));
-        if (deltaMax > 0) {
-          trend = 'up';
-          improvedCount++;
-          summary = 'Picco da ' + formatKg(previousStats.max) + 'kg a ' + formatKg(currentStats.max) + 'kg.';
-        } else if (deltaMax < 0) {
-          trend = 'down';
-          summary = 'Picco da ' + formatKg(previousStats.max) + 'kg a ' + formatKg(currentStats.max) + 'kg.';
+        if (previousStats) {
+          deltaMax = Number((currentStats.max - previousStats.max).toFixed(1));
+          if (deltaMax > 0) {
+            trend = 'up';
+            improvedCount++;
+            summary = 'Picco da ' + formatKg(previousStats.max) + 'kg a ' + formatKg(currentStats.max) + 'kg.';
+          } else if (deltaMax < 0) {
+            trend = 'down';
+            summary = 'Picco da ' + formatKg(previousStats.max) + 'kg a ' + formatKg(currentStats.max) + 'kg.';
+          } else {
+            trend = 'same';
+            maintainedCount++;
+            summary = 'Carico massimo stabile rispetto alla settimana ' + (weekNumber - 1) + '.';
+          }
         } else {
-          trend = 'same';
-          maintainedCount++;
-          summary = 'Carico massimo stabile rispetto alla settimana ' + (weekNumber - 1) + '.';
+          firstTrackedCount++;
         }
-      } else {
-        firstTrackedCount++;
-      }
 
-      items.push({
-        day: cleanText(day.label || day.name),
-        exercise: cleanText(exercise.name),
-        prevMax: previousStats ? Number(previousStats.max.toFixed(1)) : null,
-        currentMax: Number(currentStats.max.toFixed(1)),
-        deltaMax,
-        trend,
-        summary
+        items.push({
+          day: cleanText(day.label || day.name),
+          exercise: tracked.name,
+          prevMax: previousStats ? Number(previousStats.max.toFixed(1)) : null,
+          currentMax: Number(currentStats.max.toFixed(1)),
+          deltaMax,
+          trend,
+          summary
+        });
       });
     });
   });
@@ -736,8 +830,8 @@ function getSD(di, ei) {
   const programSession = getProgramSession();
   if (!programSession[di]) programSession[di] = {};
   const exercise = days[di].exercises[ei];
-  const previousKg = currentWeek > 1 ? readProgramState().weeks?.[String(currentWeek - 1)]?.exerciseData?.[di]?.[ei]?.kg || [] : [];
-  programSession[di][ei] = normalizeExerciseState(programSession[di]?.[ei], exercise, previousKg);
+  const previousExerciseState = currentWeek > 1 ? readProgramState().weeks?.[String(currentWeek - 1)]?.exerciseData?.[di]?.[ei] || null : null;
+  programSession[di][ei] = normalizeExerciseState(programSession[di]?.[ei], exercise, previousExerciseState);
   persistProgramState();
   return programSession[di][ei];
 }
@@ -1178,21 +1272,37 @@ function buildAiProgressionSummary() {
   const items = [];
   getDays().forEach((day, di) => {
     day.exercises.forEach((exercise, ei) => {
-      const currentStats = summarizeKg(currentWeekState.exerciseData?.[di]?.[ei]?.kg || []);
-      if (!currentStats) return;
-      const previousStats = previousWeekState ? summarizeKg(previousWeekState.exerciseData?.[di]?.[ei]?.kg || []) : null;
-      let trend = 'new';
-      if (previousStats) {
-        if (currentStats.max > previousStats.max) trend = 'up';
-        else if (currentStats.max < previousStats.max) trend = 'down';
-        else trend = 'same';
-      }
-      items.push({
-        day: cleanText(day.label || day.name),
-        exercise: cleanText(exercise.name),
-        lastWeight: formatKg(currentStats.max),
-        trend,
-        week: latestWeek
+      const currentExerciseState = currentWeekState.exerciseData?.[di]?.[ei] || {};
+      const previousExerciseState = previousWeekState?.exerciseData?.[di]?.[ei] || {};
+      const trackedLoads = isSupersetExercise(exercise)
+        ? getSupersetItems(exercise).map((item, itemIndex) => ({
+          name: cleanText(exercise.name + ' · ' + item.name),
+          current: getSupersetItemKgValues(currentExerciseState, itemIndex),
+          previous: getSupersetItemKgValues(previousExerciseState, itemIndex)
+        }))
+        : [{
+          name: cleanText(exercise.name),
+          current: getExerciseKgValues(currentExerciseState, exercise),
+          previous: getExerciseKgValues(previousExerciseState, exercise)
+        }];
+
+      trackedLoads.forEach((tracked) => {
+        const currentStats = summarizeKg(tracked.current);
+        if (!currentStats) return;
+        const previousStats = previousWeekState ? summarizeKg(tracked.previous) : null;
+        let trend = 'new';
+        if (previousStats) {
+          if (currentStats.max > previousStats.max) trend = 'up';
+          else if (currentStats.max < previousStats.max) trend = 'down';
+          else trend = 'same';
+        }
+        items.push({
+          day: cleanText(day.label || day.name),
+          exercise: tracked.name,
+          lastWeight: formatKg(currentStats.max),
+          trend,
+          week: latestWeek
+        });
       });
     });
   });
@@ -3380,16 +3490,20 @@ function renderListView(di) {
     let seriesHtml = '<div class="series-grid">';
     for (let s = 0; s < ex.series; s++) {
       const seriesReps = getSeriesRepDisplay(ex, s);
-      seriesHtml += `
-        <div class="serie-box${sd.seriesDone[s]?' done':''}" id="sb-${ei}-${s}" onclick="toggleSerie(${di},${ei},${s})">
-          <div class="sb-lbl">${getSeriesKindLabel(ex)} ${s+1}</div>
-          <div class="sb-reps">${seriesReps}</div>
+      const supersetKgHtml = isSupersetExercise(ex) ? renderSupersetKgInputs(ex, sd, di, ei, s, 'list') : '';
+      const normalKgHtml = !isSupersetExercise(ex) ? `
           <div class="sb-kg" id="sb-kg-${ei}-${s}">${sd.kg[s]||''}</div>
           <input class="kg-inp" id="kg-${ei}-${s}" type="number" inputmode="decimal" placeholder="kg"
             value="${sd.kg[s]||''}"
             onclick="event.stopPropagation()"
             onchange="saveKg(${di},${ei},${s},this.value)"
-            oninput="saveKg(${di},${ei},${s},this.value)">
+            oninput="saveKg(${di},${ei},${s},this.value)">` : '';
+      seriesHtml += `
+        <div class="serie-box${isSupersetExercise(ex) ? ' superset-box' : ''}${sd.seriesDone[s]?' done':''}" id="sb-${ei}-${s}" onclick="toggleSerie(${di},${ei},${s})">
+          <div class="sb-lbl">${getSeriesKindLabel(ex)} ${s+1}</div>
+          <div class="sb-reps">${seriesReps}</div>
+          ${normalKgHtml}
+          ${supersetKgHtml}
         </div>`;
     }
     seriesHtml += '</div>';
@@ -3431,7 +3545,8 @@ function toggleSerie(di, ei, s) {
   weekState.reportSeen = false;
   persistProgramState();
   const box = document.getElementById('sb-' + ei + '-' + s);
-  box.className = 'serie-box' + (sd.seriesDone[s] ? ' done' : '');
+  const exercise = getDays()?.[di]?.exercises?.[ei];
+  box.className = 'serie-box' + (isSupersetExercise(exercise) ? ' superset-box' : '') + (sd.seriesDone[s] ? ' done' : '');
   if (sd.seriesDone[s]) openTimer();
 }
 
@@ -3457,6 +3572,18 @@ function saveKg(di, ei, s, val) {
   if (label) label.textContent = sd.kg[s];
 }
 
+function saveSupersetKg(di, ei, roundIndex, itemIndex, val) {
+  const exercise = getDays()?.[di]?.exercises?.[ei];
+  const sd = getSD(di, ei);
+  if (!Array.isArray(sd.supersetKg)) sd.supersetKg = normalizeSupersetKgMatrix([], exercise);
+  if (!Array.isArray(sd.supersetKg[roundIndex])) sd.supersetKg[roundIndex] = [];
+  sd.supersetKg[roundIndex][itemIndex] = String(val ?? '').trim();
+  const weekState = getCurrentWeekState();
+  weekState.report = null;
+  weekState.reportSeen = false;
+  persistProgramState();
+}
+
 function saveNote(di, ei, val) {
   getSD(di, ei).note = String(val || '');
   persistProgramState();
@@ -3477,19 +3604,25 @@ function renderFocusView(di, ei) {
   let seriesHtml = `<div class="fc-series-lbl">${isSupersetExercise(ex) ? 'Round superset' : 'Serie'}</div>`;
   for (let s = 0; s < ex.series; s++) {
     const seriesReps = getSeriesRepDisplay(ex, s);
-    seriesHtml += `
-      <div class="fc-serie-row">
-        <div class="fsr-num">${s+1}</div>
-        <div class="fsr-reps">${seriesReps}${isSupersetExercise(ex) ? '' : ' reps'}</div>
+    const supersetKgHtml = isSupersetExercise(ex) ? renderSupersetKgInputs(ex, sd, di, ei, s, 'focus') : '';
+    const normalKgHtml = !isSupersetExercise(ex) ? `
         <div class="fsr-kg">
           <input type="number" inputmode="decimal" placeholder="kg"
             value="${sd.kg[s]||''}"
             onchange="saveKg(${di},${ei},${s},this.value)"
             oninput="saveKg(${di},${ei},${s},this.value)">
+        </div>` : '';
+    seriesHtml += `
+      <div class="fc-serie-row${isSupersetExercise(ex) ? ' superset-round' : ''}">
+        <div class="fc-serie-main">
+          <div class="fsr-num">${s+1}</div>
+          <div class="fsr-reps">${seriesReps}${isSupersetExercise(ex) ? '' : ' reps'}</div>
+          ${normalKgHtml}
+          <div class="fsr-chk${sd.seriesDone[s]?' on':''}" id="fchk-${ei}-${s}" onclick="toggleFSerie(${di},${ei},${s})">
+            <span>&#10003;</span>
+          </div>
         </div>
-        <div class="fsr-chk${sd.seriesDone[s]?' on':''}" id="fchk-${ei}-${s}" onclick="toggleFSerie(${di},${ei},${s})">
-          <span>&#10003;</span>
-        </div>
+        ${supersetKgHtml}
       </div>`;
   }
 
@@ -3560,7 +3693,8 @@ function toggleFSerie(di, ei, s) {
   const chk = document.getElementById('fchk-' + ei + '-' + s);
   if (chk) chk.className = 'fsr-chk' + (sd.seriesDone[s] ? ' on' : '');
   const box = document.getElementById('sb-' + ei + '-' + s);
-  if (box) box.className = 'serie-box' + (sd.seriesDone[s] ? ' done' : '');
+  const exercise = getDays()?.[di]?.exercises?.[ei];
+  if (box) box.className = 'serie-box' + (isSupersetExercise(exercise) ? ' superset-box' : '') + (sd.seriesDone[s] ? ' done' : '');
   if (sd.seriesDone[s]) openTimer();
 }
 
@@ -3697,7 +3831,9 @@ function finishSession() {
   };
   days[di].exercises.forEach((ex, ei) => {
     const sd = getSD(di, ei);
-    const kgStr = sd.kg.filter(k=>k).map((k,i)=>'S'+(i+1)+': '+k+'kg').join(', ');
+    const kgStr = isSupersetExercise(ex)
+      ? formatSupersetKgForHistory(ex, sd)
+      : sd.kg.filter(k=>k).map((k,i)=>'S'+(i+1)+': '+k+'kg').join(', ');
     entry.exercises.push({
       name: ex.name,
       done: sd.exDone,
