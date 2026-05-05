@@ -4420,6 +4420,8 @@ function renderFocusView(di, ei) {
 function toggleFSerie(di, ei, s) {
   const sd = getSD(di, ei);
   sd.seriesDone[s] = !sd.seriesDone[s];
+  const ex = getDays()[di].exercises[ei];
+  sd.exDone = sd.seriesDone.filter(Boolean).length >= ex.series;
   const weekState = getCurrentWeekState();
   weekState.report = null;
   weekState.reportSeen = false;
