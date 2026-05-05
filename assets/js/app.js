@@ -73,6 +73,7 @@ let negDur = 4;
 let timerWarnedMarks = new Set();
 let countdownTimer = null;
 let countdownDone = null;
+let lastSessionSummary = null;
 
 function repairText(value) {
   if (typeof value !== 'string') return value;
@@ -518,7 +519,8 @@ function createWeekState(weekNumber, seedWeek = null) {
     exerciseData,
     report: null,
     completedAt: '',
-    reportSeen: false
+    reportSeen: false,
+    livePrs: []
   };
 }
 
@@ -531,7 +533,17 @@ function normalizeWeekState(rawWeek, weekNumber) {
     exerciseData: {},
     report: normalizeWeekReport(safeWeek.report, weekNumber),
     completedAt: cleanText(safeWeek.completedAt || ''),
-    reportSeen: Boolean(safeWeek.reportSeen)
+    reportSeen: Boolean(safeWeek.reportSeen),
+    livePrs: (Array.isArray(safeWeek.livePrs) ? safeWeek.livePrs : []).map((item) => ({
+      key: cleanText(item?.key || ''),
+      week: Math.max(1, parseInt(item?.week, 10) || weekNumber || 1),
+      dayIndex: Math.max(0, parseInt(item?.dayIndex, 10) || 0),
+      exerciseIndex: Math.max(0, parseInt(item?.exerciseIndex, 10) || 0),
+      exercise: cleanText(item?.exercise || ''),
+      previousBest: Number.isFinite(Number(item?.previousBest)) ? Number(item.previousBest) : null,
+      currentBest: Number.isFinite(Number(item?.currentBest)) ? Number(item.currentBest) : null,
+      createdAt: cleanText(item?.createdAt || '')
+    })).filter((item) => item.key && item.exercise)
   };
   getDays().forEach((day, di) => {
     normalizedWeek.daysDone[di] = Boolean(daysDone[di]);
@@ -964,6 +976,201 @@ function showMiniToast(message) {
   toast._timer = setTimeout(() => toast.classList.remove('show'), 1800);
 }
 
+
+function getEmptyIllustration(kind = 'plans') {
+  const labels = {
+    plans: ['M12 50 C28 16 68 14 84 46', 'M22 62 L74 62', 'M36 76 L60 76'],
+    today: ['M22 24 H74 V78 H22 Z', 'M34 16 V32', 'M62 16 V32', 'M34 48 H62', 'M34 62 H52'],
+    nutrition: ['M52 78 C30 64 28 40 56 26 C78 43 74 66 52 78', 'M52 78 C54 58 60 42 72 30'],
+    progress: ['M18 76 H84', 'M26 66 L42 52 L56 58 L76 30', 'M26 66 V46', 'M42 52 V34', 'M56 58 V42', 'M76 30 V20'],
+    coach: ['M28 40 H72 V68 H28 Z', 'M38 40 V28 H62 V40', 'M40 54 H44', 'M56 54 H60']
+  };
+  const paths = labels[kind] || labels.plans;
+  return `
+    <div class="empty-illustration" aria-hidden="true">
+      <svg viewBox="0 0 100 100" role="img">
+        ${paths.map((d) => `<path d="${d}" pathLength="1"></path>`).join('')}
+      </svg>
+    </div>`;
+}
+
+function renderAiSkeleton(label = 'Coach AI al lavoro') {
+  return `
+    <div class="ai-skeleton" aria-live="polite">
+      <div class="ai-skeleton-orb"><span></span></div>
+      <div class="ai-skeleton-copy">
+        <strong>${escapeHtml(label)}</strong>
+        <span></span><span></span><span></span>
+      </div>
+    </div>`;
+}
+
+function getCurrentExerciseBestKg(di, ei) {
+  const exercise = getDays()?.[di]?.exercises?.[ei];
+  const state = getCurrentWeekState()?.exerciseData?.[di]?.[ei] || null;
+  const values = getExerciseKgValues(state, exercise).map(parseKgNumber).filter((value) => value !== null);
+  return values.length ? Math.max(...values) : null;
+}
+
+function getPreviousExerciseBestKg(di, ei) {
+  if (currentWeek <= 1) return null;
+  const exercise = getDays()?.[di]?.exercises?.[ei];
+  const previous = readProgramState().weeks?.[String(currentWeek - 1)]?.exerciseData?.[di]?.[ei] || null;
+  const values = getExerciseKgValues(previous, exercise).map(parseKgNumber).filter((value) => value !== null);
+  return values.length ? Math.max(...values) : null;
+}
+
+function ensureLivePrList(weekState = getCurrentWeekState()) {
+  if (!Array.isArray(weekState.livePrs)) weekState.livePrs = [];
+  return weekState.livePrs;
+}
+
+function getLivePrCount(weekNumber = currentWeek, dayIndex = null) {
+  const weekState = ensureWeekState(weekNumber);
+  const prs = Array.isArray(weekState.livePrs) ? weekState.livePrs : [];
+  return dayIndex === null ? prs.length : prs.filter((item) => Number(item.dayIndex) === Number(dayIndex)).length;
+}
+
+function checkLivePr(di, ei, anchor = null) {
+  const exercise = getDays()?.[di]?.exercises?.[ei];
+  if (!exercise || currentWeek <= 1) return false;
+  const previousBest = getPreviousExerciseBestKg(di, ei);
+  const currentBest = getCurrentExerciseBestKg(di, ei);
+  if (previousBest === null || currentBest === null || currentBest <= previousBest) return false;
+  const weekState = getCurrentWeekState();
+  const livePrs = ensureLivePrList(weekState);
+  const key = [currentWeek, di, ei, currentBest.toFixed(2)].join(':');
+  if (livePrs.some((item) => item.key === key)) return false;
+  livePrs.push({
+    key,
+    week: currentWeek,
+    dayIndex: di,
+    exerciseIndex: ei,
+    exercise: cleanText(exercise.name),
+    previousBest: Number(previousBest.toFixed(1)),
+    currentBest: Number(currentBest.toFixed(1)),
+    createdAt: new Date().toISOString()
+  });
+  persistProgramState();
+  showPrToast(exercise.name, previousBest, currentBest, anchor);
+  return true;
+}
+
+function showPrToast(exerciseName, previousBest, currentBest, anchor = null) {
+  let toast = document.getElementById('pr-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'pr-toast';
+    toast.className = 'pr-toast';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = `<strong>NUOVO PR</strong><span>${escapeHtml(exerciseName)}: ${formatKg(previousBest)}kg -> ${formatKg(currentBest)}kg</span>`;
+  toast.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), 2600);
+  if (anchor) anchor.classList.add('pr-hit');
+  if (anchor) setTimeout(() => anchor.classList.remove('pr-hit'), 850);
+  safeVibrate([100, 50, 100]);
+}
+
+function runSharedElementTransition(sourceEl, title = '') {
+  if (!sourceEl || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const rect = sourceEl.getBoundingClientRect();
+  if (!rect.width || !rect.height) return;
+  const clone = document.createElement('div');
+  clone.className = 'shared-clone';
+  clone.style.left = rect.left + 'px';
+  clone.style.top = rect.top + 'px';
+  clone.style.width = rect.width + 'px';
+  clone.style.height = rect.height + 'px';
+  clone.innerHTML = `<span>${escapeHtml(title || 'HyperCore')}</span>`;
+  document.body.appendChild(clone);
+  clone.animate([
+    { transform: 'translate3d(0,0,0) scale(1)', opacity: .75, borderRadius: getComputedStyle(sourceEl).borderRadius || '20px' },
+    { transform: 'translate3d(0,-18px,0) scale(1.035)', opacity: .28, borderRadius: '28px' },
+    { transform: 'translate3d(0,-28px,0) scale(1.08)', opacity: 0, borderRadius: '34px' }
+  ], { duration: 460, easing: 'cubic-bezier(.16,1,.3,1)' }).onfinish = () => clone.remove();
+}
+
+function parseHistoryDateKey(entry) {
+  if (entry?.dateKey) return cleanText(entry.dateKey);
+  const raw = cleanText(entry?.date || '');
+  const match = raw.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+  if (match) {
+    const day = match[1].padStart(2, '0');
+    const month = match[2].padStart(2, '0');
+    return `${match[3]}-${month}-${day}`;
+  }
+  return '';
+}
+
+function getHistoryExerciseMax(exerciseEntry) {
+  const values = String(exerciseEntry?.kg || '').match(/([0-9]+(?:[\.,][0-9]+)?)/g) || [];
+  const nums = values.map((value) => parseFloat(value.replace(',', '.'))).filter(Number.isFinite);
+  return nums.length ? Math.max(...nums) : null;
+}
+
+function buildProgressHeatmapHtml() {
+  const history = getHistory();
+  const counts = new Map();
+  history.forEach((entry) => {
+    const key = parseHistoryDateKey(entry);
+    if (!key) return;
+    counts.set(key, (counts.get(key) || 0) + 1);
+  });
+  const today = new Date();
+  const cells = [];
+  for (let offset = 83; offset >= 0; offset--) {
+    const date = new Date(today);
+    date.setDate(today.getDate() - offset);
+    const key = date.toISOString().slice(0, 10);
+    const count = counts.get(key) || 0;
+    const level = Math.min(4, count);
+    cells.push(`<span class="heat-cell l${level}" title="${key}: ${count} sessioni"></span>`);
+  }
+  return `<div class="progress-heatmap" aria-label="Heatmap ultime 12 settimane">${cells.join('')}</div>`;
+}
+
+function buildExerciseSparklineHtml(limit = 3) {
+  const seriesByName = new Map();
+  getHistory().slice().reverse().forEach((entry) => {
+    (entry.exercises || []).forEach((exercise) => {
+      const max = getHistoryExerciseMax(exercise);
+      if (max === null) return;
+      const name = cleanText(exercise.name);
+      if (!seriesByName.has(name)) seriesByName.set(name, []);
+      seriesByName.get(name).push(max);
+    });
+  });
+  const rows = Array.from(seriesByName.entries())
+    .filter(([, values]) => values.length >= 2)
+    .sort((a, b) => Math.max(...b[1]) - Math.max(...a[1]))
+    .slice(0, limit);
+  if (!rows.length) return '<div class="surface-empty">Salva almeno due sessioni con kg per vedere le sparkline dei carichi.</div>';
+  return `<div class="sparkline-list">${rows.map(([name, values]) => {
+    const min = Math.min(...values);
+    const max = Math.max(...values);
+    const range = Math.max(.1, max - min);
+    const points = values.map((value, index) => {
+      const x = values.length === 1 ? 4 : 4 + (index / (values.length - 1)) * 92;
+      const y = 34 - ((value - min) / range) * 28;
+      return `${x.toFixed(1)},${y.toFixed(1)}`;
+    }).join(' ');
+    const delta = values[values.length - 1] - values[0];
+    return `<div class="sparkline-row">
+      <div><strong>${escapeHtml(name)}</strong><span>${formatKg(values[0])}kg -> ${formatKg(values[values.length - 1])}kg</span></div>
+      <svg viewBox="0 0 100 40" preserveAspectRatio="none"><polyline points="${points}"></polyline></svg>
+      <b class="${delta >= 0 ? 'up' : 'down'}">${delta >= 0 ? '+' : ''}${formatKg(delta)}kg</b>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function buildTodayRingSvg(label, value, pct, extra = '') {
+  const safePct = Math.max(0, Math.min(1, Number(pct) || 0));
+  const offset = 100 - Math.round(safePct * 100);
+  return `<div class="activity-ring"><svg viewBox="0 0 44 44"><circle class="ring-bg" cx="22" cy="22" r="16" pathLength="100"></circle><circle class="ring-fg" cx="22" cy="22" r="16" pathLength="100" stroke-dasharray="100" stroke-dashoffset="${offset}"></circle></svg><strong>${escapeHtml(value)}</strong><span>${escapeHtml(label)}</span>${extra ? `<em>${escapeHtml(extra)}</em>` : ''}</div>`;
+}
+
 function celebrateSet(anchor) {
   safeVibrate(50);
   if (!anchor || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -1057,19 +1264,24 @@ function showSessionSummary(entry, weekCompleted = false, weekNumber = currentWe
     modal.innerHTML = '<div class="session-summary-card"><button class="session-summary-close" type="button" onclick="closeSessionSummary()">&times;</button><div id="session-summary-content"></div></div>';
     document.body.appendChild(modal);
   }
+  lastSessionSummary = { entry: cloneValue(entry), weekCompleted, weekNumber };
   const exercises = entry.exercises || [];
   const doneCount = exercises.filter((exercise) => exercise.done).length;
   const volume = getSessionVolume(entry);
+  const prCount = getLivePrCount(weekNumber, entry.dayIndex ?? null);
+  const estimatedCalories = Math.max(80, Math.round(doneCount * 32 + volume * 0.035));
   const content = document.getElementById('session-summary-content');
   content.innerHTML = `
     <div class="session-summary-kicker">Sessione completata</div>
     <h2>${escapeHtml(entry.day || 'Allenamento')}</h2>
     <div class="session-summary-stats">
       <div><strong data-count-to="${doneCount}">${doneCount}</strong><span>Esercizi fatti</span></div>
-      <div><strong data-count-to="${exercises.length}">${exercises.length}</strong><span>Totali</span></div>
-      <div><strong>${volume ? volume + ' kg' : '?'}</strong><span>Carichi segnati</span></div>
+      <div><strong data-count-to="${prCount}">${prCount}</strong><span>PR battuti</span></div>
+      <div><strong>${volume ? volume + ' kg' : '?'}</strong><span>Volume segnato</span></div>
+      <div><strong data-count-to="${estimatedCalories}">${estimatedCalories}</strong><span>Kcal stimate</span></div>
     </div>
-    <p>${weekCompleted ? 'Hai chiuso tutta la settimana: il report progressi e` pronto.' : 'Storico aggiornato e memoria carichi salvata.'}</p>
+    <p>${weekCompleted ? 'Hai chiuso tutta la settimana: il report progressi e` pronto.' : 'Storico aggiornato, memoria carichi salvata e PR live archiviati.'}</p>
+    <p class="session-summary-canvas-note">Condividi genera una story 1080x1920 pronta per Instagram.</p>
     <div class="session-summary-actions">
       ${weekCompleted ? `<button class="t-btn" type="button" onclick="closeSessionSummary();openWeekReport(${weekNumber})">Apri report settimana</button>` : ''}
       <button class="t-btn" type="button" onclick="shareSessionSummary()">Condividi</button>
@@ -1103,14 +1315,117 @@ function animateCountNumbers(root = document) {
   });
 }
 
-function shareSessionSummary() {
-  const card = document.querySelector('#session-summary-content h2');
-  const title = card ? card.textContent : 'Allenamento completato';
-  if (navigator.share) {
-    navigator.share({ title: 'HyperCore AI', text: title + ' completato con HyperCore AI.' }).catch(() => {});
-    return;
+async function shareSessionSummary() {
+  const summary = lastSessionSummary || { entry: { day: 'Allenamento', exercises: [] }, weekNumber: currentWeek };
+  const entry = summary.entry || {};
+  const exercises = entry.exercises || [];
+  const doneCount = exercises.filter((exercise) => exercise.done).length;
+  const volume = getSessionVolume(entry);
+  const prCount = getLivePrCount(summary.weekNumber || currentWeek, entry.dayIndex ?? null);
+  const title = cleanText(entry.day || 'Allenamento completato');
+
+  try {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1080;
+    canvas.height = 1920;
+    const ctx = canvas.getContext('2d');
+    const grad = ctx.createLinearGradient(0, 0, 1080, 1920);
+    grad.addColorStop(0, '#001f12');
+    grad.addColorStop(.42, '#050505');
+    grad.addColorStop(1, '#000000');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 1080, 1920);
+
+    ctx.strokeStyle = 'rgba(0,230,118,.32)';
+    ctx.lineWidth = 3;
+    for (let i = 0; i < 9; i++) {
+      ctx.beginPath();
+      ctx.arc(860, 260, 120 + i * 52, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    ctx.fillStyle = '#00e676';
+    ctx.font = '700 46px Arial, sans-serif';
+    ctx.letterSpacing = '8px';
+    ctx.fillText('HYPERCORE AI', 72, 120);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '900 118px Arial, sans-serif';
+    wrapCanvasText(ctx, title.toUpperCase(), 72, 360, 920, 126, 4);
+
+    const stats = [
+      ['Esercizi', String(doneCount)],
+      ['Volume', volume ? volume + 'kg' : '-'],
+      ['PR', String(prCount)],
+      ['Week', 'W' + (summary.weekNumber || currentWeek)]
+    ];
+    stats.forEach((item, index) => {
+      const x = 72 + (index % 2) * 468;
+      const y = 980 + Math.floor(index / 2) * 260;
+      ctx.fillStyle = 'rgba(255,255,255,.06)';
+      roundRect(ctx, x, y, 420, 190, 34);
+      ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.12)';
+      ctx.stroke();
+      ctx.fillStyle = '#00e676';
+      ctx.font = '900 82px Arial, sans-serif';
+      ctx.fillText(item[1], x + 34, y + 92);
+      ctx.fillStyle = 'rgba(255,255,255,.62)';
+      ctx.font = '700 28px Arial, sans-serif';
+      ctx.fillText(item[0].toUpperCase(), x + 34, y + 142);
+    });
+
+    ctx.fillStyle = 'rgba(255,255,255,.68)';
+    ctx.font = '500 34px Arial, sans-serif';
+    ctx.fillText('Allenamento completato e memoria carichi aggiornata.', 72, 1640);
+    ctx.fillStyle = '#00e676';
+    ctx.font = '800 36px Arial, sans-serif';
+    ctx.fillText('hypercore.ai', 72, 1744);
+
+    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png', .92));
+    if (!blob) throw new Error('canvas-empty');
+    const file = new File([blob], 'hypercore-session.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
+      await navigator.share({ title: 'HyperCore AI', text: title + ' completato con HyperCore AI.', files: [file] });
+      return;
+    }
+    if (navigator.share) {
+      await navigator.share({ title: 'HyperCore AI', text: title + ' completato con HyperCore AI.' });
+      return;
+    }
+    const url = URL.createObjectURL(blob);
+    window.open(url, '_blank', 'noopener,noreferrer');
+    setTimeout(() => URL.revokeObjectURL(url), 30000);
+  } catch (error) {
+    console.error('Errore condivisione report', error);
+    showMiniToast('Condivisione non supportata su questo dispositivo.');
   }
-  showMiniToast('Condivisione non supportata su questo dispositivo.');
+}
+
+function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 4) {
+  const words = String(text || '').split(/\s+/).filter(Boolean);
+  let line = '';
+  let lines = [];
+  words.forEach((word) => {
+    const next = line ? line + ' ' + word : word;
+    if (ctx.measureText(next).width > maxWidth && line) {
+      lines.push(line);
+      line = word;
+    } else {
+      line = next;
+    }
+  });
+  if (line) lines.push(line);
+  lines.slice(0, maxLines).forEach((item, index) => ctx.fillText(item, x, y + index * lineHeight));
+}
+
+function roundRect(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.arcTo(x + w, y, x + w, y + h, r);
+  ctx.arcTo(x + w, y + h, x, y + h, r);
+  ctx.arcTo(x, y + h, x, y, r);
+  ctx.arcTo(x, y, x + w, y, r);
+  ctx.closePath();
 }
 
 function showInstallSheet() {
@@ -1337,6 +1652,7 @@ function renderProgressSection() {
   if (!currentProgram && !activeNutritionPlan) {
     container.innerHTML = `
       <div class="empty-pane">
+        ${getEmptyIllustration('progress')}
         <h3>Nessuna scheda attiva</h3>
         <p>Seleziona o importa una scheda per vedere progressi allenamento, oppure crea un piano alimentare per iniziare a tracciare anche la nutrizione.</p>
         <button class="hdr-btn" type="button" onclick="setAppSection('plans')">Vai alle schede</button>
@@ -1349,6 +1665,7 @@ function renderProgressSection() {
     container.innerHTML = `
       <div class="progress-layout">
         <div class="surface-card">
+          ${getEmptyIllustration('progress')}
           <div class="surface-title">Allenamento</div>
           <div class="surface-empty">Non hai una scheda allenamento attiva in questo momento. La parte nutrizione pero' e' gia' disponibile qui sotto.</div>
           <div class="action-row">
@@ -1429,6 +1746,14 @@ function renderProgressSection() {
                 <span class="mini-pill">${entry.week ? 'W' + entry.week : 'Sessione'}</span>
               </div>`).join('')}
           </div>` : '<div class="surface-empty">Nessuna sessione salvata ancora. Quando termini un allenamento, qui vedrai i riferimenti piu` recenti.</div>'}
+      </div>
+      <div class="surface-card progress-visual-card">
+        <div class="surface-title">Heatmap 12 settimane</div>
+        ${buildProgressHeatmapHtml()}
+      </div>
+      <div class="surface-card progress-visual-card">
+        <div class="surface-title">Sparkline carichi principali</div>
+        ${buildExerciseSparklineHtml()}
       </div>
       ${nutritionCardHtml}
     </div>`;
@@ -2447,6 +2772,7 @@ function renderCoachSection() {
         `).join('')}
       </div>
     </div>` : '';
+  const busyHtml = aiCoachState.busy ? renderAiSkeleton(aiCoachState.phase === 'refining' ? 'Aggiorno la bozza' : 'Coach AI sta ragionando') : '';
   const draftHtml = aiCoachState.draftProgram ? `
     <div class="coach-draft-banner">
       Ultima bozza pronta: <strong>${escapeHtml(aiCoachState.draftProgram.title || 'Nuova scheda Coach AI')}</strong>
@@ -2471,6 +2797,7 @@ function renderCoachSection() {
   root.innerHTML = `
     <div class="coach-head">
       <div>
+        <div class="coach-ai-orb" aria-hidden="true"><span></span></div>
         <div class="section-badge">Coach AI PT</div>
         <h2>Crea la prossima scheda</h2>
         <p>Il Coach AI parte dalle schede che hai importato, dai progressi reali e da poche domande mirate per costruire una nuova bozza pronta da salvare nell'app.</p>
@@ -3142,12 +3469,19 @@ async function sendNutritionRefinement() {
 }
 
 function renderNutritionTargets(targets) {
+  const calories = Math.max(0, Number(targets.calories) || 0);
+  const protein = Math.max(0, Number(targets.proteinGrams) || 0);
+  const carbs = Math.max(0, Number(targets.carbsGrams) || 0);
+  const fats = Math.max(0, Number(targets.fatsGrams) || 0);
+  const rings = [
+    ['Kcal', calories ? String(calories) : '-', calories / 3200, 'target'],
+    ['Proteine', protein ? protein + 'g' : '-', protein / 220, 'target'],
+    ['Carbo', carbs ? carbs + 'g' : '-', carbs / 420, 'target'],
+    ['Grassi', fats ? fats + 'g' : '-', fats / 130, 'target']
+  ];
   return `
-    <div class="nutrition-target-grid">
-      <div class="nutrition-target"><strong>Kcal</strong><span>${targets.calories}</span></div>
-      <div class="nutrition-target"><strong>Proteine</strong><span>${targets.proteinGrams} g</span></div>
-      <div class="nutrition-target"><strong>Carbo</strong><span>${targets.carbsGrams} g</span></div>
-      <div class="nutrition-target"><strong>Grassi</strong><span>${targets.fatsGrams} g</span></div>
+    <div class="nutrition-ring-grid">
+      ${rings.map(([label, value, pct, extra]) => buildTodayRingSvg(label, value, pct, extra)).join('')}
     </div>
   `;
 }
@@ -3231,6 +3565,7 @@ function renderNutritionSection() {
         `).join('')}
       </div>
     </div>` : '';
+  const busyHtml = nutritionAiState.busy ? renderAiSkeleton(nutritionAiState.phase === 'refining' ? 'Aggiorno il piano alimentare' : 'Nutrition Coach AI sta preparando il piano') : '';
   const draftHtml = nutritionAiState.draftPlan ? `
     <div class="coach-draft-banner">
       Ultima bozza pronta: <strong>${escapeHtml(nutritionAiState.draftPlan.title || 'Nuovo piano alimentare')}</strong>
@@ -3364,6 +3699,7 @@ function renderNutritionSection() {
   root.innerHTML = `
     <div class="coach-head">
       <div>
+        <div class="coach-ai-orb nutrition" aria-hidden="true"><span></span></div>
         <div class="section-badge">Nutrizione AI</div>
         <h2 style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;line-height:1;margin-top:10px">Piano alimentare</h2>
         <p style="font-size:13px;color:var(--tm);margin-top:6px;line-height:1.6;max-width:620px">Genera un piano alimentare realistico con training day e rest day, rifiniscilo in chat e traccia aderenza, peso e acqua direttamente nell'app.</p>
@@ -3460,6 +3796,7 @@ function renderNutritionSection() {
             ${nutritionAiState.draftPlan ? `<button class="hdr-btn" type="button" onclick="saveNutritionDraftPlan()"${nutritionAiState.busy ? ' disabled' : ''}>Salva piano</button>` : ''}
           </div>
           ${(nutritionAiState.error || nutritionAiState.status) ? `<div class="${statusClass}">${escapeHtml(nutritionAiState.error || nutritionAiState.status)}</div>` : ''}
+          ${busyHtml}
           ${draftHtml}
           ${refineCardHtml}
         </div>
@@ -3548,6 +3885,7 @@ function renderPrograms() {
     label.textContent = 'Nessuna scheda ancora';
     grid.innerHTML = `
       <div class="program-card program-empty">
+        ${getEmptyIllustration('plans')}
         <h3>Nessuna scheda ancora</h3>
         <p>Puoi iniziare importando il PDF del personal trainer oppure lasciare che il Coach AI ti prepari una nuova bozza da personalizzare.</p>
         <div class="action-row" style="justify-content:center">
@@ -3595,7 +3933,7 @@ function renderPrograms() {
         deleteImportedProgram(program.id);
       };
     }
-    card.onclick = () => openProgram(i);
+    card.onclick = () => { runSharedElementTransition(card, program.title); openProgram(i); };
     grid.appendChild(card);
   });
 }
@@ -3682,6 +4020,7 @@ function renderHome() {
     weekPanel.innerHTML = '';
     grid.innerHTML = `
       <div class="empty-pane" style="grid-column:1/-1">
+        ${getEmptyIllustration('today')}
         <h3>Nessuna scheda attiva</h3>
         <p>Importa il PDF del PT oppure apri una delle tue schede per trasformare questa sezione nella tua dashboard giornaliera.</p>
         <button class="hdr-btn" type="button" onclick="setAppSection('plans')">Vai alle schede</button>
@@ -3702,10 +4041,10 @@ function renderHome() {
           <div class="week-status">${escapeHtml(selectedStatus)}</div>
         </div>
       </div>
-      <div class="week-rings" style="--day-pct:${days.length ? completedDays / days.length : 0};--week-pct:${visibleWeeks.length ? currentWeek / Math.max(...visibleWeeks) : 0};--session-pct:${Math.min(1, getHistory().length / 12)}">
-        <div><strong>${completedDays}/${days.length}</strong><span>Giorni</span></div>
-        <div><strong>W${currentWeek}</strong><span>Settimana</span></div>
-        <div><strong>${getHistory().length}</strong><span>Sessioni</span></div>
+      <div class="week-rings">
+        ${buildTodayRingSvg('Giorni', completedDays + '/' + days.length, days.length ? completedDays / days.length : 0)}
+        ${buildTodayRingSvg('Settimana', 'W' + currentWeek, visibleWeeks.length ? currentWeek / Math.max(...visibleWeeks) : 0)}
+        ${buildTodayRingSvg('Sessioni', String(getHistory().length), Math.min(1, getHistory().length / 12))}
       </div>
       <div class="week-grid">
         ${visibleWeeks.map((weekNumber) => {
@@ -3759,7 +4098,7 @@ function renderHome() {
       <div class="dc-count">${completedExercises}/${day.exercises.length} esercizi</div>
       <div class="day-card-progress"><span style="width:${dayPct}%"></span></div>
     `;
-    card.onclick = () => startSession(i);
+    card.onclick = () => { runSharedElementTransition(card, day.label || day.name); startSession(i); };
     grid.appendChild(card);
   });
 }
@@ -3886,7 +4225,7 @@ function toggleSerie(di, ei, s) {
   const box = document.getElementById('sb-' + ei + '-' + s);
   const exercise = getDays()?.[di]?.exercises?.[ei];
   box.className = 'serie-box' + (isSupersetExercise(exercise) ? ' superset-box' : '') + (sd.seriesDone[s] ? ' done' : '');
-  if (sd.seriesDone[s]) { celebrateSet(box); openTimer(); }
+  if (sd.seriesDone[s]) { celebrateSet(box); checkLivePr(di, ei, box); openTimer(); }
 }
 
 function toggleExDone(di, ei) {
@@ -3909,6 +4248,7 @@ function saveKg(di, ei, s, val) {
   persistProgramState();
   const label = document.getElementById('sb-kg-' + ei + '-' + s);
   if (label) label.textContent = sd.kg[s];
+  checkLivePr(di, ei, label || document.getElementById('fchk-' + ei + '-' + s));
 }
 
 function saveSupersetKg(di, ei, roundIndex, itemIndex, val) {
@@ -3921,6 +4261,7 @@ function saveSupersetKg(di, ei, roundIndex, itemIndex, val) {
   weekState.report = null;
   weekState.reportSeen = false;
   persistProgramState();
+  checkLivePr(di, ei, document.getElementById('fchk-' + ei + '-' + roundIndex) || document.getElementById('sb-' + ei + '-' + roundIndex));
 }
 
 function saveNote(di, ei, val) {
@@ -3938,6 +4279,17 @@ function renderFocusView(di, ei) {
   document.getElementById('fnav-ctr').textContent = (ei+1) + ' / ' + days[di].exercises.length;
   document.getElementById('fnav-prev').disabled = ei === 0;
   document.getElementById('fnav-next').disabled = ei === days[di].exercises.length - 1;
+
+  const completedSets = sd.seriesDone.filter(Boolean).length;
+  const nextSetIndex = sd.seriesDone.findIndex((done) => !done);
+  const activeSetNumber = nextSetIndex === -1 ? Math.max(1, ex.series) : nextSetIndex + 1;
+  const energyPct = ex.series ? Math.max(0, Math.round(((ex.series - completedSets) / ex.series) * 100)) : 0;
+  const focusMeterHtml = `
+    <div class="fc-hero-meter" style="--energy:${energyPct}%">
+      <div class="fc-hero-set"><span>Serie attiva</span><strong>${activeSetNumber}</strong></div>
+      <div class="fc-hero-energy"><span></span></div>
+      <div class="fc-hero-copy">${completedSets}/${ex.series} completate - energia residua ${energyPct}%</div>
+    </div>`;
 
   // Build series rows
   let seriesHtml = `<div class="fc-series-lbl">${isSupersetExercise(ex) ? 'Round superset' : 'Serie'}</div>`;
@@ -3995,6 +4347,7 @@ function renderFocusView(di, ei) {
     </div>
     ${renderSupersetItemsHtml(ex, 'focus')}
     ${ex.note ? `<div class="fc-note">${ex.note}</div>` : ''}
+    ${focusMeterHtml}
     ${nextHtml}
     <div class="chrono-row">
       <span class="chrono-lbl">Cronometro serie:</span>
@@ -4037,7 +4390,7 @@ function toggleFSerie(di, ei, s) {
   const box = document.getElementById('sb-' + ei + '-' + s);
   const exercise = getDays()?.[di]?.exercises?.[ei];
   if (box) box.className = 'serie-box' + (isSupersetExercise(exercise) ? ' superset-box' : '') + (sd.seriesDone[s] ? ' done' : '');
-  if (sd.seriesDone[s]) { celebrateSet(chk || box); openTimer(); }
+  if (sd.seriesDone[s]) { celebrateSet(chk || box); checkLivePr(di, ei, chk || box); openTimer(); }
 }
 
 function focusNav(dir) {
@@ -4173,6 +4526,8 @@ function finishSession() {
     date: new Date().toLocaleString('it-IT'),
     program: currentProgram ? currentProgram.title : '',
     week: currentWeek,
+    dayIndex: di,
+    prCount: getLivePrCount(currentWeek, di),
     day: days[di].name + ' - ' + (days[di].label || ''),
     exercises: []
   };
