@@ -4357,7 +4357,7 @@ function renderFocusView(di, ei) {
     const inputId = `fkg-${ei}-${s}`;
     const normalKgHtml = !isSupersetExercise(ex) ? `
         <div class="fsr-kg kg-stepper">
-          <button type="button" onclick="event.stopPropagation();stepKg(${di},${ei},${s},-2.5,'${inputId}')">?</button>
+          <button type="button" onclick="event.stopPropagation();stepKg(${di},${ei},${s},-2.5,'${inputId}')">−</button>
           <input id="${inputId}" type="number" inputmode="decimal" placeholder="kg"
             value="${sd.kg[s]||''}"
             onchange="saveKg(${di},${ei},${s},this.value)"
