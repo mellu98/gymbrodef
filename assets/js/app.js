@@ -1110,6 +1110,25 @@ function getHistoryExerciseMax(exerciseEntry) {
   return nums.length ? Math.max(...nums) : null;
 }
 
+function formatHeatmapLabel(date, count) {
+  const months = ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'];
+  const weekdays = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'];
+  const d = date.getDate();
+  const m = months[date.getMonth()];
+  const wd = weekdays[date.getDay()];
+  const sessions = count === 0 ? 'nessuna sessione' : count === 1 ? '1 sessione' : `${count} sessioni`;
+  return `${wd} ${d} ${m} · ${sessions}`;
+}
+
+function showHeatmapInfo(btn) {
+  const info = document.getElementById('progressHeatmapInfo');
+  if (!info) return;
+  info.textContent = btn.getAttribute('data-label') || '';
+  info.classList.add('active');
+  document.querySelectorAll('.progress-heatmap .heat-cell.focused').forEach((el) => el.classList.remove('focused'));
+  btn.classList.add('focused');
+}
+
 function buildProgressHeatmapHtml() {
   const history = getHistory();
   const counts = new Map();
@@ -1120,15 +1139,34 @@ function buildProgressHeatmapHtml() {
   });
   const today = new Date();
   const cells = [];
+  let totalSessions = 0;
+  let activeDays = 0;
   for (let offset = 83; offset >= 0; offset--) {
     const date = new Date(today);
     date.setDate(today.getDate() - offset);
     const key = date.toISOString().slice(0, 10);
     const count = counts.get(key) || 0;
+    if (count > 0) { totalSessions += count; activeDays += 1; }
     const level = Math.min(4, count);
-    cells.push(`<span class="heat-cell l${level}" title="${key}: ${count} sessioni"></span>`);
+    const label = formatHeatmapLabel(date, count);
+    cells.push(`<button type="button" class="heat-cell l${level}" data-label="${escapeHtml(label)}" aria-label="${escapeHtml(label)}" onclick="showHeatmapInfo(this)"></button>`);
   }
-  return `<div class="progress-heatmap" aria-label="Heatmap ultime 12 settimane">${cells.join('')}</div>`;
+  const summary = activeDays
+    ? `${totalSessions} sessioni in ${activeDays} giorni · tocca per il dettaglio`
+    : 'Nessuna sessione negli ultimi 84 giorni · tocca un giorno per il dettaglio';
+  return `<div class="progress-heatmap-wrap">
+    <div class="progress-heatmap" role="grid" aria-label="Heatmap ultime 12 settimane">${cells.join('')}</div>
+    <div class="progress-heatmap-info" id="progressHeatmapInfo" aria-live="polite">${escapeHtml(summary)}</div>
+    <div class="progress-heatmap-legend" aria-hidden="true">
+      <span class="legend-label">Meno</span>
+      <span class="heat-cell l0"></span>
+      <span class="heat-cell l1"></span>
+      <span class="heat-cell l2"></span>
+      <span class="heat-cell l3"></span>
+      <span class="heat-cell l4"></span>
+      <span class="legend-label">Più</span>
+    </div>
+  </div>`;
 }
 
 function buildExerciseSparklineHtml(limit = 3) {
@@ -4555,6 +4593,7 @@ function finishSession() {
     persistProgramState();
   }
   renderPrograms();
+  if (currentSection === 'progress' && typeof renderProgressSection === 'function') renderProgressSection();
   goHome();
   showSessionSummary(entry, weekJustCompleted, currentWeek);
 }
