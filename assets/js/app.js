@@ -1,4 +1,4 @@
-﻿const PROGRAMS_URL = './programs.json';
+const PROGRAMS_URL = './programs.json';
 const IMPORT_API_BASE_URL = String(window.MASSI_CONFIG?.importApiBaseUrl || '').replace(/\/$/, '');
 const USER_PROGRAMS_KEY = 'massi_user_programs';
 const USER_PROFILE_KEY = 'massi_user_profile';
@@ -6,6 +6,8 @@ const NUTRITION_PROFILE_KEY = 'massi_user_nutrition_profile';
 const NUTRITION_PLANS_KEY = 'massi_user_nutrition_plans';
 const NUTRITION_LOG_KEY = 'massi_nutrition_log_v1';
 const ASSISTANT_SESSION_KEY = 'massi_overlay_assistant_v1';
+const ONBOARDING_DONE_KEY = 'massi_onboarding_done';
+const THEME_PREF_KEY = 'massi_theme_pref';
 const PROGRAM_STATE_PREFIX = 'massi_state_';
 const SHOW_BUNDLED_PROGRAMS = false;
 const MAIN_SECTION_IDS = ['programs', 'home', 'progress', 'nutrition', 'coach'];
@@ -68,6 +70,9 @@ let negInterval = null;
 let negLeft = 4;
 let negRunning = false;
 let negDur = 4;
+let timerWarnedMarks = new Set();
+let countdownTimer = null;
+let countdownDone = null;
 
 function repairText(value) {
   if (typeof value !== 'string') return value;
@@ -867,12 +872,334 @@ function getCurrentProgramHistoryPreview(limit = 4) {
   return getHistory().slice(0, limit);
 }
 
+
+function safeVibrate(pattern) {
+  try {
+    if (navigator.vibrate) navigator.vibrate(pattern);
+  } catch(e) {}
+}
+
+function getTimeBand(date = new Date()) {
+  const hour = date.getHours();
+  if (hour >= 5 && hour < 9) return 'morning';
+  if (hour >= 9 && hour < 18) return 'day';
+  if (hour >= 18 && hour < 22) return 'evening';
+  return 'night';
+}
+
+function syncVisualContext(section = currentSection) {
+  document.body.dataset.section = currentDay !== null ? 'workout' : section;
+  document.body.dataset.time = getTimeBand();
+}
+
+function ensureDockIndicator() {
+  const dock = document.querySelector('.section-dock');
+  if (!dock) return null;
+  let indicator = document.getElementById('dock-indicator');
+  if (!indicator) {
+    indicator = document.createElement('span');
+    indicator.id = 'dock-indicator';
+    indicator.className = 'dock-indicator';
+    indicator.setAttribute('aria-hidden', 'true');
+    dock.prepend(indicator);
+  }
+  return indicator;
+}
+
+function updateDockIndicator() {
+  const dock = document.querySelector('.section-dock');
+  const active = document.querySelector('.section-tab.on');
+  const indicator = ensureDockIndicator();
+  if (!dock || !active || !indicator) return;
+  requestAnimationFrame(() => {
+    const dockRect = dock.getBoundingClientRect();
+    const activeRect = active.getBoundingClientRect();
+    indicator.style.width = activeRect.width + 'px';
+    indicator.style.height = activeRect.height + 'px';
+    indicator.style.transform = 'translate3d(' + (activeRect.left - dockRect.left) + 'px,' + (activeRect.top - dockRect.top) + 'px,0)';
+  });
+}
+
+function applyTheme(theme) {
+  const allowed = ['oled', 'cool', 'warm'];
+  const nextTheme = allowed.includes(theme) ? theme : 'oled';
+  document.documentElement.dataset.theme = nextTheme;
+  try { localStorage.setItem(THEME_PREF_KEY, nextTheme); } catch(e) {}
+}
+
+function initTheme() {
+  let stored = '';
+  try { stored = localStorage.getItem(THEME_PREF_KEY) || ''; } catch(e) {}
+  applyTheme(stored || 'oled');
+}
+
+function cycleTheme() {
+  const order = ['oled', 'cool', 'warm'];
+  const current = document.documentElement.dataset.theme || 'oled';
+  const next = order[(order.indexOf(current) + 1) % order.length] || 'oled';
+  applyTheme(next);
+  showMiniToast('Tema ' + next.toUpperCase());
+}
+
+function bindHeaderScroll() {
+  const app = document.getElementById('app');
+  const header = document.getElementById('main-hdr');
+  if (!app || !header) return;
+  app.addEventListener('scroll', () => {
+    header.classList.toggle('shrunk', app.scrollTop > 24);
+  }, { passive: true });
+}
+
+function showMiniToast(message) {
+  let toast = document.getElementById('mini-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'mini-toast';
+    toast.className = 'mini-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = message;
+  toast.classList.add('show');
+  clearTimeout(toast._timer);
+  toast._timer = setTimeout(() => toast.classList.remove('show'), 1800);
+}
+
+function celebrateSet(anchor) {
+  safeVibrate(50);
+  if (!anchor || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const rect = anchor.getBoundingClientRect();
+  const burst = document.createElement('div');
+  burst.className = 'set-burst';
+  burst.style.left = (rect.left + rect.width / 2) + 'px';
+  burst.style.top = (rect.top + rect.height / 2) + 'px';
+  for (let i = 0; i < 8; i++) {
+    const dot = document.createElement('span');
+    dot.style.setProperty('--a', (i * 45) + 'deg');
+    burst.appendChild(dot);
+  }
+  document.body.appendChild(burst);
+  anchor.classList.add('just-done');
+  setTimeout(() => anchor.classList.remove('just-done'), 520);
+  setTimeout(() => burst.remove(), 720);
+}
+
+function stepKg(di, ei, s, delta, inputId) {
+  const input = inputId ? document.getElementById(inputId) : null;
+  const sd = getSD(di, ei);
+  const current = parseFloat(String(input?.value || sd.kg[s] || '0').replace(',', '.')) || 0;
+  const next = Math.max(0, Math.round((current + delta) * 2) / 2);
+  const value = String(next).replace('.', ',');
+  if (input) input.value = value;
+  saveKg(di, ei, s, value);
+}
+
+function addTimerSeconds(seconds) {
+  timerLeft = Math.max(0, timerLeft + seconds);
+  timerTotal = Math.max(timerTotal, timerLeft);
+  updateTimerDisplay();
+  safeVibrate(10);
+}
+
+function showWorkoutCountdown() {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let overlay = document.getElementById('workout-countdown');
+  if (!overlay) {
+    overlay = document.createElement('div');
+    overlay.id = 'workout-countdown';
+    overlay.className = 'workout-countdown';
+    overlay.innerHTML = '<div class="countdown-num">3</div><div class="countdown-sub">Tocca per saltare</div>';
+    overlay.onclick = skipWorkoutCountdown;
+    document.body.appendChild(overlay);
+  }
+  let value = 3;
+  const num = overlay.querySelector('.countdown-num');
+  overlay.classList.add('show');
+  num.textContent = value;
+  safeVibrate([80]);
+  clearInterval(countdownTimer);
+  countdownDone = () => {
+    overlay.classList.remove('show');
+    clearInterval(countdownTimer);
+    countdownDone = null;
+  };
+  countdownTimer = setInterval(() => {
+    value -= 1;
+    if (value <= 0) {
+      num.textContent = 'GO';
+      safeVibrate([100, 50, 100]);
+      setTimeout(() => countdownDone && countdownDone(), 380);
+      return;
+    }
+    num.textContent = value;
+    safeVibrate([80]);
+  }, 800);
+}
+
+function skipWorkoutCountdown() {
+  if (countdownDone) countdownDone();
+}
+
+function getSessionVolume(entry) {
+  let total = 0;
+  (entry.exercises || []).forEach((exercise) => {
+    const matches = String(exercise.kg || '').match(/([0-9]+(?:[\.,][0-9]+)?)/g) || [];
+    matches.forEach((value) => { total += parseFloat(value.replace(',', '.')) || 0; });
+  });
+  return Math.round(total * 10) / 10;
+}
+
+function showSessionSummary(entry, weekCompleted = false, weekNumber = currentWeek) {
+  let modal = document.getElementById('session-summary-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'session-summary-modal';
+    modal.className = 'session-summary-modal';
+    modal.innerHTML = '<div class="session-summary-card"><button class="session-summary-close" type="button" onclick="closeSessionSummary()">&times;</button><div id="session-summary-content"></div></div>';
+    document.body.appendChild(modal);
+  }
+  const exercises = entry.exercises || [];
+  const doneCount = exercises.filter((exercise) => exercise.done).length;
+  const volume = getSessionVolume(entry);
+  const content = document.getElementById('session-summary-content');
+  content.innerHTML = `
+    <div class="session-summary-kicker">Sessione completata</div>
+    <h2>${escapeHtml(entry.day || 'Allenamento')}</h2>
+    <div class="session-summary-stats">
+      <div><strong data-count-to="${doneCount}">${doneCount}</strong><span>Esercizi fatti</span></div>
+      <div><strong data-count-to="${exercises.length}">${exercises.length}</strong><span>Totali</span></div>
+      <div><strong>${volume ? volume + ' kg' : '?'}</strong><span>Carichi segnati</span></div>
+    </div>
+    <p>${weekCompleted ? 'Hai chiuso tutta la settimana: il report progressi e` pronto.' : 'Storico aggiornato e memoria carichi salvata.'}</p>
+    <div class="session-summary-actions">
+      ${weekCompleted ? `<button class="t-btn" type="button" onclick="closeSessionSummary();openWeekReport(${weekNumber})">Apri report settimana</button>` : ''}
+      <button class="t-btn" type="button" onclick="shareSessionSummary()">Condividi</button>
+      <button class="t-btn danger" type="button" onclick="closeSessionSummary()">Chiudi</button>
+    </div>`;
+  modal.dataset.week = String(weekNumber);
+  modal.classList.add('show');
+  animateCountNumbers(content);
+  syncAssistantUi();
+}
+
+function closeSessionSummary() {
+  document.getElementById('session-summary-modal')?.classList.remove('show');
+  syncAssistantUi();
+}
+
+function animateCountNumbers(root = document) {
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  root.querySelectorAll('[data-count-to]').forEach((el) => {
+    const target = parseInt(el.getAttribute('data-count-to'), 10);
+    if (!Number.isFinite(target)) return;
+    const start = performance.now();
+    const duration = 600;
+    const step = (now) => {
+      const pct = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - pct, 3);
+      el.textContent = String(Math.round(target * eased));
+      if (pct < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+
+function shareSessionSummary() {
+  const card = document.querySelector('#session-summary-content h2');
+  const title = card ? card.textContent : 'Allenamento completato';
+  if (navigator.share) {
+    navigator.share({ title: 'HyperCore AI', text: title + ' completato con HyperCore AI.' }).catch(() => {});
+    return;
+  }
+  showMiniToast('Condivisione non supportata su questo dispositivo.');
+}
+
+function showInstallSheet() {
+  let sheet = document.getElementById('install-sheet');
+  if (!sheet) {
+    sheet = document.createElement('div');
+    sheet.id = 'install-sheet';
+    sheet.className = 'install-sheet';
+    sheet.innerHTML = `
+      <div class="install-card">
+        <button class="install-close" type="button" onclick="closeInstallSheet()">?</button>
+        <div class="install-kicker">App installabile</div>
+        <h2>Porta HyperCore nella Home</h2>
+        <p>Accesso rapido, uso offline della scheda e timer sempre a portata durante l'allenamento.</p>
+        <div class="install-benefits"><span>Timer</span><span>Offline</span><span>PWA</span></div>
+        <button class="t-btn" type="button" onclick="performInstallPrompt()">Installa adesso</button>
+      </div>`;
+    document.body.appendChild(sheet);
+  }
+  sheet.classList.add('show');
+}
+
+function closeInstallSheet() {
+  document.getElementById('install-sheet')?.classList.remove('show');
+}
+
+async function performInstallPrompt() {
+  if (!deferredPrompt) {
+    showMiniToast('Su iPhone usa Condividi > Aggiungi alla schermata Home.');
+    closeInstallSheet();
+    return;
+  }
+  deferredPrompt.prompt();
+  await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  document.getElementById('installBtn').style.display = 'none';
+  closeInstallSheet();
+}
+
+function initOnboarding() {
+  let done = false;
+  try { done = localStorage.getItem(ONBOARDING_DONE_KEY) === '1'; } catch(e) {}
+  if (done) return;
+  setTimeout(showOnboarding, 500);
+}
+
+function showOnboarding() {
+  if (currentDay !== null) return;
+  let layer = document.getElementById('onboarding-layer');
+  if (!layer) {
+    layer = document.createElement('div');
+    layer.id = 'onboarding-layer';
+    layer.className = 'onboarding-layer';
+    layer.innerHTML = `
+      <div class="onboarding-card">
+        <div class="onboarding-mark">&#9889;</div>
+        <div class="onboarding-kicker">HyperCore AI</div>
+        <h2>Allenamento, progressi e AI in una sola app.</h2>
+        <div class="onboarding-steps">
+          <div><strong>1</strong><span>Importa il PDF del PT.</span></div>
+          <div><strong>2</strong><span>Scegli settimana e giorno.</span></div>
+          <div><strong>3</strong><span>Salva carichi, report e nutrizione.</span></div>
+        </div>
+        <div class="onboarding-actions">
+          <button class="t-btn" type="button" onclick="finishOnboarding('import')">Importa PDF</button>
+          <button class="t-btn" type="button" onclick="finishOnboarding('coach')">Coach AI</button>
+          <button class="t-btn danger" type="button" onclick="finishOnboarding('skip')">Salta</button>
+        </div>
+      </div>`;
+    document.body.appendChild(layer);
+  }
+  layer.classList.add('show');
+}
+
+function finishOnboarding(action) {
+  try { localStorage.setItem(ONBOARDING_DONE_KEY, '1'); } catch(e) {}
+  document.getElementById('onboarding-layer')?.classList.remove('show');
+  if (action === 'import') triggerPdfImport();
+  if (action === 'coach') setAppSection('chat');
+}
+
 function renderSectionNav() {
+  ensureDockIndicator();
   ['plans', 'today', 'nutrition', 'progress', 'chat'].forEach((section) => {
     const button = document.getElementById('section-tab-' + section);
     if (!button) return;
     button.classList.toggle('on', currentSection === section);
   });
+  updateDockIndicator();
 }
 
 function syncHeaderMenuUi() {
@@ -1830,7 +2157,7 @@ function resetAssistantSession() {
 }
 
 function hasBlockingOverlayOpen() {
-  return ['timer-ov', 'hist-modal', 'week-modal', 'import-modal'].some((id) => document.getElementById(id)?.classList.contains('show'));
+  return ['timer-ov', 'hist-modal', 'week-modal', 'import-modal', 'session-summary-modal', 'install-sheet', 'onboarding-layer', 'workout-countdown'].some((id) => document.getElementById(id)?.classList.contains('show'));
 }
 
 function syncAssistantUi() {
@@ -1841,7 +2168,7 @@ function syncAssistantUi() {
   if (!fab || !layer) return;
 
   const inSession = currentDay !== null;
-  const hasVisibleAppSection = inSession || ['plans', 'progress', 'chat', 'today'].includes(currentSection);
+  const hasVisibleAppSection = inSession || ['plans', 'progress', 'chat', 'today', 'nutrition'].includes(currentSection);
   const blocked = hasBlockingOverlayOpen();
   const showFab = hasVisibleAppSection && !blocked;
 
@@ -3165,6 +3492,7 @@ function openExerciseDemo(di, ei) {
 function setAppSection(section) {
   closeHeaderMenu();
   currentSection = section;
+  syncVisualContext(section);
   const sectionMap = {
     today: 'home',
     plans: 'programs',
@@ -3240,6 +3568,8 @@ function renderPrograms() {
     const card = document.createElement('div');
     card.className = 'program-card pop' + (currentProgram && currentProgram.id === program.id ? ' active' : '');
     card.style.animationDelay = (i * 0.05) + 's';
+    card.style.setProperty('--i', i);
+    const previewExercises = (program.days || []).flatMap((day) => day.exercises || []).slice(0, 3);
     card.innerHTML = `
       <div class="program-card-top">
         <div class="program-card-copy">
@@ -3256,6 +3586,7 @@ function renderPrograms() {
         <span>${stats.done} fatti</span>
         <span>${stats.hist} sessioni</span>
       </div>
+      ${previewExercises.length ? `<div class="program-preview"><span>Preview</span>${previewExercises.map((exercise) => `<b>${escapeHtml(exercise.name)}</b>`).join('')}</div>` : ''}
     `;
     if (program.source === 'imported') {
       const deleteBtn = card.querySelector('.program-delete');
@@ -3330,15 +3661,9 @@ function initPwa() {
     document.getElementById('installBtn').style.display = 'none';
     syncHeaderBalance();
   });
-  document.getElementById('installBtn').addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
-    deferredPrompt = null;
-    document.getElementById('installBtn').style.display = 'none';
-    syncHeaderBalance();
-  });
-  window.addEventListener('resize', syncHeaderBalance);
+  document.getElementById('installBtn').addEventListener('click', showInstallSheet);
+  window.addEventListener('resize', () => { syncHeaderBalance(); updateDockIndicator(); });
+  window.addEventListener('orientationchange', () => setTimeout(updateDockIndicator, 250));
 }
 
 
@@ -3376,6 +3701,11 @@ function renderHome() {
           <div class="week-title">Settimane della scheda</div>
           <div class="week-status">${escapeHtml(selectedStatus)}</div>
         </div>
+      </div>
+      <div class="week-rings" style="--day-pct:${days.length ? completedDays / days.length : 0};--week-pct:${visibleWeeks.length ? currentWeek / Math.max(...visibleWeeks) : 0};--session-pct:${Math.min(1, getHistory().length / 12)}">
+        <div><strong>${completedDays}/${days.length}</strong><span>Giorni</span></div>
+        <div><strong>W${currentWeek}</strong><span>Settimana</span></div>
+        <div><strong>${getHistory().length}</strong><span>Sessioni</span></div>
       </div>
       <div class="week-grid">
         ${visibleWeeks.map((weekNumber) => {
@@ -3420,11 +3750,14 @@ function renderHome() {
     const card = document.createElement('div');
     card.className = 'day-card pop';
     card.style.animationDelay = (i*0.07)+'s';
+    const completedExercises = day.exercises.reduce((total, _ex, ei) => total + (getSD(i, ei).exDone ? 1 : 0), 0);
+    const dayPct = day.exercises.length ? Math.round((completedExercises / day.exercises.length) * 100) : 0;
     card.innerHTML = `
       ${done ? '<div class="dc-done">FATTO</div>' : ''}
       <div class="dc-num">${i+1}</div>
       <div class="dc-name">${day.label || day.name}</div>
-      <div class="dc-count">${day.exercises.length} esercizi</div>
+      <div class="dc-count">${completedExercises}/${day.exercises.length} esercizi</div>
+      <div class="day-card-progress"><span style="width:${dayPct}%"></span></div>
     `;
     card.onclick = () => startSession(i);
     grid.appendChild(card);
@@ -3447,6 +3780,8 @@ function startSession(di) {
   document.getElementById('btn-finish').classList.add('show');
   switchTab('list');
   updateProgress(di);
+  syncVisualContext('workout');
+  showWorkoutCountdown();
   updateHeader();
 }
 
@@ -3460,7 +3795,12 @@ function updateProgress(di) {
   let done = 0;
   exs.forEach((_, ei) => { if (getSD(di, ei).exDone) done++; });
   const pct = Math.round((done / exs.length) * 100);
-  document.getElementById('prog-fill').style.width = pct + '%';
+  const fill = document.getElementById('prog-fill');
+  fill.style.width = pct + '%';
+  fill.dataset.progress = String(pct);
+  fill.classList.toggle('energy-low', pct < 35);
+  fill.classList.toggle('energy-mid', pct >= 35 && pct < 75);
+  fill.classList.toggle('energy-high', pct >= 75);
 }
 
 function switchTab(tab) {
@@ -3546,7 +3886,7 @@ function toggleSerie(di, ei, s) {
   const box = document.getElementById('sb-' + ei + '-' + s);
   const exercise = getDays()?.[di]?.exercises?.[ei];
   box.className = 'serie-box' + (isSupersetExercise(exercise) ? ' superset-box' : '') + (sd.seriesDone[s] ? ' done' : '');
-  if (sd.seriesDone[s]) openTimer();
+  if (sd.seriesDone[s]) { celebrateSet(box); openTimer(); }
 }
 
 function toggleExDone(di, ei) {
@@ -3604,12 +3944,15 @@ function renderFocusView(di, ei) {
   for (let s = 0; s < ex.series; s++) {
     const seriesReps = getSeriesRepDisplay(ex, s);
     const supersetKgHtml = isSupersetExercise(ex) ? renderSupersetKgInputs(ex, sd, di, ei, s, 'focus') : '';
+    const inputId = `fkg-${ei}-${s}`;
     const normalKgHtml = !isSupersetExercise(ex) ? `
-        <div class="fsr-kg">
-          <input type="number" inputmode="decimal" placeholder="kg"
+        <div class="fsr-kg kg-stepper">
+          <button type="button" onclick="event.stopPropagation();stepKg(${di},${ei},${s},-2.5,'${inputId}')">?</button>
+          <input id="${inputId}" type="number" inputmode="decimal" placeholder="kg"
             value="${sd.kg[s]||''}"
             onchange="saveKg(${di},${ei},${s},this.value)"
             oninput="saveKg(${di},${ei},${s},this.value)">
+          <button type="button" onclick="event.stopPropagation();stepKg(${di},${ei},${s},2.5,'${inputId}')">+</button>
         </div>` : '';
     seriesHtml += `
       <div class="fc-serie-row${isSupersetExercise(ex) ? ' superset-round' : ''}">
@@ -3694,7 +4037,7 @@ function toggleFSerie(di, ei, s) {
   const box = document.getElementById('sb-' + ei + '-' + s);
   const exercise = getDays()?.[di]?.exercises?.[ei];
   if (box) box.className = 'serie-box' + (isSupersetExercise(exercise) ? ' superset-box' : '') + (sd.seriesDone[s] ? ' done' : '');
-  if (sd.seriesDone[s]) openTimer();
+  if (sd.seriesDone[s]) { celebrateSet(chk || box); openTimer(); }
 }
 
 function focusNav(dir) {
@@ -3755,6 +4098,7 @@ function stopNeg() {
 const CIRC = 515;
 function openTimer() {
   timerLeft = timerTotal;
+  timerWarnedMarks = new Set();
   updateTimerDisplay();
   document.getElementById('timer-ov').classList.add('show');
   syncAssistantUi();
@@ -3779,6 +4123,10 @@ function startTimer() {
   timerInterval = setInterval(() => {
     timerLeft--;
     updateTimerDisplay();
+    if ([5, 3, 1].includes(timerLeft) && !timerWarnedMarks.has(timerLeft)) {
+      timerWarnedMarks.add(timerLeft);
+      safeVibrate(timerLeft === 1 ? [60, 40, 60] : 40);
+    }
     if (timerLeft <= 0) { stopTimer(); buzzVibrate(); document.getElementById('t-sub').textContent = 'PRONTI!'; }
   }, 1000);
 }
@@ -3799,7 +4147,7 @@ function updateTimerDisplay() {
 
 // â”€â”€â”€ BUZZ / VIBRATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function buzzVibrate() {
-  if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
+  safeVibrate([300, 100, 300]);
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     [0, 0.3, 0.6].forEach(t => {
@@ -3853,7 +4201,7 @@ function finishSession() {
   }
   renderPrograms();
   goHome();
-  if (weekJustCompleted) openWeekReport(currentWeek);
+  showSessionSummary(entry, weekJustCompleted, currentWeek);
 }
 
 // â”€â”€â”€ HISTORY MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -4361,6 +4709,14 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     if (assistantOpen) { closeAssistantOverlay(); return; }
     if (headerMenuOpen) { closeHeaderMenu(); return; }
+    const countdown = document.getElementById('workout-countdown');
+    if (countdown && countdown.classList.contains('show')) { skipWorkoutCountdown(); return; }
+    const onboarding = document.getElementById('onboarding-layer');
+    if (onboarding && onboarding.classList.contains('show')) { finishOnboarding('skip'); return; }
+    const installSheet = document.getElementById('install-sheet');
+    if (installSheet && installSheet.classList.contains('show')) { closeInstallSheet(); return; }
+    const sessionSummary = document.getElementById('session-summary-modal');
+    if (sessionSummary && sessionSummary.classList.contains('show')) { closeSessionSummary(); return; }
     const importModal = document.getElementById('import-modal');
     if (importModal && importModal.classList.contains('show')) { closeImportModal(); return; }
     const weekModal = document.getElementById('week-modal');
@@ -4384,6 +4740,9 @@ document.addEventListener('click', (event) => {
     closeHeaderMenu();
   }
 });
+initTheme();
+bindHeaderScroll();
+syncVisualContext('plans');
 syncAssistantInputHeight();
 renderAssistantThread();
 renderSectionNav();
@@ -4392,3 +4751,4 @@ renderNutritionSection();
 syncHeaderMenuUi();
 setAppSection('plans');
 loadPrograms();
+initOnboarding();

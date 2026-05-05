@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
 <meta charset="UTF-8">
@@ -104,6 +104,7 @@
         <h2>Progressi</h2>
         <p>Monitora la settimana corrente, rivedi lo storico e tieni sempre sotto controllo la progressione dei carichi.</p>
       </div>
+      <button class="hdr-btn" type="button" onclick="cycleTheme()">Cambia tema</button>
     </div>
     <div id="progress-content"></div>
   </div>
@@ -192,7 +193,7 @@
     <button class="t-dur-btn on" onclick="setDur(90,this)">90"</button>
     <button class="t-dur-btn" onclick="setDur(120,this)">120"</button>
   </div>
-  <div class="t-ring">
+  <div class="t-ring" onclick="addTimerSeconds(15)" title="+15 secondi">
     <svg width="190" height="190" viewBox="0 0 190 190">
       <circle class="t-ring-bg" cx="95" cy="95" r="82" fill="none" stroke-width="8"/>
       <circle class="t-ring-fg" id="t-circle" cx="95" cy="95" r="82" fill="none" stroke-width="8"
