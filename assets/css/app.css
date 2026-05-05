@@ -764,14 +764,6 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;opa
 .t-btn.danger:hover{border-color:var(--red)}
 
 /* NEG TIMER (small inline) */
-.neg-timer-row{display:flex;align-items:center;gap:8px;margin:10px 0}
-.neg-label{font-size:11px;color:var(--tm)}
-.neg-secs{font-family:'JetBrains Mono',monospace;font-size:22px;color:var(--blue);font-weight:700;min-width:36px}
-.neg-btns{display:flex;gap:6px}
-.neg-btn{background:var(--s2);border:1px solid var(--td);color:var(--tm);border-radius:7px;padding:5px 12px;font-size:12px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background-color .2s,border-color .2s,color .2s,box-shadow .2s,transform .2s}
-.neg-btn:hover{color:var(--blue);border-color:var(--blue)}
-.neg-dur-sel{background:var(--s3);border:1px solid var(--td);color:var(--t);border-radius:7px;padding:5px 8px;font-size:12px;font-family:'DM Sans',sans-serif;cursor:pointer;outline:none}
-.neg-dur-sel:focus{border-color:var(--blue)}
 
 /* CHRONO */
 .chrono-row{display:flex;align-items:center;gap:8px;margin:6px 0 10px}

@@ -65,11 +65,6 @@ let timerRunning = false;
 let chronoInterval = null;
 let chronoSecs = 0;
 let chronoRunning = false;
-// Neg timer
-let negInterval = null;
-let negLeft = 4;
-let negRunning = false;
-let negDur = 4;
 let timerWarnedMarks = new Set();
 let countdownTimer = null;
 let countdownDone = null;
@@ -3893,7 +3888,7 @@ function setAppSection(section) {
   document.getElementById('fab').classList.remove('show');
   document.getElementById('btn-finish').classList.remove('show');
   currentDay = null;
-  stopTimer(); stopChrono(); stopNeg();
+  stopTimer(); stopChrono();
   renderSectionNav();
   if (section === 'today') renderHome();
   if (section === 'plans') renderPrograms();
@@ -4415,25 +4410,11 @@ function renderFocusView(di, ei) {
         <button class="chrono-btn" onclick="resetChrono()">Reset</button>
       </div>
     </div>
-    <div class="neg-timer-row">
-      <span class="neg-label">Neg:</span>
-      <span class="neg-secs" id="neg-disp">${negLeft}</span>
-      <select class="neg-dur-sel" onchange="negDur=parseInt(this.value);negLeft=negDur;updateNegDisp()" >
-        <option value="3"${negDur===3?' selected':''}>3"</option>
-        <option value="4"${negDur===4?' selected':''}>4"</option>
-        <option value="5"${negDur===5?' selected':''}>5"</option>
-      </select>
-      <div class="neg-btns">
-        <button class="neg-btn" onclick="startNeg()">Start</button>
-        <button class="neg-btn" onclick="stopNeg()">Reset</button>
-      </div>
-    </div>
     ${seriesHtml}
     <textarea class="fc-textnote" rows="2" placeholder="Note..."
       onchange="saveNote(${di},${ei},this.value)"
       oninput="saveNote(${di},${ei},this.value)">${sd.note}</textarea>
   `;
-  updateNegDisp();
 }
 
 function toggleFSerie(di, ei, s) {
@@ -4469,7 +4450,7 @@ function updateFocusMeter(di, ei) {
 function focusNav(dir) {
   const next = focusIdx + dir;
   if (next < 0 || next >= getDays()[currentDay].exercises.length) return;
-  stopChrono(); stopNeg();
+  stopChrono();
   renderFocusView(currentDay, next);
 }
 
@@ -4497,28 +4478,6 @@ function resetChrono() {
 }
 function stopChrono() { clearInterval(chronoInterval); chronoRunning = false; chronoSecs = 0; }
 
-// â”€â”€â”€ NEG TIMER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function updateNegDisp() {
-  const el = document.getElementById('neg-disp');
-  if (el) el.textContent = negLeft;
-}
-function startNeg() {
-  if (negRunning) return;
-  negLeft = negDur;
-  updateNegDisp();
-  negRunning = true;
-  negInterval = setInterval(() => {
-    negLeft--;
-    updateNegDisp();
-    if (negLeft <= 0) {
-      stopNeg();
-      buzzVibrate();
-    }
-  }, 1000);
-}
-function stopNeg() {
-  clearInterval(negInterval); negRunning = false; negLeft = negDur; updateNegDisp();
-}
 
 // â”€â”€â”€ REST TIMER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const CIRC = 515;
