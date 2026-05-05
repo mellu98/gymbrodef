@@ -613,7 +613,11 @@ function ensureWeekState(weekNumber = currentWeek) {
     if (!state.weeks[key]) {
       state.weeks[key] = createWeekState(index, state.weeks[String(index - 1)] || null);
     } else {
-      state.weeks[key] = normalizeWeekState(state.weeks[key], index);
+      // Mutate in-place to preserve external references. Replacing the object
+      // would orphan any caller currently holding a reference (e.g. finishSession,
+      // openWeekReport), causing assignments like `weekState.report = ...` to be
+      // lost on the next persistProgramState().
+      Object.assign(state.weeks[key], normalizeWeekState(state.weeks[key], index));
     }
   }
   if (!state.currentWeek) state.currentWeek = 1;
@@ -1718,6 +1722,15 @@ function renderProgressSection() {
   const stats = getProgramStats(currentProgram);
   const completedDays = getCompletedDaysCount(currentWeek);
   const completedWeeks = getCompletedWeeksCount(currentProgram);
+  // Heal pre-fix saved state: if the week is complete but the report is missing
+  // (legacy bug from stale references), build and persist it now.
+  if (isWeekComplete(currentWeek) && !getCurrentWeekState()?.report) {
+    const healedReport = buildWeekReport(currentWeek);
+    const healedWeekState = getCurrentWeekState();
+    if (!healedWeekState.completedAt) healedWeekState.completedAt = new Date().toISOString();
+    healedWeekState.report = healedReport;
+    persistProgramState();
+  }
   const reportReady = getCurrentWeekState()?.report;
   const historyPreview = getCurrentProgramHistoryPreview(4);
 
@@ -4088,6 +4101,13 @@ function renderHome() {
         ${visibleWeeks.map((weekNumber) => {
           const exists = existingWeeks.has(weekNumber);
           const complete = exists ? isWeekComplete(weekNumber) : false;
+          if (exists && complete && !ensureWeekState(weekNumber).report) {
+            const healed = buildWeekReport(weekNumber);
+            const ws = ensureWeekState(weekNumber);
+            if (!ws.completedAt) ws.completedAt = new Date().toISOString();
+            ws.report = healed;
+            persistProgramState();
+          }
           const report = exists ? ensureWeekState(weekNumber).report : null;
           let badge = 'Inizia';
           if (!exists) badge = 'Nuova';
