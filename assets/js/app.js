@@ -61,6 +61,8 @@ let timerInterval = null;
 let timerTotal = 90;
 let timerLeft = 90;
 let timerRunning = false;
+let timerDi = -1;
+let timerEi = -1;
 // Chrono state
 let chronoInterval = null;
 let chronoSecs = 0;
@@ -1283,13 +1285,61 @@ function skipWorkoutCountdown() {
   if (countdownDone) countdownDone();
 }
 
-function getSessionVolume(entry) {
-  let total = 0;
-  (entry.exercises || []).forEach((exercise) => {
-    const matches = String(exercise.kg || '').match(/([0-9]+(?:[\.,][0-9]+)?)/g) || [];
-    matches.forEach((value) => { total += parseFloat(value.replace(',', '.')) || 0; });
+function classifyExerciseIntensity(name) {
+  var n = (name || '').toLowerCase();
+  if (/(?:squat|stacco|deadlift|leg press|hack|hip thrust|panca piana|distensioni piana|bench press)/i.test(n)) return 3;
+  if (/(?:inclinat|declin|chest press|lat |tirate|rematore|row|pulldown|pulley|overhead|military|distensioni verticali|dip|affond|lunge|leg curl|leg ext|estensioni|french|push down|pull down)/i.test(n)) return 2;
+  return 1;
+}
+
+function countCompletedSets(kgStr) {
+  var s = (String(kgStr || '').match(/S\d+\s*:/g) || []).length;
+  if (s) return s;
+  var r = (String(kgStr || '').match(/R\d+\s/g) || []).length;
+  return r || 0;
+}
+
+function extractSetWeights(kgStr) {
+  return (String(kgStr || '').match(/([0-9]+(?:[\.,][0-9]+)?)\s*kg/gi) || [])
+    .map(function(m) { return parseFloat(m.replace(',', '.')) || 0; });
+}
+
+function estimateSessionCalories(entry) {
+  var exercises = (entry.exercises || []).filter(function(e) { return e.done; });
+  if (!exercises.length) return 0;
+
+  var totalSets = 0;
+  var intensitySum = 0;
+
+  exercises.forEach(function(exercise) {
+    var sets = Math.max(1, countCompletedSets(exercise.kg));
+    totalSets += sets;
+    intensitySum += sets * classifyExerciseIntensity(exercise.name);
   });
-  return Math.round(total * 10) / 10;
+
+  if (!totalSets) return 80;
+
+  var avgIntensity = intensitySum / totalSets;
+  var met = 3.5 + (avgIntensity - 1) * 1.25;
+  var estimatedDurationMin = (totalSets * 130) / 60;
+  var durationHours = estimatedDurationMin / 60;
+
+  var nutritionProfile = getNutritionProfile();
+  var bodyweight = nutritionProfile.currentWeightKg || 70;
+
+  var calories = Math.round(met * bodyweight * durationHours);
+  return Math.max(80, Math.min(900, calories));
+}
+
+function getSessionVolume(entry) {
+  var total = 0;
+  (entry.exercises || []).forEach(function(exercise) {
+    var sets = Math.max(1, countCompletedSets(exercise.kg));
+    var weights = extractSetWeights(exercise.kg);
+    var avgWeight = weights.length ? weights.reduce(function(a, b) { return a + b; }, 0) / weights.length : 0;
+    total += avgWeight * sets * 10;
+  });
+  return Math.round(total / 10);
 }
 
 function showSessionSummary(entry, weekCompleted = false, weekNumber = currentWeek) {
@@ -1306,7 +1356,7 @@ function showSessionSummary(entry, weekCompleted = false, weekNumber = currentWe
   const doneCount = exercises.filter((exercise) => exercise.done).length;
   const volume = getSessionVolume(entry);
   const prCount = getLivePrCount(weekNumber, entry.dayIndex ?? null);
-  const estimatedCalories = Math.max(80, Math.round(doneCount * 32 + volume * 0.035));
+  const estimatedCalories = estimateSessionCalories(entry);
   const content = document.getElementById('session-summary-content');
   content.innerHTML = `
     <div class="session-summary-kicker">Sessione completata</div>
@@ -4278,7 +4328,7 @@ function toggleSerie(di, ei, s) {
   const box = document.getElementById('sb-' + ei + '-' + s);
   const exercise = getDays()?.[di]?.exercises?.[ei];
   box.className = 'serie-box' + (isSupersetExercise(exercise) ? ' superset-box' : '') + (sd.seriesDone[s] ? ' done' : '');
-  if (sd.seriesDone[s]) { celebrateSet(box); checkLivePr(di, ei, box); openTimer(); }
+  if (sd.seriesDone[s]) { celebrateSet(box); checkLivePr(di, ei, box); openTimer(di, ei); }
 }
 
 function toggleExDone(di, ei) {
@@ -4431,7 +4481,7 @@ function toggleFSerie(di, ei, s) {
   const box = document.getElementById('sb-' + ei + '-' + s);
   const exercise = getDays()?.[di]?.exercises?.[ei];
   if (box) box.className = 'serie-box' + (isSupersetExercise(exercise) ? ' superset-box' : '') + (sd.seriesDone[s] ? ' done' : '');
-  if (sd.seriesDone[s]) { celebrateSet(chk || box); checkLivePr(di, ei, chk || box); openTimer(); }
+  if (sd.seriesDone[s]) { celebrateSet(chk || box); checkLivePr(di, ei, chk || box); openTimer(di, ei); }
   updateFocusMeter(di, ei);
 }
 
@@ -4483,9 +4533,12 @@ function stopChrono() { clearInterval(chronoInterval); chronoRunning = false; ch
 
 // â”€â”€â”€ REST TIMER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const CIRC = 515;
-function openTimer() {
+function openTimer(di, ei) {
+  timerDi = di ?? currentDay;
+  timerEi = ei ?? focusIdx;
   timerLeft = timerTotal;
   timerWarnedMarks = new Set();
+  populateTimerContext();
   updateTimerDisplay();
   document.getElementById('timer-ov').classList.add('show');
   syncAssistantUi();
@@ -4514,7 +4567,7 @@ function startTimer() {
       timerWarnedMarks.add(timerLeft);
       safeVibrate(timerLeft === 1 ? [60, 40, 60] : 40);
     }
-    if (timerLeft <= 0) { stopTimer(); buzzVibrate(); document.getElementById('t-sub').textContent = 'PRONTI!'; }
+    if (timerLeft <= 0) { stopTimer(); buzzVibrate(); }
   }, 1000);
 }
 function stopTimer() {
@@ -4525,11 +4578,51 @@ function toggleTimer() {
   if (timerRunning) stopTimer();
   else { if (timerLeft <= 0) { timerLeft = timerTotal; } startTimer(); }
 }
+function populateTimerContext() {
+  if (timerDi == null || timerDi < 0) return;
+  var days = getDays();
+  var day = days[timerDi];
+  if (!day) return;
+  var currentEx = day.exercises[timerEi];
+  var nextEx = day.exercises[timerEi + 1] || null;
+  var ctxEl = document.getElementById('t-exercise-ctx');
+  var nextEl = document.getElementById('t-up-next');
+  if (currentEx) {
+    ctxEl.innerHTML = '<span class="t-ctx-label">Stai facendo</span><span class="t-ctx-name">' + escapeHtml(currentEx.name) + '</span>';
+  } else {
+    ctxEl.innerHTML = '';
+  }
+  if (nextEx) {
+    nextEl.innerHTML = '<div class="t-next-kicker">Prossimo esercizio</div><div class="t-next-name">' + escapeHtml(nextEx.name) + '</div><div class="t-next-meta">' + escapeHtml(getExerciseMetaLabel(nextEx)) + '</div>';
+  } else {
+    nextEl.innerHTML = '<div class="t-next-kicker">Finale</div><div class="t-next-name">Ultimo esercizio del giorno!</div><div class="t-next-meta">Chiudi alla grande.</div>';
+  }
+}
 function updateTimerDisplay() {
   document.getElementById('t-num').textContent = timerLeft;
-  document.getElementById('t-sub').textContent = timerLeft > 0 ? 'secondi' : 'PRONTI!';
-  const pct = timerLeft / timerTotal;
-  document.getElementById('t-circle').style.strokeDashoffset = CIRC * (1 - pct);
+  var pct = timerTotal > 0 ? timerLeft / timerTotal : 0;
+  var circle = document.getElementById('t-circle');
+  var sub = document.getElementById('t-sub');
+  var num = document.getElementById('t-num');
+  circle.style.strokeDashoffset = CIRC * (1 - pct);
+  circle.classList.remove('phase-rest', 'phase-ready', 'phase-almost', 'phase-go');
+  if (timerLeft <= 0) {
+    sub.textContent = 'VIA!';
+    num.style.color = '#00e676';
+    circle.classList.add('phase-go');
+  } else if (pct <= 0.2) {
+    sub.textContent = 'Ci siamo quasi...';
+    num.style.color = '#ff6d00';
+    circle.classList.add('phase-almost');
+  } else if (pct <= 0.45) {
+    sub.textContent = 'Preparati...';
+    num.style.color = '#ffc107';
+    circle.classList.add('phase-ready');
+  } else {
+    sub.textContent = 'Recupera...';
+    num.style.color = '#00e676';
+    circle.classList.add('phase-rest');
+  }
 }
 
 // â”€â”€â”€ BUZZ / VIBRATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
