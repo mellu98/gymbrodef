@@ -96,14 +96,18 @@ Coach AI con catalogo:
 - La shortlist viene inclusa nel prompt di sistema per orientare il modello
 - Dopo la risposta il backend esegue post-processing con il matcher per assegnare catalogId validi quando possibile
 
-Limiti licenza media:
-- Il catalogo include SOLO dati testuali (id, nomi, body part, target, muscoli secondari, equipment, istruzioni italiane)
-- NON sono importate immagini o GIF del dataset per rispettare le licenze dei media originali
-- Il pulsante DEMO nel Focus Mode apre Google Immagini con il nome dell'esercizio
+Dataset completo:
+- La repo `hasaneyldrm/exercises-dataset` e' inclusa in `data/exercises-dataset/` con dati testuali, immagini e video.
+- I file sono serviti pubblicamente dal server tramite la route statica `/exercises-dataset/`.
+
+Attenzione licenza media:
+- I dati testuali e la struttura del dataset sono rilasciati sotto MIT License.
+- Le immagini in `data/exercises-dataset/images/` e i video in `data/exercises-dataset/videos/` sono © Gym visual (https://gymvisual.com/) e sono governati da `data/exercises-dataset/NOTICE.md`, NON dalla MIT. Clonare il dataset originale non concede diritti di ridistribuzione commerciale dei media.
+- Il pulsante DEMO nel Focus Mode apre Google Immagini con il nome dell'esercizio.
 
 Aggiornare il catalogo:
 1. Clonare o scaricare https://github.com/hasaneyldrm/exercises-dataset
-2. Copiare `data/exercises.json` del dataset in `.claude/tmp/exercises-dataset/data/exercises.json`
+2. Copiare il contenuto nella cartella `data/exercises-dataset/`
 3. Eseguire `node scripts/build-catalog.js`
 4. Verificare con `node -e "console.log(require('./lib/exercise-catalog').getStats())"`
 
