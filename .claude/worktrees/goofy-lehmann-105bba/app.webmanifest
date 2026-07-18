@@ -1,0 +1,29 @@
+{
+  "id": "./",
+  "name": "HyperCore AI",
+  "short_name": "HyperCore",
+  "description": "Allenamento, nutrizione, progressi e Coach AI in un'unica app fitness interattiva.",
+  "lang": "it",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["standalone", "minimal-ui"],
+  "orientation": "portrait",
+  "background_color": "#080808",
+  "theme_color": "#00e676",
+  "categories": ["health", "fitness"],
+  "icons": [
+    {
+      "src": "./icons/hypercore-app-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icons/hypercore-app-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

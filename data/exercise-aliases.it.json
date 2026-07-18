@@ -1,0 +1,6125 @@
+{
+  "1000": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1001": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1002": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1003": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1004": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1005": {
+    "canonicalIt": "Crunch in piedi con elastico",
+    "aliases": [
+      "crunch in piedi elastico"
+    ]
+  },
+  "1007": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1008": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1009": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1010": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1011": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1012": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1013": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1014": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1015": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1016": {
+    "canonicalIt": "Wrist curl con elastico",
+    "aliases": [
+      "curl polsi elastico"
+    ]
+  },
+  "1017": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1018": {
+    "canonicalIt": "Shrug con elastico",
+    "aliases": [
+      "shrug elastico"
+    ]
+  },
+  "1022": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1023": {
+    "canonicalIt": "Stiff leg deadlift con elastico",
+    "aliases": [
+      "stiff elastico"
+    ]
+  },
+  "1160": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1167": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1201": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1253": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1254": {
+    "canonicalIt": "Panca piana con elastico",
+    "aliases": [
+      "bench press elastico"
+    ]
+  },
+  "1255": {
+    "canonicalIt": "Pullover declinato con bilanciere",
+    "aliases": [
+      "pullover declinato"
+    ]
+  },
+  "1256": {
+    "canonicalIt": "Panca declinata presa inversa con bilanciere",
+    "aliases": [
+      "decline press inversa"
+    ]
+  },
+  "1257": {
+    "canonicalIt": "Panca inclinata presa inversa con bilanciere",
+    "aliases": [
+      "incline press inversa"
+    ]
+  },
+  "1258": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1259": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1260": {
+    "canonicalIt": "Press declinato monobraccio al cavo",
+    "aliases": [
+      "decline press cavo"
+    ]
+  },
+  "1261": {
+    "canonicalIt": "Panca declinata al cavo",
+    "aliases": [
+      "decline press cavo"
+    ]
+  },
+  "1262": {
+    "canonicalIt": "Croce petto declinata monobraccio al cavo",
+    "aliases": [
+      "decline fly monobraccio cavo"
+    ]
+  },
+  "1263": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1264": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1265": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1266": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1267": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1268": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1269": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1270": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1271": {
+    "canonicalIt": "Stretch petto e parte anteriore spalla",
+    "aliases": [
+      "chest stretch"
+    ]
+  },
+  "1272": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1273": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1274": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1275": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1276": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1277": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1278": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1279": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1280": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1281": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1282": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1283": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1284": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1285": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1286": {
+    "canonicalIt": "Croce petto monobraccio su fitball con manubrio",
+    "aliases": [
+      "one arm fly fitball"
+    ]
+  },
+  "1287": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1288": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1289": {
+    "canonicalIt": "Panca inclinata petto monobraccio con manubrio",
+    "aliases": [
+      "one arm incline press"
+    ]
+  },
+  "1290": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1291": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1292": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1293": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1294": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1295": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1296": {
+    "canonicalIt": "Pike push-up su fitball",
+    "aliases": [
+      "pike push up fitball"
+    ]
+  },
+  "1297": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1298": {
+    "canonicalIt": "Floor press monobraccio con kettlebell",
+    "aliases": [
+      "kb one arm floor press"
+    ]
+  },
+  "1299": {
+    "canonicalIt": "Chest press inclinata al macchinario",
+    "aliases": [
+      "incline chest press machine"
+    ]
+  },
+  "1300": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1301": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1302": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1303": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1304": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1305": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1306": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1307": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1308": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1309": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1310": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1311": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1312": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1313": {
+    "canonicalIt": "Rematore unilaterale al macchinario",
+    "aliases": [
+      "unilateral row machine"
+    ]
+  },
+  "1314": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1316": {
+    "canonicalIt": "Pullover con braccia piegate con bilanciere",
+    "aliases": [
+      "pullover bilanciere"
+    ]
+  },
+  "1317": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1318": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1319": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1320": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1321": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1322": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1323": {
+    "canonicalIt": "Rematore seduto con fune al cavo",
+    "aliases": [
+      "seated row fune"
+    ]
+  },
+  "1324": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1325": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1326": {
+    "canonicalIt": "Chin-up",
+    "aliases": [
+      "chin up",
+      "trazione presa stretta"
+    ]
+  },
+  "1327": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1328": {
+    "canonicalIt": "Rematore deltoidi posteriori disteso con manubri",
+    "aliases": [
+      "lying rear delt row"
+    ]
+  },
+  "1329": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1330": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1331": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1332": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1333": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1334": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1335": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1336": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1338": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1339": {
+    "canonicalIt": "Stretch dorsali su fitball",
+    "aliases": [
+      "lat stretch fitball"
+    ]
+  },
+  "1341": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1342": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1343": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1344": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1345": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1346": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1347": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1348": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1349": {
+    "canonicalIt": "Reverse T-bar row al macchinario",
+    "aliases": [
+      "reverse tbar row"
+    ]
+  },
+  "1350": {
+    "canonicalIt": "Rematore seduto al macchinario",
+    "aliases": [
+      "seated row machine"
+    ]
+  },
+  "1351": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1352": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1353": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1354": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1355": {
+    "canonicalIt": "One arm against wall",
+    "aliases": [
+      "one arm wall"
+    ]
+  },
+  "1356": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1358": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1359": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1360": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1361": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1362": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1363": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1364": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1365": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1366": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1367": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1368": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1369": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1370": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1371": {
+    "canonicalIt": "Sollevamenti polpacci seduto con bilanciere",
+    "aliases": [
+      "calf raise seduto bilanciere"
+    ]
+  },
+  "1372": {
+    "canonicalIt": "Sollevamenti polpacci in piedi con bilanciere",
+    "aliases": [
+      "calf raise in piedi bilanciere"
+    ]
+  },
+  "1373": {
+    "canonicalIt": "Sollevamenti polpacci in piedi a corpo libero",
+    "aliases": [
+      "calf raise corpo libero"
+    ]
+  },
+  "1374": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1375": {
+    "canonicalIt": "Sollevamenti polpacci in piedi al cavo",
+    "aliases": [
+      "calf raise cavo"
+    ]
+  },
+  "1376": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1377": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1378": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1379": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1380": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1381": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1382": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1383": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1384": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1385": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1386": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1387": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1388": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1389": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1390": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1391": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1392": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1393": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1394": {
+    "canonicalIt": "Reverse calf raise al multipower",
+    "aliases": [
+      "smith reverse calf raise"
+    ]
+  },
+  "1395": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1396": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1397": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1398": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1399": {
+    "canonicalIt": "Dip a terra",
+    "aliases": [
+      "floor dip"
+    ]
+  },
+  "1401": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1403": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1405": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1407": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1408": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1409": {
+    "canonicalIt": "Glute bridge con bilanciere",
+    "aliases": [
+      "ponte glutei bilanciere"
+    ]
+  },
+  "1410": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1411": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1412": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1413": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1414": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1415": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1416": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1417": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1418": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1419": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1420": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1421": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1422": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1423": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1424": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1425": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1426": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1427": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1428": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1429": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1430": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1431": {
+    "canonicalIt": "Chin-up assistito in piedi",
+    "aliases": [
+      "chin up assistito"
+    ]
+  },
+  "1432": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1433": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1434": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1435": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1436": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1437": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1438": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1439": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1441": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1451": {
+    "canonicalIt": "Dip seduto al macchinario",
+    "aliases": [
+      "seated dip machine"
+    ]
+  },
+  "1452": {
+    "canonicalIt": "Crunch seduto al macchinario",
+    "aliases": [
+      "seated crunch machine"
+    ]
+  },
+  "1456": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1457": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1458": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1459": {
+    "canonicalIt": "Romanian deadlift con manubri",
+    "aliases": [
+      "rdl manubri",
+      "stiff rumeno manubri"
+    ]
+  },
+  "1460": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1461": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1462": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1463": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1464": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1466": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1467": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1468": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1471": {
+    "canonicalIt": "Inchworm",
+    "aliases": [
+      "inchworm"
+    ]
+  },
+  "1472": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1473": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1476": {
+    "canonicalIt": "Squat monogamba",
+    "aliases": [
+      "pistol squat",
+      "one leg squat"
+    ]
+  },
+  "1479": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1489": {
+    "canonicalIt": "Sissy squat",
+    "aliases": [
+      "sissy squat"
+    ]
+  },
+  "1490": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1494": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1495": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1496": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1511": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1512": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1545": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1548": {
+    "canonicalIt": "Stretch gamba estesa sulla sedia",
+    "aliases": [
+      "leg stretch sedia"
+    ]
+  },
+  "1559": {
+    "canonicalIt": "Stretch flessori dell'anca su fitball",
+    "aliases": [
+      "hip flexor stretch fitball"
+    ]
+  },
+  "1560": {
+    "canonicalIt": "Stretch ischiocrurali seduto su fitball",
+    "aliases": [
+      "hamstring stretch fitball"
+    ]
+  },
+  "1564": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1576": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1582": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1585": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1587": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1599": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1604": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1614": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1615": {
+    "canonicalIt": "Hammer curl su panca Scott al macchinario",
+    "aliases": [
+      "machine hammer preacher curl"
+    ]
+  },
+  "1616": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1617": {
+    "canonicalIt": "Hammer press declinato monobraccio con manubrio",
+    "aliases": [
+      "decline hammer press"
+    ]
+  },
+  "1618": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1619": {
+    "canonicalIt": "Hammer press inclinato monobraccio con manubrio",
+    "aliases": [
+      "incline hammer press monobraccio"
+    ]
+  },
+  "1620": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1621": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1622": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1623": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1624": {
+    "canonicalIt": "Panca inversa con manubri",
+    "aliases": [
+      "reverse bench press manubri"
+    ]
+  },
+  "1625": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1626": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1627": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1628": {
+    "canonicalIt": "Spider curl con barra EZ",
+    "aliases": [
+      "spider curl ez"
+    ]
+  },
+  "1629": {
+    "canonicalIt": "Curl bicipiti presa larga in piedi con bilanciere",
+    "aliases": [
+      "curl largo bilanciere"
+    ]
+  },
+  "1630": {
+    "canonicalIt": "Curl presa stretta al cavo",
+    "aliases": [
+      "curl stretto cavo"
+    ]
+  },
+  "1631": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1632": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1633": {
+    "canonicalIt": "Curl su panca Scott monobraccio al cavo",
+    "aliases": [
+      "preacher curl cavo"
+    ]
+  },
+  "1634": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1635": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1636": {
+    "canonicalIt": "Curl sopra testa al cavo",
+    "aliases": [
+      "overhead curl cavo"
+    ]
+  },
+  "1637": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1638": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1639": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1640": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1641": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1642": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1643": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1644": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1645": {
+    "canonicalIt": "Curl due braccia su panca inclinata al cavo",
+    "aliases": [
+      "incline curl cavo"
+    ]
+  },
+  "1646": {
+    "canonicalIt": "Hammer curl alternato su panca Scott con manubri",
+    "aliases": [
+      "hammer curl scott alternato"
+    ]
+  },
+  "1647": {
+    "canonicalIt": "Curl alternato su panca Scott con manubri",
+    "aliases": [
+      "preacher curl alternato manubri"
+    ]
+  },
+  "1648": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1649": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1650": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1651": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1652": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1653": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1654": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1655": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1656": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1657": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1658": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1659": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1660": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1661": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1662": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1663": {
+    "canonicalIt": "Hammer curl su panca Scott monobraccio con manubrio",
+    "aliases": [
+      "one arm hammer preacher curl"
+    ]
+  },
+  "1664": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1665": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1666": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1667": {
+    "canonicalIt": "Reverse spider curl monobraccio con manubrio",
+    "aliases": [
+      "one arm reverse spider curl"
+    ]
+  },
+  "1668": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1669": {
+    "canonicalIt": "Hammer curl seduto monobraccio con manubrio",
+    "aliases": [
+      "one arm seated hammer curl"
+    ]
+  },
+  "1670": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1671": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1672": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1673": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1674": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1675": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1676": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1677": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1678": {
+    "canonicalIt": "Hammer curl seduto con manubri",
+    "aliases": [
+      "seated hammer curl"
+    ]
+  },
+  "1679": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1680": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1682": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1683": {
+    "canonicalIt": "Curl bicipiti al multipower",
+    "aliases": [
+      "smith curl"
+    ]
+  },
+  "1684": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1685": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1686": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1687": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1688": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1689": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1700": {
+    "canonicalIt": "Push press con manubri",
+    "aliases": [
+      "dumbbell push press"
+    ]
+  },
+  "1701": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1705": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1707": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1708": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1709": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1710": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1712": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1713": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1714": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1716": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1717": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1718": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1719": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1720": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1721": {
+    "canonicalIt": "Skullcrusher presa inversa con bilanciere",
+    "aliases": [
+      "skullcrusher inverso"
+    ]
+  },
+  "1722": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1723": {
+    "canonicalIt": "Pushdown tricipiti monobraccio al cavo",
+    "aliases": [
+      "pushdown monobraccio cavo"
+    ]
+  },
+  "1724": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1725": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1726": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1727": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1728": {
+    "canonicalIt": "Kickback tricipiti due braccia al cavo",
+    "aliases": [
+      "tricep kickback cavo"
+    ]
+  },
+  "1729": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1730": {
+    "canonicalIt": "Kickback alternato piegato seduto con manubri",
+    "aliases": [
+      "seated kickback alternato"
+    ]
+  },
+  "1731": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1732": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1733": {
+    "canonicalIt": "Extension due braccia su panca inclinata con manubri",
+    "aliases": [
+      "incline two arm extension"
+    ]
+  },
+  "1734": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1735": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1736": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1737": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1738": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1739": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1740": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1741": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1742": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1743": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1744": {
+    "canonicalIt": "Dip su fitball",
+    "aliases": [
+      "dip fitball"
+    ]
+  },
+  "1745": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1746": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1747": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1748": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1749": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1750": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1751": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1752": {
+    "canonicalIt": "Extension tricipiti inclinata al multipower",
+    "aliases": [
+      "smith incline triceps ext"
+    ]
+  },
+  "1753": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1754": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1755": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1756": {
+    "canonicalIt": "Stacco monogamba con bilanciere",
+    "aliases": [
+      "single leg deadlift bilanciere"
+    ]
+  },
+  "1757": {
+    "canonicalIt": "Stacco monogamba con manubri",
+    "aliases": [
+      "single leg deadlift manubri"
+    ]
+  },
+  "1758": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1759": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1760": {
+    "canonicalIt": "Goblet squat con manubrio",
+    "aliases": [
+      "goblet squat",
+      "squat goblet"
+    ]
+  },
+  "1761": {
+    "canonicalIt": "Sollevamento ginocchia oblique in sospensione",
+    "aliases": [
+      "oblique knee raise"
+    ]
+  },
+  "1763": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1764": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1765": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1766": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1767": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1769": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1770": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1771": {
+    "canonicalIt": "Extension tricipiti in ginocchio a corpo libero",
+    "aliases": [
+      "triceps extension ginocchio"
+    ]
+  },
+  "1772": {
+    "canonicalIt": "Elbow lift reverse push-up",
+    "aliases": [
+      "elbow lift"
+    ]
+  },
+  "1773": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1774": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "1775": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2133": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2135": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2136": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2137": {
+    "canonicalIt": "Arnold press con manubri",
+    "aliases": [
+      "arnold press"
+    ]
+  },
+  "2138": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2139": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2141": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2142": {
+    "canonicalIt": "Ski ergometer",
+    "aliases": [
+      "ski erg"
+    ]
+  },
+  "2143": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2144": {
+    "canonicalIt": "Chest press seduto al cavo",
+    "aliases": [
+      "seated chest press cavo"
+    ]
+  },
+  "2186": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2187": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2188": {
+    "canonicalIt": "Extension tricipiti seduto con manubri",
+    "aliases": [
+      "seated triceps extension"
+    ]
+  },
+  "2189": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2202": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2203": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2204": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2205": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2206": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2207": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2208": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2209": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2271": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2285": {
+    "canonicalIt": "Pullover al macchinario",
+    "aliases": [
+      "machine pullover"
+    ]
+  },
+  "2286": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2287": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2288": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2289": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2292": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2293": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2294": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2297": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2298": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2300": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2311": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2312": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2315": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2317": {
+    "canonicalIt": "Alzate laterali braccia piegate seduto con manubri",
+    "aliases": [
+      "seated bent arm lateral raise"
+    ]
+  },
+  "2318": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2321": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2327": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2328": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2329": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2330": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2331": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2333": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2334": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2335": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2355": {
+    "canonicalIt": "Sollevamento ginocchia piegate in sospensione",
+    "aliases": [
+      "knee raise sospensione"
+    ]
+  },
+  "2363": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2364": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2368": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2371": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2397": {
+    "canonicalIt": "Scott press con manubri",
+    "aliases": [
+      "scott press"
+    ]
+  },
+  "2398": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2399": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2400": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2401": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2402": {
+    "canonicalIt": "Hammer curl con arm blaster",
+    "aliases": [
+      "hammer curl arm blaster"
+    ]
+  },
+  "2403": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2404": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2405": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2406": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2407": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2414": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2429": {
+    "canonicalIt": "Crunch rana",
+    "aliases": [
+      "frog crunch"
+    ]
+  },
+  "2432": {
+    "canonicalIt": "Panca stretta con EZ bar",
+    "aliases": [
+      "close grip bench ez"
+    ]
+  },
+  "2459": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2462": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2464": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2466": {
+    "canonicalIt": "Mountain climber cross body da ponte",
+    "aliases": [
+      "mountain climber cross"
+    ]
+  },
+  "2470": {
+    "canonicalIt": "Alzate deltoidi posteriori distesi a terra con manubri",
+    "aliases": [
+      "floor rear delt raise"
+    ]
+  },
+  "2567": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2571": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2611": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2612": {
+    "canonicalIt": "Corda per saltare",
+    "aliases": [
+      "corda",
+      "saltare la corda"
+    ]
+  },
+  "2616": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2705": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2706": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2736": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2741": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2796": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2798": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2799": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2800": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2801": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2802": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2803": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2805": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2808": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2810": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "2812": {
+    "canonicalIt": "Step-up split squat con manubri",
+    "aliases": [
+      "step up split squat"
+    ]
+  },
+  "2963": {
+    "canonicalIt": "Sollevamento gambe tese su captains chair",
+    "aliases": [
+      "leg raise captains chair"
+    ]
+  },
+  "2987": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3006": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3007": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3010": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3011": {
+    "canonicalIt": "Scapula push-up su panca inclinata",
+    "aliases": [
+      "incline scapula push up"
+    ]
+  },
+  "3012": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3013": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3016": {
+    "canonicalIt": "Curl-up",
+    "aliases": [
+      "curl up"
+    ]
+  },
+  "3017": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3019": {
+    "canonicalIt": "Pull-up su panca bassa",
+    "aliases": [
+      "pull up panca"
+    ]
+  },
+  "3021": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3116": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3117": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3119": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3122": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3123": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3124": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3132": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3142": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3144": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3145": {
+    "canonicalIt": "Push-up plus",
+    "aliases": [
+      "push up plus"
+    ]
+  },
+  "3147": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3156": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3158": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3161": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3162": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3165": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3166": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3167": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3168": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3193": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3194": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3195": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3200": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3201": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3202": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3203": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3204": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3211": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3212": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3213": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3214": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3215": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3216": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3217": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3218": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3219": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3220": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3221": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3222": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3223": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3224": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3231": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3234": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3235": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3236": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3237": {
+    "canonicalIt": "Alzate laterali al landmine",
+    "aliases": [
+      "landmine lateral raise"
+    ]
+  },
+  "3239": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3240": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3241": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3281": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3286": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3287": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3288": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3289": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3290": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3291": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3292": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3293": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3294": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3295": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3296": {
+    "canonicalIt": "Front lever",
+    "aliases": [
+      "leva anteriore"
+    ]
+  },
+  "3297": {
+    "canonicalIt": "Back lever",
+    "aliases": [
+      "leva posteriore"
+    ]
+  },
+  "3298": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3299": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3300": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3301": {
+    "canonicalIt": "Frog planche",
+    "aliases": [
+      "planche rana"
+    ]
+  },
+  "3302": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3303": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3304": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3305": {
+    "canonicalIt": "Thruster con bilanciere",
+    "aliases": [
+      "thruster"
+    ]
+  },
+  "3312": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3313": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3314": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3315": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3318": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3327": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3360": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3361": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3418": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3419": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3420": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3433": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3470": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3523": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3533": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3541": {
+    "canonicalIt": "Y-raise su panca inclinata con manubri",
+    "aliases": [
+      "incline y raise"
+    ]
+  },
+  "3542": {
+    "canonicalIt": "T-raise su panca inclinata con manubri",
+    "aliases": [
+      "incline t raise"
+    ]
+  },
+  "3543": {
+    "canonicalIt": "Drop jump squat a corpo libero",
+    "aliases": [
+      "drop squat"
+    ]
+  },
+  "3544": {
+    "canonicalIt": "Side plank inclinato a corpo libero",
+    "aliases": [
+      "side plank inclinato"
+    ]
+  },
+  "3545": {
+    "canonicalIt": "Panca inclinata alternata con manubri",
+    "aliases": [
+      "incline press alternato manubri"
+    ]
+  },
+  "3546": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3547": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3548": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3552": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3560": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3561": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3562": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3563": {
+    "canonicalIt": "Pulldown monobraccio al cavo",
+    "aliases": [
+      "pulldown monobraccio cavo"
+    ]
+  },
+  "3582": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3635": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3636": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3637": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3638": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3639": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3640": {
+    "canonicalIt": "Crunch tocchi ginocchia",
+    "aliases": [
+      "knee touch crunch"
+    ]
+  },
+  "3641": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3642": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3643": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3644": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3645": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3655": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3656": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3662": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3663": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3664": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3665": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3666": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3667": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3669": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3670": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3671": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3672": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3679": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3697": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3698": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3699": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3758": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3759": {
+    "canonicalIt": "Good morning seduto al macchinario",
+    "aliases": [
+      "seated good morning machine"
+    ]
+  },
+  "3760": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3769": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3785": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "3888": {
+    "canonicalIt": "Snatch monobraccio con manubrio",
+    "aliases": [
+      "one arm dumbbell snatch"
+    ]
+  },
+  "5201": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0001": {
+    "canonicalIt": "Sit-up 3/4",
+    "aliases": [
+      "sit-up parziale",
+      "crunch 3/4"
+    ]
+  },
+  "0002": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0003": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0006": {
+    "canonicalIt": "Tocchi alternati ai talloni",
+    "aliases": [
+      "heel touch",
+      "tocchi talloni"
+    ]
+  },
+  "0007": {
+    "canonicalIt": "Pulldown laterale alternato",
+    "aliases": [
+      "pulldown alternato"
+    ]
+  },
+  "0009": {
+    "canonicalIt": "Dip petto assistito in ginocchio",
+    "aliases": [
+      "dip petto assistito"
+    ]
+  },
+  "0011": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0010": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0012": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0013": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0014": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0015": {
+    "canonicalIt": "Pull-up presa stretta assistita",
+    "aliases": [
+      "pull up stretta assistita"
+    ]
+  },
+  "0016": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0017": {
+    "canonicalIt": "Pull-up assistita",
+    "aliases": [
+      "pull up assistita",
+      "pullup assistito"
+    ]
+  },
+  "0018": {
+    "canonicalIt": "Extension tricipiti in piedi assistita con asciugamano",
+    "aliases": [
+      "extension tricipiti asciugamano"
+    ]
+  },
+  "0019": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0020": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0968": {
+    "canonicalIt": "Curl bicipiti alternato con elastico",
+    "aliases": [
+      "curl elastico alternato"
+    ]
+  },
+  "0969": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0970": {
+    "canonicalIt": "Pull-up assistita con elastico",
+    "aliases": [
+      "pull up elastico"
+    ]
+  },
+  "0971": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0980": {
+    "canonicalIt": "Extension fianchi piegato con elastico",
+    "aliases": [
+      "hip extension elastico"
+    ]
+  },
+  "0972": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0974": {
+    "canonicalIt": "Pulldown presa stretta con elastico",
+    "aliases": [
+      "pulldown stretto elastico"
+    ]
+  },
+  "0975": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0976": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0977": {
+    "canonicalIt": "Alzate frontali laterali con elastico",
+    "aliases": [
+      "lateral raise elastico"
+    ]
+  },
+  "0978": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0979": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0981": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0983": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0985": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0984": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0986": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0987": {
+    "canonicalIt": "Bulgarian split squat monobraccio con elastico",
+    "aliases": [
+      "split squat elastico"
+    ]
+  },
+  "0988": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0989": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0990": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0991": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0992": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0993": {
+    "canonicalIt": "Reverse fly con elastico",
+    "aliases": [
+      "reverse fly elastico"
+    ]
+  },
+  "0994": {
+    "canonicalIt": "Reverse wrist curl con elastico",
+    "aliases": [
+      "reverse curl polsi elastico"
+    ]
+  },
+  "0996": {
+    "canonicalIt": "Rotazione interna anca seduto con elastico",
+    "aliases": [
+      "hip rotation elastico"
+    ]
+  },
+  "0997": {
+    "canonicalIt": "Shoulder press con elastico",
+    "aliases": [
+      "military press elastico"
+    ]
+  },
+  "0998": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0999": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0023": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0024": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0025": {
+    "canonicalIt": "Panca piana con bilanciere",
+    "aliases": [
+      "panca piana",
+      "distensioni su panca piana",
+      "bench press bilanciere",
+      "panca"
+    ]
+  },
+  "0026": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0027": {
+    "canonicalIt": "Rematore con bilanciere",
+    "aliases": [
+      "bent over row bilanciere",
+      "rematore"
+    ]
+  },
+  "0028": {
+    "canonicalIt": "Clean and press con bilanciere",
+    "aliases": [
+      "clean and press"
+    ]
+  },
+  "0029": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0030": {
+    "canonicalIt": "Panca stretta con bilanciere",
+    "aliases": [
+      "panca stretta",
+      "close grip bench press"
+    ]
+  },
+  "0031": {
+    "canonicalIt": "Curl bicipiti con bilanciere",
+    "aliases": [
+      "curl bilanciere"
+    ]
+  },
+  "0032": {
+    "canonicalIt": "Stacco da terra con bilanciere",
+    "aliases": [
+      "deadlift bilanciere",
+      "stacco"
+    ]
+  },
+  "0033": {
+    "canonicalIt": "Panca declinata con bilanciere",
+    "aliases": [
+      "panca declinata",
+      "decline bench press"
+    ]
+  },
+  "0034": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0035": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0036": {
+    "canonicalIt": "Panca declinata presa larga con bilanciere",
+    "aliases": [
+      "decline press larga"
+    ]
+  },
+  "0037": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0038": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0039": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0041": {
+    "canonicalIt": "Alzate frontali con bilanciere",
+    "aliases": [
+      "front raise bilanciere"
+    ]
+  },
+  "0040": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0042": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0043": {
+    "canonicalIt": "Squat completo con bilanciere",
+    "aliases": [
+      "squat bilanciere",
+      "squat"
+    ]
+  },
+  "0044": {
+    "canonicalIt": "Good morning con bilanciere",
+    "aliases": [
+      "good morning"
+    ]
+  },
+  "0045": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0046": {
+    "canonicalIt": "Hack squat con bilanciere",
+    "aliases": [
+      "hack squat bilanciere"
+    ]
+  },
+  "0047": {
+    "canonicalIt": "Panca inclinata con bilanciere",
+    "aliases": [
+      "panca inclinata",
+      "incline bench press bilanciere"
+    ]
+  },
+  "0048": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0049": {
+    "canonicalIt": "Rematore inclinato con bilanciere",
+    "aliases": [
+      "incline row bilanciere"
+    ]
+  },
+  "0050": {
+    "canonicalIt": "Alzate spalle inclinate con bilanciere",
+    "aliases": [
+      "shoulder raise bilanciere"
+    ]
+  },
+  "0051": {
+    "canonicalIt": "Jefferson squat con bilanciere",
+    "aliases": [
+      "jefferson squat"
+    ]
+  },
+  "0052": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0053": {
+    "canonicalIt": "Jump squat con bilanciere",
+    "aliases": [
+      "squat salto bilanciere"
+    ]
+  },
+  "0054": {
+    "canonicalIt": "Affondi con bilanciere",
+    "aliases": [
+      "affondi bilanciere",
+      "lunge bilanciere"
+    ]
+  },
+  "0055": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0056": {
+    "canonicalIt": "Extension tricipiti disteso presa stretta con bilanciere",
+    "aliases": [
+      "skullcrusher stretto",
+      "french press stretto"
+    ]
+  },
+  "0057": {
+    "canonicalIt": "Extension tricipiti disteso con bilanciere",
+    "aliases": [
+      "skullcrusher",
+      "french press"
+    ]
+  },
+  "0058": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0059": {
+    "canonicalIt": "Curl su panca Scott distesa con bilanciere",
+    "aliases": [
+      "preacher curl bilanciere"
+    ]
+  },
+  "0061": {
+    "canonicalIt": "Extension tricipiti disteso con bilanciere",
+    "aliases": [
+      "lying triceps extension"
+    ]
+  },
+  "0060": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0063": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0064": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0065": {
+    "canonicalIt": "Floor press monobraccio con bilanciere",
+    "aliases": [
+      "floor press monobraccio"
+    ]
+  },
+  "0066": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0067": {
+    "canonicalIt": "Snatch monobraccio con bilanciere",
+    "aliases": [
+      "one arm snatch"
+    ]
+  },
+  "0068": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0069": {
+    "canonicalIt": "Overhead squat con bilanciere",
+    "aliases": [
+      "squat sopra testa"
+    ]
+  },
+  "0070": {
+    "canonicalIt": "Curl su panca Scott con bilanciere",
+    "aliases": [
+      "preacher curl",
+      "curl scott"
+    ]
+  },
+  "0071": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0072": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0073": {
+    "canonicalIt": "Pullover con bilanciere",
+    "aliases": [
+      "pullover"
+    ]
+  },
+  "0022": {
+    "canonicalIt": "Pullover to press con bilanciere",
+    "aliases": [
+      "pullover press"
+    ]
+  },
+  "0074": {
+    "canonicalIt": "Rack pull con bilanciere",
+    "aliases": [
+      "rack pull"
+    ]
+  },
+  "0075": {
+    "canonicalIt": "Alzate deltoidi posteriori con bilanciere",
+    "aliases": [
+      "rear delt raise bilanciere"
+    ]
+  },
+  "0076": {
+    "canonicalIt": "Rematore deltoidi posteriori con bilanciere",
+    "aliases": [
+      "rear delt row"
+    ]
+  },
+  "0078": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0077": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0079": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0080": {
+    "canonicalIt": "Curl inverso con bilanciere",
+    "aliases": [
+      "reverse curl bilanciere"
+    ]
+  },
+  "0118": {
+    "canonicalIt": "Rematore presa inversa con bilanciere",
+    "aliases": [
+      "rematore inverso"
+    ]
+  },
+  "0081": {
+    "canonicalIt": "Curl inverso su panca Scott con bilanciere",
+    "aliases": [
+      "reverse preacher curl"
+    ]
+  },
+  "0082": {
+    "canonicalIt": "Reverse wrist curl con bilanciere",
+    "aliases": [
+      "reverse curl polsi bilanciere"
+    ]
+  },
+  "0084": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0083": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0085": {
+    "canonicalIt": "Romanian deadlift con bilanciere",
+    "aliases": [
+      "rdl bilanciere",
+      "stiff rumeno"
+    ]
+  },
+  "0086": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0087": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0088": {
+    "canonicalIt": "Sollevamenti polpacci seduto con bilanciere",
+    "aliases": [
+      "calf raise seduto bilanciere"
+    ]
+  },
+  "0089": {
+    "canonicalIt": "Curl concentrazione seduto presa stretta con bilanciere",
+    "aliases": [
+      "concentration curl bilanciere"
+    ]
+  },
+  "0090": {
+    "canonicalIt": "Good morning seduto con bilanciere",
+    "aliases": [
+      "good morning seduto"
+    ]
+  },
+  "0091": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0092": {
+    "canonicalIt": "Extension tricipiti seduto sopra testa con bilanciere",
+    "aliases": [
+      "overhead triceps extension bilanciere"
+    ]
+  },
+  "0094": {
+    "canonicalIt": "Twist seduto con bilanciere",
+    "aliases": [
+      "rotazione busto seduto bilanciere"
+    ]
+  },
+  "0095": {
+    "canonicalIt": "Shrug con bilanciere",
+    "aliases": [
+      "shrug bilanciere"
+    ]
+  },
+  "0096": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0098": {
+    "canonicalIt": "Split squat laterale con bilanciere",
+    "aliases": [
+      "split squat laterale"
+    ]
+  },
+  "0097": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0099": {
+    "canonicalIt": "Bulgarian split squat con bilanciere",
+    "aliases": [
+      "split squat bulgaro bilanciere"
+    ]
+  },
+  "0100": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0101": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0102": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0103": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0104": {
+    "canonicalIt": "Wrist curl posteriore in piedi con bilanciere",
+    "aliases": [
+      "wrist curl posteriore"
+    ]
+  },
+  "0105": {
+    "canonicalIt": "Bradford press in piedi con bilanciere",
+    "aliases": [
+      "bradford press"
+    ]
+  },
+  "0106": {
+    "canonicalIt": "Curl presa stretta in piedi con bilanciere",
+    "aliases": [
+      "curl stretto bilanciere"
+    ]
+  },
+  "0107": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0108": {
+    "canonicalIt": "Calf raise gamba singola in piedi con bilanciere",
+    "aliases": [
+      "single leg calf raise bilanciere"
+    ]
+  },
+  "0109": {
+    "canonicalIt": "Extension tricipiti sopra testa in piedi con bilanciere",
+    "aliases": [
+      "overhead triceps ext bilanciere"
+    ]
+  },
+  "0110": {
+    "canonicalIt": "Curl inverso in piedi con bilanciere",
+    "aliases": [
+      "reverse curl in piedi"
+    ]
+  },
+  "0111": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0112": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0113": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0114": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0115": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0116": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0117": {
+    "canonicalIt": "Sumo deadlift con bilanciere",
+    "aliases": [
+      "sumo deadlift"
+    ]
+  },
+  "0120": {
+    "canonicalIt": "Upright row con bilanciere",
+    "aliases": [
+      "upright row bilanciere"
+    ]
+  },
+  "0119": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0121": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0122": {
+    "canonicalIt": "Panca larga con bilanciere",
+    "aliases": [
+      "panca larga",
+      "wide bench press"
+    ]
+  },
+  "0124": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0123": {
+    "canonicalIt": "Upright row presa larga con bilanciere",
+    "aliases": [
+      "upright row largo"
+    ]
+  },
+  "0126": {
+    "canonicalIt": "Wrist curl con bilanciere",
+    "aliases": [
+      "curl polsi bilanciere"
+    ]
+  },
+  "0125": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0127": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0128": {
+    "canonicalIt": "Battle ropes",
+    "aliases": [
+      "funi",
+      "corde"
+    ]
+  },
+  "0129": {
+    "canonicalIt": "Dip panca ginocchia piegate",
+    "aliases": [
+      "bench dip"
+    ]
+  },
+  "0130": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0139": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0140": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0137": {
+    "canonicalIt": "Body-up",
+    "aliases": [
+      "body up"
+    ]
+  },
+  "0138": {
+    "canonicalIt": "Bottoms-up",
+    "aliases": [
+      "bottoms up"
+    ]
+  },
+  "0870": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0148": {
+    "canonicalIt": "Shoulder press alternato al cavo",
+    "aliases": [
+      "shoulder press cavo alternato"
+    ]
+  },
+  "0149": {
+    "canonicalIt": "Extension tricipiti alternato al cavo",
+    "aliases": [
+      "triceps extension cavo alternato"
+    ]
+  },
+  "0150": {
+    "canonicalIt": "Pulldown laterale al cavo con barra",
+    "aliases": [
+      "lat pulldown cavo"
+    ]
+  },
+  "0151": {
+    "canonicalIt": "Panca piana al cavo",
+    "aliases": [
+      "bench press cavo"
+    ]
+  },
+  "0152": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0153": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0154": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0155": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0868": {
+    "canonicalIt": "Curl al cavo",
+    "aliases": [
+      "curl cavo"
+    ]
+  },
+  "0157": {
+    "canonicalIt": "Stacco da terra al cavo",
+    "aliases": [
+      "deadlift cavo"
+    ]
+  },
+  "0158": {
+    "canonicalIt": "Croci declinate al cavo",
+    "aliases": [
+      "decline fly cavo"
+    ]
+  },
+  "0159": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0160": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0161": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0162": {
+    "canonicalIt": "Alzate frontali al cavo",
+    "aliases": [
+      "front raise cavo"
+    ]
+  },
+  "0164": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0165": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0167": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0168": {
+    "canonicalIt": "Adduzione fianchi al cavo",
+    "aliases": [
+      "hip adduction cavo"
+    ]
+  },
+  "0169": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0171": {
+    "canonicalIt": "Croci inclinate al cavo",
+    "aliases": [
+      "incline fly cavo"
+    ]
+  },
+  "0170": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0172": {
+    "canonicalIt": "Pushdown inclinato al cavo",
+    "aliases": [
+      "incline pushdown cavo"
+    ]
+  },
+  "0173": {
+    "canonicalIt": "Extension tricipiti inclinato al cavo",
+    "aliases": [
+      "incline triceps extension cavo"
+    ]
+  },
+  "0174": {
+    "canonicalIt": "Judo flip al cavo",
+    "aliases": [
+      "judo flip"
+    ]
+  },
+  "0860": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0175": {
+    "canonicalIt": "Crunch in ginocchio al cavo",
+    "aliases": [
+      "kneeling crunch cavo"
+    ]
+  },
+  "0176": {
+    "canonicalIt": "Extension tricipiti in ginocchio al cavo",
+    "aliases": [
+      "triceps extension ginocchio cavo"
+    ]
+  },
+  "0177": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0178": {
+    "canonicalIt": "Alzate laterali al cavo",
+    "aliases": [
+      "lateral raise cavo"
+    ]
+  },
+  "0179": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0180": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0182": {
+    "canonicalIt": "Curl disteso presa stretta al cavo",
+    "aliases": [
+      "lying curl stretto cavo"
+    ]
+  },
+  "0184": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0185": {
+    "canonicalIt": "Croci distese al cavo",
+    "aliases": [
+      "lying fly cavo"
+    ]
+  },
+  "0186": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0188": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0189": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0190": {
+    "canonicalIt": "Curl monobraccio al cavo",
+    "aliases": [
+      "curl monobraccio cavo"
+    ]
+  },
+  "0191": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0192": {
+    "canonicalIt": "Alzata laterale monobraccio al cavo",
+    "aliases": [
+      "lateral raise monobraccio cavo"
+    ]
+  },
+  "0193": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0194": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0195": {
+    "canonicalIt": "Curl su panca Scott al cavo",
+    "aliases": [
+      "preacher curl cavo"
+    ]
+  },
+  "0196": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0198": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0197": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0201": {
+    "canonicalIt": "Pushdown al cavo",
+    "aliases": [
+      "pushdown cavo"
+    ]
+  },
+  "0199": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0200": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0202": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0203": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0204": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0205": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0873": {
+    "canonicalIt": "Reverse crunch al cavo",
+    "aliases": [
+      "reverse crunch cavo"
+    ]
+  },
+  "0206": {
+    "canonicalIt": "Curl inverso al cavo",
+    "aliases": [
+      "reverse curl cavo"
+    ]
+  },
+  "0209": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0210": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0207": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0208": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0211": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0212": {
+    "canonicalIt": "Crunch seduto al cavo",
+    "aliases": [
+      "seated crunch cavo"
+    ]
+  },
+  "0213": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0214": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0215": {
+    "canonicalIt": "Alzate laterali posteriori seduto al cavo",
+    "aliases": [
+      "seated rear lateral raise cavo"
+    ]
+  },
+  "0861": {
+    "canonicalIt": "Rematore seduto al cavo",
+    "aliases": [
+      "seated row cavo"
+    ]
+  },
+  "0216": {
+    "canonicalIt": "Rotazione interna spalla seduto al cavo",
+    "aliases": [
+      "internal rotation cavo"
+    ]
+  },
+  "0218": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0219": {
+    "canonicalIt": "Shoulder press al cavo",
+    "aliases": [
+      "shoulder press cavo"
+    ]
+  },
+  "0220": {
+    "canonicalIt": "Shrug al cavo",
+    "aliases": [
+      "shrug cavo"
+    ]
+  },
+  "0222": {
+    "canonicalIt": "Flessione laterale al cavo",
+    "aliases": [
+      "side bend cavo"
+    ]
+  },
+  "0221": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0223": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0224": {
+    "canonicalIt": "Wrist curl posteriore in piedi al cavo",
+    "aliases": [
+      "back wrist curl cavo"
+    ]
+  },
+  "0225": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0226": {
+    "canonicalIt": "Crunch in piedi al cavo",
+    "aliases": [
+      "standing crunch cavo"
+    ]
+  },
+  "0874": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0227": {
+    "canonicalIt": "Croci in piedi al cavo",
+    "aliases": [
+      "standing fly cavo"
+    ]
+  },
+  "0228": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0229": {
+    "canonicalIt": "Curl interno in piedi al cavo",
+    "aliases": [
+      "inner curl cavo"
+    ]
+  },
+  "0230": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0231": {
+    "canonicalIt": "Extension tricipiti monobraccio in piedi al cavo",
+    "aliases": [
+      "standing triceps extension cavo"
+    ]
+  },
+  "0232": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0233": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0234": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0235": {
+    "canonicalIt": "Rotazione esterna spalla in piedi al cavo",
+    "aliases": [
+      "external rotation cavo"
+    ]
+  },
+  "0236": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0238": {
+    "canonicalIt": "Pulldown braccia tese al cavo",
+    "aliases": [
+      "straight arm pulldown cavo"
+    ]
+  },
+  "0237": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0239": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0240": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0241": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0242": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0243": {
+    "canonicalIt": "Twist al cavo",
+    "aliases": [
+      "twist cavo"
+    ]
+  },
+  "0862": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0244": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0245": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0246": {
+    "canonicalIt": "Upright row al cavo",
+    "aliases": [
+      "upright row cavo"
+    ]
+  },
+  "0247": {
+    "canonicalIt": "Wrist curl al cavo",
+    "aliases": [
+      "wrist curl cavo"
+    ]
+  },
+  "0248": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0251": {
+    "canonicalIt": "Dip petto",
+    "aliases": [
+      "dip petto",
+      "dip"
+    ]
+  },
+  "0253": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0257": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0258": {
+    "canonicalIt": "Clock push-up",
+    "aliases": [
+      "push up orologio"
+    ]
+  },
+  "0259": {
+    "canonicalIt": "Push-up presa stretta",
+    "aliases": [
+      "push up stretto"
+    ]
+  },
+  "0260": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0262": {
+    "canonicalIt": "Crunch cross-body",
+    "aliases": [
+      "crunch obliquo"
+    ]
+  },
+  "0267": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0271": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0272": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0274": {
+    "canonicalIt": "Crunch a terra",
+    "aliases": [
+      "crunch"
+    ]
+  },
+  "0276": {
+    "canonicalIt": "Dead bug",
+    "aliases": [
+      "deadbug"
+    ]
+  },
+  "0277": {
+    "canonicalIt": "Crunch declinato",
+    "aliases": [
+      "crunch declino"
+    ]
+  },
+  "0279": {
+    "canonicalIt": "Push-up declinato",
+    "aliases": [
+      "push up declinato"
+    ]
+  },
+  "0282": {
+    "canonicalIt": "Sit-up declinato",
+    "aliases": [
+      "sit up declinato"
+    ]
+  },
+  "0283": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0284": {
+    "canonicalIt": "Donkey calf raise",
+    "aliases": [
+      "calf raise asino"
+    ]
+  },
+  "0285": {
+    "canonicalIt": "Curl bicipiti alternato con manubri",
+    "aliases": [
+      "curl alternato manubri"
+    ]
+  },
+  "0286": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0287": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0288": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0289": {
+    "canonicalIt": "Panca piana con manubri",
+    "aliases": [
+      "panca manubri",
+      "dumbbell press",
+      "panca piana db"
+    ]
+  },
+  "0290": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0291": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0293": {
+    "canonicalIt": "Rematore con manubri",
+    "aliases": [
+      "rematore manubri"
+    ]
+  },
+  "0294": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0295": {
+    "canonicalIt": "Clean con manubri",
+    "aliases": [
+      "dumbbell clean"
+    ]
+  },
+  "0296": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0297": {
+    "canonicalIt": "Curl concentrazione con manubrio",
+    "aliases": [
+      "concentration curl"
+    ]
+  },
+  "0298": {
+    "canonicalIt": "Hammer curl cross-body con manubri",
+    "aliases": [
+      "cross body hammer curl"
+    ]
+  },
+  "0299": {
+    "canonicalIt": "Cuban press con manubri",
+    "aliases": [
+      "cuban press"
+    ]
+  },
+  "0300": {
+    "canonicalIt": "Stacco da terra con manubri",
+    "aliases": [
+      "deadlift manubri"
+    ]
+  },
+  "0301": {
+    "canonicalIt": "Panca declinata con manubri",
+    "aliases": [
+      "decline bench manubri"
+    ]
+  },
+  "0302": {
+    "canonicalIt": "Croci declinate con manubri",
+    "aliases": [
+      "decline fly manubri"
+    ]
+  },
+  "0303": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0305": {
+    "canonicalIt": "Shrug declinato con manubri",
+    "aliases": [
+      "decline shrug"
+    ]
+  },
+  "0304": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0306": {
+    "canonicalIt": "Extension tricipiti declinata con manubri",
+    "aliases": [
+      "decline triceps ext manubri"
+    ]
+  },
+  "0307": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0308": {
+    "canonicalIt": "Croci con manubri",
+    "aliases": [
+      "croci manubri",
+      "dumbbell fly"
+    ]
+  },
+  "0310": {
+    "canonicalIt": "Alzate frontali con manubri",
+    "aliases": [
+      "front raise manubri"
+    ]
+  },
+  "0309": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0311": {
+    "canonicalIt": "Full can lateral raise con manubri",
+    "aliases": [
+      "full can lateral raise"
+    ]
+  },
+  "0313": {
+    "canonicalIt": "Hammer curl con manubri",
+    "aliases": [
+      "hammer curl manubri"
+    ]
+  },
+  "0312": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0314": {
+    "canonicalIt": "Panca inclinata con manubri",
+    "aliases": [
+      "incline dumbbell press",
+      "panca inclinata manubri"
+    ]
+  },
+  "0315": {
+    "canonicalIt": "Curl bicipiti su panca inclinata con manubri",
+    "aliases": [
+      "incline curl manubri"
+    ]
+  },
+  "0316": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0318": {
+    "canonicalIt": "Curl su panca inclinata con manubri",
+    "aliases": [
+      "incline curl"
+    ]
+  },
+  "0317": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0319": {
+    "canonicalIt": "Croci inclinate con manubri",
+    "aliases": [
+      "incline fly manubri"
+    ]
+  },
+  "0320": {
+    "canonicalIt": "Hammer curl su panca inclinata con manubri",
+    "aliases": [
+      "incline hammer curl"
+    ]
+  },
+  "0321": {
+    "canonicalIt": "Hammer press su panca inclinata con manubri",
+    "aliases": [
+      "incline hammer press"
+    ]
+  },
+  "0322": {
+    "canonicalIt": "Curl bicipiti interno su panca inclinata con manubri",
+    "aliases": [
+      "incline inner curl"
+    ]
+  },
+  "0323": {
+    "canonicalIt": "Alzata laterale inclinata monobraccio con manubrio",
+    "aliases": [
+      "incline lateral raise monobraccio"
+    ]
+  },
+  "0324": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0325": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0326": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0327": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0328": {
+    "canonicalIt": "Shoulder raise su panca inclinata con manubri",
+    "aliases": [
+      "incline shoulder raise"
+    ]
+  },
+  "0329": {
+    "canonicalIt": "Shrug su panca inclinata con manubri",
+    "aliases": [
+      "incline shrug"
+    ]
+  },
+  "0330": {
+    "canonicalIt": "Extension tricipiti su panca inclinata con manubri",
+    "aliases": [
+      "incline triceps ext manubri"
+    ]
+  },
+  "0331": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0332": {
+    "canonicalIt": "Iron cross con manubri",
+    "aliases": [
+      "iron cross manubri"
+    ]
+  },
+  "0333": {
+    "canonicalIt": "Kickback tricipiti con manubrio",
+    "aliases": [
+      "tricep kickback",
+      "kickback"
+    ]
+  },
+  "0334": {
+    "canonicalIt": "Alzate laterali con manubri",
+    "aliases": [
+      "lateral raise manubri",
+      "alzate laterali"
+    ]
+  },
+  "0335": {
+    "canonicalIt": "Alzate laterali-frontali con manubri",
+    "aliases": [
+      "lateral to front raise"
+    ]
+  },
+  "0336": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0337": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0338": {
+    "canonicalIt": "Elbow press disteso con manubri",
+    "aliases": [
+      "lying elbow press"
+    ]
+  },
+  "0863": {
+    "canonicalIt": "Rotazione esterna spalla distesa con manubrio",
+    "aliases": [
+      "external rotation manubrio"
+    ]
+  },
+  "0339": {
+    "canonicalIt": "Curl femorali disteso con manubrio",
+    "aliases": [
+      "lying leg curl manubrio"
+    ]
+  },
+  "0340": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0341": {
+    "canonicalIt": "Deltoidi posteriori monobraccio disteso con manubrio",
+    "aliases": [
+      "lying rear delt"
+    ]
+  },
+  "0343": {
+    "canonicalIt": "Press monobraccio disteso con manubrio",
+    "aliases": [
+      "lying one arm press"
+    ]
+  },
+  "0342": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0344": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0345": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0346": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0347": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0348": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0349": {
+    "canonicalIt": "Supinazione distesa con manubrio",
+    "aliases": [
+      "dumbbell supination"
+    ]
+  },
+  "0350": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0351": {
+    "canonicalIt": "Extension tricipiti disteso con manubri",
+    "aliases": [
+      "skullcrusher manubri",
+      "french press manubri"
+    ]
+  },
+  "0352": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0292": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0353": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0354": {
+    "canonicalIt": "Kickback monobraccio con manubrio",
+    "aliases": [
+      "one arm kickback"
+    ]
+  },
+  "0355": {
+    "canonicalIt": "Alzata laterale monobraccio con manubrio",
+    "aliases": [
+      "one arm lateral raise"
+    ]
+  },
+  "0356": {
+    "canonicalIt": "Alzata laterale monobraccio con supporto",
+    "aliases": [
+      "supported lateral raise"
+    ]
+  },
+  "0358": {
+    "canonicalIt": "Reverse wrist curl monobraccio con manubrio",
+    "aliases": [
+      "one arm reverse wrist curl"
+    ]
+  },
+  "0359": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0361": {
+    "canonicalIt": "Shoulder press monobraccio con manubrio",
+    "aliases": [
+      "one arm shoulder press"
+    ]
+  },
+  "0360": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0362": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0363": {
+    "canonicalIt": "Upright row monobraccio con manubrio",
+    "aliases": [
+      "one arm upright row"
+    ]
+  },
+  "0364": {
+    "canonicalIt": "Wrist curl monobraccio con manubrio",
+    "aliases": [
+      "one arm wrist curl"
+    ]
+  },
+  "0365": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0366": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0367": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0368": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0369": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0370": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0371": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0372": {
+    "canonicalIt": "Curl su panca Scott con manubri",
+    "aliases": [
+      "preacher curl manubri"
+    ]
+  },
+  "0373": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0374": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0375": {
+    "canonicalIt": "Pullover con manubrio",
+    "aliases": [
+      "pullover manubrio"
+    ]
+  },
+  "0376": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0377": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0378": {
+    "canonicalIt": "Reverse fly con manubri",
+    "aliases": [
+      "rear fly manubri"
+    ]
+  },
+  "0380": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0379": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0381": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0382": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0383": {
+    "canonicalIt": "Reverse fly con manubri",
+    "aliases": [
+      "reverse fly manubri"
+    ]
+  },
+  "0384": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0385": {
+    "canonicalIt": "Reverse wrist curl con manubri",
+    "aliases": [
+      "reverse wrist curl manubri"
+    ]
+  },
+  "0386": {
+    "canonicalIt": "Reverse fly rotatorio con manubri",
+    "aliases": [
+      "rotation reverse fly"
+    ]
+  },
+  "0387": {
+    "canonicalIt": "Alzate frontali alternate seduto con manubri",
+    "aliases": [
+      "seated front raise alternato"
+    ]
+  },
+  "0388": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0389": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0390": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0391": {
+    "canonicalIt": "Curl seduto con manubri",
+    "aliases": [
+      "seated curl"
+    ]
+  },
+  "0392": {
+    "canonicalIt": "Alzate frontali seduto con manubri",
+    "aliases": [
+      "seated front raise"
+    ]
+  },
+  "0393": {
+    "canonicalIt": "Curl bicipiti interno seduto con manubri",
+    "aliases": [
+      "seated inner curl"
+    ]
+  },
+  "0394": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0396": {
+    "canonicalIt": "Alzate laterali seduto con manubri",
+    "aliases": [
+      "seated lateral raise"
+    ]
+  },
+  "0395": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0397": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0398": {
+    "canonicalIt": "Kickback monobraccio seduto con manubrio",
+    "aliases": [
+      "seated one arm kickback"
+    ]
+  },
+  "0399": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0400": {
+    "canonicalIt": "Sollevamento polpacci monogamba seduto con manubrio",
+    "aliases": [
+      "seated one leg calf raise"
+    ]
+  },
+  "0401": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0402": {
+    "canonicalIt": "Curl su panca Scott seduto con manubri",
+    "aliases": [
+      "seated preacher curl"
+    ]
+  },
+  "0403": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0405": {
+    "canonicalIt": "Shoulder press seduto con manubri",
+    "aliases": [
+      "seated shoulder press manubri"
+    ]
+  },
+  "0404": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0406": {
+    "canonicalIt": "Shrug con manubri",
+    "aliases": [
+      "shrug manubri"
+    ]
+  },
+  "0407": {
+    "canonicalIt": "Flessioni laterali con manubrio",
+    "aliases": [
+      "side bend manubrio"
+    ]
+  },
+  "0408": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0409": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0410": {
+    "canonicalIt": "Bulgarian split squat con manubri",
+    "aliases": [
+      "split squat manubri"
+    ]
+  },
+  "0411": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0413": {
+    "canonicalIt": "Squat con manubri",
+    "aliases": [
+      "squat manubri"
+    ]
+  },
+  "0414": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0415": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0416": {
+    "canonicalIt": "Curl bicipiti in piedi con manubri",
+    "aliases": [
+      "standing curl manubri"
+    ]
+  },
+  "0417": {
+    "canonicalIt": "Sollevamenti polpacci in piedi con manubri",
+    "aliases": [
+      "standing calf raise manubri"
+    ]
+  },
+  "0418": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0419": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0420": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0421": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0422": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0423": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0424": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0425": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0426": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0427": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0428": {
+    "canonicalIt": "Curl su panca Scott in piedi con manubri",
+    "aliases": [
+      "standing preacher curl"
+    ]
+  },
+  "0429": {
+    "canonicalIt": "Curl inverso in piedi con manubri",
+    "aliases": [
+      "standing reverse curl"
+    ]
+  },
+  "0430": {
+    "canonicalIt": "Extension tricipiti in piedi con manubri",
+    "aliases": [
+      "standing triceps extension"
+    ]
+  },
+  "0431": {
+    "canonicalIt": "Step-up con manubri",
+    "aliases": [
+      "step up manubri"
+    ]
+  },
+  "0432": {
+    "canonicalIt": "Stiff leg deadlift con manubri",
+    "aliases": [
+      "stiff leg deadlift manubri"
+    ]
+  },
+  "0433": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0434": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0436": {
+    "canonicalIt": "Tate press con manubri",
+    "aliases": [
+      "tate press"
+    ]
+  },
+  "0437": {
+    "canonicalIt": "Upright row con manubri",
+    "aliases": [
+      "upright row manubri"
+    ]
+  },
+  "0864": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0438": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0439": {
+    "canonicalIt": "Zottman curl con manubri",
+    "aliases": [
+      "zottman curl"
+    ]
+  },
+  "0443": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0445": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0446": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0447": {
+    "canonicalIt": "Curl con barra EZ",
+    "aliases": [
+      "ez bar curl",
+      "curl ez"
+    ]
+  },
+  "0448": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0449": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0450": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0451": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0452": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0453": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0454": {
+    "canonicalIt": "Spider curl con barra EZ",
+    "aliases": [
+      "spider curl ez"
+    ]
+  },
+  "0455": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0456": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0457": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0458": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0459": {
+    "canonicalIt": "Flutter kicks",
+    "aliases": [
+      "colpi di gambe"
+    ]
+  },
+  "0464": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0466": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0467": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0469": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0471": {
+    "canonicalIt": "Handstand push-up",
+    "aliases": [
+      "piegamento in verticale"
+    ]
+  },
+  "0472": {
+    "canonicalIt": "Sollevamento gambe in sospensione",
+    "aliases": [
+      "leg raise sospensione",
+      "hanging leg raise"
+    ]
+  },
+  "0473": {
+    "canonicalIt": "Pike in sospensione",
+    "aliases": [
+      "hanging pike"
+    ]
+  },
+  "0474": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0475": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0476": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0484": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0489": {
+    "canonicalIt": "Iperextensione lombare",
+    "aliases": [
+      "iperextensione"
+    ]
+  },
+  "0488": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0490": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0491": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0492": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0493": {
+    "canonicalIt": "Push-up inclinato",
+    "aliases": [
+      "push up inclinato"
+    ]
+  },
+  "0494": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0495": {
+    "canonicalIt": "Sit-up twist su panca inclinata",
+    "aliases": [
+      "incline twisting sit up"
+    ]
+  },
+  "0496": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0499": {
+    "canonicalIt": "Rematore invertito",
+    "aliases": [
+      "inverted row",
+      "australian pull up"
+    ]
+  },
+  "0497": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0498": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0500": {
+    "canonicalIt": "Isometric wipers",
+    "aliases": [
+      "wipers"
+    ]
+  },
+  "0501": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0507": {
+    "canonicalIt": "Jackknife sit-up",
+    "aliases": [
+      "jackknife"
+    ]
+  },
+  "0508": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0514": {
+    "canonicalIt": "Jump squat",
+    "aliases": [
+      "squat salto"
+    ]
+  },
+  "0513": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0517": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0518": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0520": {
+    "canonicalIt": "Shoulder press alternato con kettlebell",
+    "aliases": [
+      "kb press alternato"
+    ]
+  },
+  "0519": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0521": {
+    "canonicalIt": "Renegade row alternato con kettlebell",
+    "aliases": [
+      "kb renegade row"
+    ]
+  },
+  "0522": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0523": {
+    "canonicalIt": "Arnold press con kettlebell",
+    "aliases": [
+      "kb arnold press"
+    ]
+  },
+  "0524": {
+    "canonicalIt": "Bent press con kettlebell",
+    "aliases": [
+      "kb bent press"
+    ]
+  },
+  "0525": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0526": {
+    "canonicalIt": "Hang clean alternato doppio con kettlebell",
+    "aliases": [
+      "kb hang clean"
+    ]
+  },
+  "0527": {
+    "canonicalIt": "Double jerk con kettlebell",
+    "aliases": [
+      "kb double jerk"
+    ]
+  },
+  "0528": {
+    "canonicalIt": "Double push press con kettlebell",
+    "aliases": [
+      "kb double push press"
+    ]
+  },
+  "0529": {
+    "canonicalIt": "Double snatch con kettlebell",
+    "aliases": [
+      "kb double snatch"
+    ]
+  },
+  "0530": {
+    "canonicalIt": "Double windmill con kettlebell",
+    "aliases": [
+      "kb double windmill"
+    ]
+  },
+  "0531": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0532": {
+    "canonicalIt": "Figure 8 con kettlebell",
+    "aliases": [
+      "kb figure 8"
+    ]
+  },
+  "0533": {
+    "canonicalIt": "Front squat con kettlebell",
+    "aliases": [
+      "kb front squat"
+    ]
+  },
+  "0534": {
+    "canonicalIt": "Goblet squat con kettlebell",
+    "aliases": [
+      "kb goblet squat"
+    ]
+  },
+  "0535": {
+    "canonicalIt": "Hang clean con kettlebell",
+    "aliases": [
+      "kb hang clean"
+    ]
+  },
+  "0536": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0537": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0538": {
+    "canonicalIt": "Jerk monobraccio con kettlebell",
+    "aliases": [
+      "kb one arm jerk"
+    ]
+  },
+  "0539": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0540": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0541": {
+    "canonicalIt": "Rematore monobraccio con kettlebell",
+    "aliases": [
+      "kb one arm row"
+    ]
+  },
+  "0542": {
+    "canonicalIt": "Snatch monobraccio con kettlebell",
+    "aliases": [
+      "kb one arm snatch"
+    ]
+  },
+  "0543": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0544": {
+    "canonicalIt": "Pistol squat con kettlebell",
+    "aliases": [
+      "kb pistol squat"
+    ]
+  },
+  "0545": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0546": {
+    "canonicalIt": "Shoulder press seduto con kettlebell",
+    "aliases": [
+      "kb seated press"
+    ]
+  },
+  "0547": {
+    "canonicalIt": "Seesaw press con kettlebell",
+    "aliases": [
+      "kb seesaw press"
+    ]
+  },
+  "0548": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0549": {
+    "canonicalIt": "Kettlebell swing",
+    "aliases": [
+      "kb swing",
+      "swing"
+    ]
+  },
+  "0550": {
+    "canonicalIt": "Thruster con kettlebell",
+    "aliases": [
+      "kb thruster"
+    ]
+  },
+  "0551": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0552": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0553": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0554": {
+    "canonicalIt": "Windmill con kettlebell",
+    "aliases": [
+      "kb windmill"
+    ]
+  },
+  "0555": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0558": {
+    "canonicalIt": "Kipping muscle-up",
+    "aliases": [
+      "muscle up kipping"
+    ]
+  },
+  "0562": {
+    "canonicalIt": "Landmine 180",
+    "aliases": [
+      "landmine rotation"
+    ]
+  },
+  "0570": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0571": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0572": {
+    "canonicalIt": "Chin-up assistito al macchinario",
+    "aliases": [
+      "assisted chin up"
+    ]
+  },
+  "0573": {
+    "canonicalIt": "Iperextensione lombare al macchinario",
+    "aliases": [
+      "back extension machine"
+    ]
+  },
+  "0574": {
+    "canonicalIt": "Rematore piegato al macchinario",
+    "aliases": [
+      "machine bent over row"
+    ]
+  },
+  "0575": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0577": {
+    "canonicalIt": "Chest press al macchinario",
+    "aliases": [
+      "chest press machine"
+    ]
+  },
+  "0576": {
+    "canonicalIt": "Chest press al macchinario",
+    "aliases": [
+      "chest press machine"
+    ]
+  },
+  "0578": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0579": {
+    "canonicalIt": "Pulldown frontale al macchinario",
+    "aliases": [
+      "front pulldown machine"
+    ]
+  },
+  "0580": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0581": {
+    "canonicalIt": "High row al macchinario",
+    "aliases": [
+      "machine high row"
+    ]
+  },
+  "0582": {
+    "canonicalIt": "Leg curl in ginocchio al macchinario",
+    "aliases": [
+      "kneeling leg curl"
+    ]
+  },
+  "0583": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0584": {
+    "canonicalIt": "Alzate laterali al macchinario",
+    "aliases": [
+      "machine lateral raise"
+    ]
+  },
+  "0585": {
+    "canonicalIt": "Leg extension al macchinario",
+    "aliases": [
+      "machine leg extension"
+    ]
+  },
+  "0586": {
+    "canonicalIt": "Leg curl disteso al macchinario",
+    "aliases": [
+      "lying leg curl machine"
+    ]
+  },
+  "0587": {
+    "canonicalIt": "Military press al macchinario",
+    "aliases": [
+      "machine military press"
+    ]
+  },
+  "0588": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0589": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0590": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0591": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0592": {
+    "canonicalIt": "Curl su panca Scott al macchinario",
+    "aliases": [
+      "machine preacher curl"
+    ]
+  },
+  "0593": {
+    "canonicalIt": "Reverse hyperextension al macchinario",
+    "aliases": [
+      "reverse hyper machine"
+    ]
+  },
+  "0594": {
+    "canonicalIt": "Sollevamenti polpacci seduto al macchinario",
+    "aliases": [
+      "seated calf raise machine"
+    ]
+  },
+  "0595": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0596": {
+    "canonicalIt": "Croci seduto al macchinario",
+    "aliases": [
+      "seated fly machine"
+    ]
+  },
+  "0597": {
+    "canonicalIt": "Adduttori al macchinario",
+    "aliases": [
+      "hip abduction machine"
+    ]
+  },
+  "0598": {
+    "canonicalIt": "Adduttori al macchinario",
+    "aliases": [
+      "hip adduction machine"
+    ]
+  },
+  "0599": {
+    "canonicalIt": "Leg curl seduto al macchinario",
+    "aliases": [
+      "seated leg curl machine"
+    ]
+  },
+  "0600": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0602": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0601": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0603": {
+    "canonicalIt": "Shoulder press al macchinario",
+    "aliases": [
+      "shoulder press machine"
+    ]
+  },
+  "0869": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0604": {
+    "canonicalIt": "Shrug al macchinario",
+    "aliases": [
+      "machine shrug"
+    ]
+  },
+  "0605": {
+    "canonicalIt": "Sollevamenti polpacci in piedi al macchinario",
+    "aliases": [
+      "standing calf raise machine"
+    ]
+  },
+  "0606": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0607": {
+    "canonicalIt": "Extension tricipiti al macchinario",
+    "aliases": [
+      "machine triceps extension"
+    ]
+  },
+  "0609": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0613": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0620": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0865": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0624": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0627": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0628": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0630": {
+    "canonicalIt": "Mountain climber",
+    "aliases": [
+      "climber"
+    ]
+  },
+  "0631": {
+    "canonicalIt": "Muscle-up",
+    "aliases": [
+      "muscle up"
+    ]
+  },
+  "0634": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0635": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0636": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0637": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0638": {
+    "canonicalIt": "Chin-up monobraccio",
+    "aliases": [
+      "one arm chin up"
+    ]
+  },
+  "0639": {
+    "canonicalIt": "Dip monobraccio",
+    "aliases": [
+      "one arm dip"
+    ]
+  },
+  "0640": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0641": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0642": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0643": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0648": {
+    "canonicalIt": "Power clean",
+    "aliases": [
+      "power clean"
+    ]
+  },
+  "0651": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0650": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0652": {
+    "canonicalIt": "Pull-up",
+    "aliases": [
+      "pull up",
+      "trazione"
+    ]
+  },
+  "0662": {
+    "canonicalIt": "Push-up",
+    "aliases": [
+      "push up",
+      "piegamento"
+    ]
+  },
+  "0653": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0655": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0656": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0659": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0658": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0660": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0661": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0663": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0664": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0666": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0668": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0669": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0670": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0872": {
+    "canonicalIt": "Reverse crunch",
+    "aliases": [
+      "reverse crunch"
+    ]
+  },
+  "0672": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0673": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0674": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0675": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0677": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0678": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0680": {
+    "canonicalIt": "Salita alla corda",
+    "aliases": [
+      "rope climb"
+    ]
+  },
+  "0685": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0684": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0687": {
+    "canonicalIt": "Russian twist",
+    "aliases": [
+      "russian twist"
+    ]
+  },
+  "0688": {
+    "canonicalIt": "Scapular pull-up",
+    "aliases": [
+      "scapular pull up"
+    ]
+  },
+  "0689": {
+    "canonicalIt": "Sollevamento gambe seduto",
+    "aliases": [
+      "seated leg raise"
+    ]
+  },
+  "0690": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0691": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0697": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0696": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0699": {
+    "canonicalIt": "Push-up con tocchi alle spalle",
+    "aliases": [
+      "shoulder tap push up"
+    ]
+  },
+  "0705": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0709": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0710": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0716": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0717": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0721": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0720": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0725": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0727": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0730": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0735": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0738": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0739": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0740": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0741": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0742": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0743": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0744": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0746": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0747": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0748": {
+    "canonicalIt": "Panca piana al multipower",
+    "aliases": [
+      "panca multipower",
+      "smith bench press"
+    ]
+  },
+  "0749": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0750": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0751": {
+    "canonicalIt": "Panca stretta al multipower",
+    "aliases": [
+      "smith close grip bench"
+    ]
+  },
+  "0752": {
+    "canonicalIt": "Stacco da terra al multipower",
+    "aliases": [
+      "smith deadlift"
+    ]
+  },
+  "0753": {
+    "canonicalIt": "Panca declinata al multipower",
+    "aliases": [
+      "smith decline bench"
+    ]
+  },
+  "0754": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0755": {
+    "canonicalIt": "Hack squat al multipower",
+    "aliases": [
+      "smith hack squat"
+    ]
+  },
+  "0756": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0757": {
+    "canonicalIt": "Panca inclinata al multipower",
+    "aliases": [
+      "smith incline bench"
+    ]
+  },
+  "0758": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0759": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0760": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0761": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0762": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0763": {
+    "canonicalIt": "Reverse calf raise al multipower",
+    "aliases": [
+      "smith reverse calf raise"
+    ]
+  },
+  "0764": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0765": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0766": {
+    "canonicalIt": "Shoulder press al multipower",
+    "aliases": [
+      "smith shoulder press"
+    ]
+  },
+  "0767": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0768": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0769": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0770": {
+    "canonicalIt": "Squat al multipower",
+    "aliases": [
+      "squat multipower"
+    ]
+  },
+  "0771": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0772": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0773": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0774": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0775": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0776": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0777": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0778": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0786": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0788": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0794": {
+    "canonicalIt": "Stretch laterale in piedi",
+    "aliases": [
+      "lateral stretch"
+    ]
+  },
+  "0795": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0796": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0798": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0803": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0805": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0806": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0807": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0808": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0809": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0811": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0814": {
+    "canonicalIt": "Dip tricipiti",
+    "aliases": [
+      "tricep dip"
+    ]
+  },
+  "0812": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0813": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0815": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0816": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0817": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0871": {
+    "canonicalIt": "Tuck crunch",
+    "aliases": [
+      "tuck crunch"
+    ]
+  },
+  "0818": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0826": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0830": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0832": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0833": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0834": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0866": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0835": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0840": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0841": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0844": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0846": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0845": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0847": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0849": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0850": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0851": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0852": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0853": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0854": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0856": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0857": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0858": {
+    "canonicalIt": "",
+    "aliases": []
+  },
+  "0859": {
+    "canonicalIt": "",
+    "aliases": []
+  }
+}

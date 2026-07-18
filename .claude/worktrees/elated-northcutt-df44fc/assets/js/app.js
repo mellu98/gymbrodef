@@ -61,12 +61,15 @@ let timerInterval = null;
 let timerTotal = 90;
 let timerLeft = 90;
 let timerRunning = false;
-let timerDi = -1;
-let timerEi = -1;
 // Chrono state
 let chronoInterval = null;
 let chronoSecs = 0;
 let chronoRunning = false;
+// Neg timer
+let negInterval = null;
+let negLeft = 4;
+let negRunning = false;
+let negDur = 4;
 let timerWarnedMarks = new Set();
 let countdownTimer = null;
 let countdownDone = null;
@@ -218,8 +221,7 @@ function getSupersetItems(exercise) {
     .map((item) => ({
       name: cleanText(item?.name || ''),
       reps: normalizeRepToken(item?.reps || ''),
-      note: cleanText(item?.note || ''),
-      ...normalizeCatalogFields(item)
+      note: cleanText(item?.note || '')
     }))
     .filter((item) => item.name || item.reps || item.note);
 }
@@ -335,18 +337,6 @@ function formatSupersetKgForHistory(exercise, state) {
   return rows.join(' | ');
 }
 
-function normalizeCatalogFields(ex) {
-  return {
-    catalogId: String(ex?.catalogId || ''),
-    matchConfidence: Math.max(0, Math.min(1, Number(ex?.matchConfidence) || 0)),
-    canonicalName: cleanText(ex?.canonicalName || ''),
-    target: cleanText(ex?.target || ''),
-    equipment: cleanText(ex?.equipment || ''),
-    secondaryMuscles: Array.isArray(ex?.secondaryMuscles) ? ex.secondaryMuscles.map(String) : [],
-    instructionsIt: cleanText(ex?.instructionsIt || '')
-  };
-}
-
 function normalizePrograms(programs, sourceFallback = 'bundled') {
   return (Array.isArray(programs) ? programs : []).map((program, pi) => ({
     id: String(program?.id || 'program-' + (pi + 1)).replace(/[^a-zA-Z0-9_-]/g, '_'),
@@ -380,8 +370,7 @@ function normalizePrograms(programs, sourceFallback = 'bundled') {
             ? Array.from({ length: Math.max(1, series || 1) }, (_, index) => 'Round ' + (index + 1))
             : deriveRepsPlan(ex?.reps, ex?.series, ex?.repsPlan),
           note: cleanText(ex?.note || ''),
-          supersetItems,
-          ...normalizeCatalogFields(ex)
+          supersetItems
         };
       })
     }))
@@ -1299,61 +1288,13 @@ function skipWorkoutCountdown() {
   if (countdownDone) countdownDone();
 }
 
-function classifyExerciseIntensity(name) {
-  var n = (name || '').toLowerCase();
-  if (/(?:squat|stacco|deadlift|leg press|hack|hip thrust|panca piana|distensioni piana|bench press)/i.test(n)) return 3;
-  if (/(?:inclinat|declin|chest press|lat |tirate|rematore|row|pulldown|pulley|overhead|military|distensioni verticali|dip|affond|lunge|leg curl|leg ext|estensioni|french|push down|pull down)/i.test(n)) return 2;
-  return 1;
-}
-
-function countCompletedSets(kgStr) {
-  var s = (String(kgStr || '').match(/S\d+\s*:/g) || []).length;
-  if (s) return s;
-  var r = (String(kgStr || '').match(/R\d+\s/g) || []).length;
-  return r || 0;
-}
-
-function extractSetWeights(kgStr) {
-  return (String(kgStr || '').match(/([0-9]+(?:[\.,][0-9]+)?)\s*kg/gi) || [])
-    .map(function(m) { return parseFloat(m.replace(',', '.')) || 0; });
-}
-
-function estimateSessionCalories(entry) {
-  var exercises = (entry.exercises || []).filter(function(e) { return e.done; });
-  if (!exercises.length) return 0;
-
-  var totalSets = 0;
-  var intensitySum = 0;
-
-  exercises.forEach(function(exercise) {
-    var sets = Math.max(1, countCompletedSets(exercise.kg));
-    totalSets += sets;
-    intensitySum += sets * classifyExerciseIntensity(exercise.name);
-  });
-
-  if (!totalSets) return 80;
-
-  var avgIntensity = intensitySum / totalSets;
-  var met = 3.5 + (avgIntensity - 1) * 1.25;
-  var estimatedDurationMin = (totalSets * 130) / 60;
-  var durationHours = estimatedDurationMin / 60;
-
-  var nutritionProfile = getNutritionProfile();
-  var bodyweight = nutritionProfile.currentWeightKg || 70;
-
-  var calories = Math.round(met * bodyweight * durationHours);
-  return Math.max(80, Math.min(900, calories));
-}
-
 function getSessionVolume(entry) {
-  var total = 0;
-  (entry.exercises || []).forEach(function(exercise) {
-    var sets = Math.max(1, countCompletedSets(exercise.kg));
-    var weights = extractSetWeights(exercise.kg);
-    var avgWeight = weights.length ? weights.reduce(function(a, b) { return a + b; }, 0) / weights.length : 0;
-    total += avgWeight * sets * 10;
+  let total = 0;
+  (entry.exercises || []).forEach((exercise) => {
+    const matches = String(exercise.kg || '').match(/([0-9]+(?:[\.,][0-9]+)?)/g) || [];
+    matches.forEach((value) => { total += parseFloat(value.replace(',', '.')) || 0; });
   });
-  return Math.round(total / 10);
+  return Math.round(total * 10) / 10;
 }
 
 function showSessionSummary(entry, weekCompleted = false, weekNumber = currentWeek) {
@@ -1370,7 +1311,7 @@ function showSessionSummary(entry, weekCompleted = false, weekNumber = currentWe
   const doneCount = exercises.filter((exercise) => exercise.done).length;
   const volume = getSessionVolume(entry);
   const prCount = getLivePrCount(weekNumber, entry.dayIndex ?? null);
-  const estimatedCalories = estimateSessionCalories(entry);
+  const estimatedCalories = Math.max(80, Math.round(doneCount * 32 + volume * 0.035));
   const content = document.getElementById('session-summary-content');
   content.innerHTML = `
     <div class="session-summary-kicker">Sessione completata</div>
@@ -3952,7 +3893,7 @@ function setAppSection(section) {
   document.getElementById('fab').classList.remove('show');
   document.getElementById('btn-finish').classList.remove('show');
   currentDay = null;
-  stopTimer(); stopChrono();
+  stopTimer(); stopChrono(); stopNeg();
   renderSectionNav();
   if (section === 'today') renderHome();
   if (section === 'plans') renderPrograms();
@@ -4342,7 +4283,7 @@ function toggleSerie(di, ei, s) {
   const box = document.getElementById('sb-' + ei + '-' + s);
   const exercise = getDays()?.[di]?.exercises?.[ei];
   box.className = 'serie-box' + (isSupersetExercise(exercise) ? ' superset-box' : '') + (sd.seriesDone[s] ? ' done' : '');
-  if (sd.seriesDone[s]) { celebrateSet(box); checkLivePr(di, ei, box); openTimer(di, ei); }
+  if (sd.seriesDone[s]) { celebrateSet(box); checkLivePr(di, ei, box); openTimer(); }
 }
 
 function toggleExDone(di, ei) {
@@ -4387,25 +4328,6 @@ function saveNote(di, ei, val) {
 }
 
 // â”€â”€â”€ FOCUS VIEW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function renderFocusCatalogSection(ex) {
-  if (!ex.catalogId) return '';
-  const secondary = Array.isArray(ex.secondaryMuscles) && ex.secondaryMuscles.length
-    ? `<div class="fc-catalog-meta">Muscoli secondari: ${ex.secondaryMuscles.map(escapeHtml).join(', ')}</div>`
-    : '';
-  const instructions = ex.instructionsIt
-    ? `<div class="fc-catalog-instructions">${escapeHtml(ex.instructionsIt)}</div>`
-    : '';
-  return `
-    <div class="fc-catalog">
-      <div class="fc-catalog-title">Come si esegue</div>
-      <div class="fc-catalog-name">${escapeHtml(ex.canonicalName || ex.name)}</div>
-      <div class="fc-catalog-meta">Target: ${escapeHtml(ex.target || '-')} · Equipment: ${escapeHtml(ex.equipment || '-')}</div>
-      ${secondary}
-      ${instructions}
-    </div>
-  `;
-}
-
 function renderFocusView(di, ei) {
   const days = getDays();
   focusIdx = ei;
@@ -4421,7 +4343,7 @@ function renderFocusView(di, ei) {
   const activeSetNumber = nextSetIndex === -1 ? Math.max(1, ex.series) : nextSetIndex + 1;
   const energyPct = ex.series ? Math.max(0, Math.round(((ex.series - completedSets) / ex.series) * 100)) : 0;
   const focusMeterHtml = `
-    <div class="fc-hero-meter" id="fc-meter" style="--energy:${energyPct}%">
+    <div class="fc-hero-meter" style="--energy:${energyPct}%">
       <div class="fc-hero-set"><span>Serie attiva</span><strong>${activeSetNumber}</strong></div>
       <div class="fc-hero-energy"><span></span></div>
       <div class="fc-hero-copy">${completedSets}/${ex.series} completate - energia residua ${energyPct}%</div>
@@ -4435,7 +4357,7 @@ function renderFocusView(di, ei) {
     const inputId = `fkg-${ei}-${s}`;
     const normalKgHtml = !isSupersetExercise(ex) ? `
         <div class="fsr-kg kg-stepper">
-          <button type="button" onclick="event.stopPropagation();stepKg(${di},${ei},${s},-2.5,'${inputId}')">−</button>
+          <button type="button" onclick="event.stopPropagation();stepKg(${di},${ei},${s},-2.5,'${inputId}')">?</button>
           <input id="${inputId}" type="number" inputmode="decimal" placeholder="kg"
             value="${sd.kg[s]||''}"
             onchange="saveKg(${di},${ei},${s},this.value)"
@@ -4483,7 +4405,6 @@ function renderFocusView(di, ei) {
     </div>
     ${renderSupersetItemsHtml(ex, 'focus')}
     ${ex.note ? `<div class="fc-note">${ex.note}</div>` : ''}
-    ${renderFocusCatalogSection(ex)}
     ${focusMeterHtml}
     ${nextHtml}
     <div class="chrono-row">
@@ -4494,18 +4415,30 @@ function renderFocusView(di, ei) {
         <button class="chrono-btn" onclick="resetChrono()">Reset</button>
       </div>
     </div>
+    <div class="neg-timer-row">
+      <span class="neg-label">Neg:</span>
+      <span class="neg-secs" id="neg-disp">${negLeft}</span>
+      <select class="neg-dur-sel" onchange="negDur=parseInt(this.value);negLeft=negDur;updateNegDisp()" >
+        <option value="3"${negDur===3?' selected':''}>3"</option>
+        <option value="4"${negDur===4?' selected':''}>4"</option>
+        <option value="5"${negDur===5?' selected':''}>5"</option>
+      </select>
+      <div class="neg-btns">
+        <button class="neg-btn" onclick="startNeg()">Start</button>
+        <button class="neg-btn" onclick="stopNeg()">Reset</button>
+      </div>
+    </div>
     ${seriesHtml}
     <textarea class="fc-textnote" rows="2" placeholder="Note..."
       onchange="saveNote(${di},${ei},this.value)"
       oninput="saveNote(${di},${ei},this.value)">${sd.note}</textarea>
   `;
+  updateNegDisp();
 }
 
 function toggleFSerie(di, ei, s) {
   const sd = getSD(di, ei);
   sd.seriesDone[s] = !sd.seriesDone[s];
-  const ex = getDays()[di].exercises[ei];
-  sd.exDone = sd.seriesDone.filter(Boolean).length >= ex.series;
   const weekState = getCurrentWeekState();
   weekState.report = null;
   weekState.reportSeen = false;
@@ -4515,28 +4448,13 @@ function toggleFSerie(di, ei, s) {
   const box = document.getElementById('sb-' + ei + '-' + s);
   const exercise = getDays()?.[di]?.exercises?.[ei];
   if (box) box.className = 'serie-box' + (isSupersetExercise(exercise) ? ' superset-box' : '') + (sd.seriesDone[s] ? ' done' : '');
-  if (sd.seriesDone[s]) { celebrateSet(chk || box); checkLivePr(di, ei, chk || box); openTimer(di, ei); }
-  updateFocusMeter(di, ei);
-}
-
-function updateFocusMeter(di, ei) {
-  const meter = document.getElementById('fc-meter');
-  if (!meter) return;
-  const sd = getSD(di, ei);
-  const ex = getDays()[di].exercises[ei];
-  const completedSets = sd.seriesDone.filter(Boolean).length;
-  const nextSetIndex = sd.seriesDone.findIndex((done) => !done);
-  const activeSetNumber = nextSetIndex === -1 ? Math.max(1, ex.series) : nextSetIndex + 1;
-  const energyPct = ex.series ? Math.max(0, Math.round(((ex.series - completedSets) / ex.series) * 100)) : 0;
-  meter.style.setProperty('--energy', energyPct + '%');
-  meter.querySelector('.fc-hero-set strong').textContent = activeSetNumber;
-  meter.querySelector('.fc-hero-copy').textContent = completedSets + '/' + ex.series + ' completate - energia residua ' + energyPct + '%';
+  if (sd.seriesDone[s]) { celebrateSet(chk || box); checkLivePr(di, ei, chk || box); openTimer(); }
 }
 
 function focusNav(dir) {
   const next = focusIdx + dir;
   if (next < 0 || next >= getDays()[currentDay].exercises.length) return;
-  stopChrono();
+  stopChrono(); stopNeg();
   renderFocusView(currentDay, next);
 }
 
@@ -4564,15 +4482,34 @@ function resetChrono() {
 }
 function stopChrono() { clearInterval(chronoInterval); chronoRunning = false; chronoSecs = 0; }
 
+// â”€â”€â”€ NEG TIMER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function updateNegDisp() {
+  const el = document.getElementById('neg-disp');
+  if (el) el.textContent = negLeft;
+}
+function startNeg() {
+  if (negRunning) return;
+  negLeft = negDur;
+  updateNegDisp();
+  negRunning = true;
+  negInterval = setInterval(() => {
+    negLeft--;
+    updateNegDisp();
+    if (negLeft <= 0) {
+      stopNeg();
+      buzzVibrate();
+    }
+  }, 1000);
+}
+function stopNeg() {
+  clearInterval(negInterval); negRunning = false; negLeft = negDur; updateNegDisp();
+}
 
 // â”€â”€â”€ REST TIMER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const CIRC = 515;
-function openTimer(di, ei) {
-  timerDi = di ?? currentDay;
-  timerEi = ei ?? focusIdx;
+function openTimer() {
   timerLeft = timerTotal;
   timerWarnedMarks = new Set();
-  populateTimerContext();
   updateTimerDisplay();
   document.getElementById('timer-ov').classList.add('show');
   syncAssistantUi();
@@ -4601,7 +4538,7 @@ function startTimer() {
       timerWarnedMarks.add(timerLeft);
       safeVibrate(timerLeft === 1 ? [60, 40, 60] : 40);
     }
-    if (timerLeft <= 0) { stopTimer(); buzzVibrate(); }
+    if (timerLeft <= 0) { stopTimer(); buzzVibrate(); document.getElementById('t-sub').textContent = 'PRONTI!'; }
   }, 1000);
 }
 function stopTimer() {
@@ -4612,51 +4549,11 @@ function toggleTimer() {
   if (timerRunning) stopTimer();
   else { if (timerLeft <= 0) { timerLeft = timerTotal; } startTimer(); }
 }
-function populateTimerContext() {
-  if (timerDi == null || timerDi < 0) return;
-  var days = getDays();
-  var day = days[timerDi];
-  if (!day) return;
-  var currentEx = day.exercises[timerEi];
-  var nextEx = day.exercises[timerEi + 1] || null;
-  var ctxEl = document.getElementById('t-exercise-ctx');
-  var nextEl = document.getElementById('t-up-next');
-  if (currentEx) {
-    ctxEl.innerHTML = '<span class="t-ctx-label">Stai facendo</span><span class="t-ctx-name">' + escapeHtml(currentEx.name) + '</span>';
-  } else {
-    ctxEl.innerHTML = '';
-  }
-  if (nextEx) {
-    nextEl.innerHTML = '<div class="t-next-kicker">Prossimo esercizio</div><div class="t-next-name">' + escapeHtml(nextEx.name) + '</div><div class="t-next-meta">' + escapeHtml(getExerciseMetaLabel(nextEx)) + '</div>';
-  } else {
-    nextEl.innerHTML = '<div class="t-next-kicker">Finale</div><div class="t-next-name">Ultimo esercizio del giorno!</div><div class="t-next-meta">Chiudi alla grande.</div>';
-  }
-}
 function updateTimerDisplay() {
   document.getElementById('t-num').textContent = timerLeft;
-  var pct = timerTotal > 0 ? timerLeft / timerTotal : 0;
-  var circle = document.getElementById('t-circle');
-  var sub = document.getElementById('t-sub');
-  var num = document.getElementById('t-num');
-  circle.style.strokeDashoffset = CIRC * (1 - pct);
-  circle.classList.remove('phase-rest', 'phase-ready', 'phase-almost', 'phase-go');
-  if (timerLeft <= 0) {
-    sub.textContent = 'VIA!';
-    num.style.color = '#00e676';
-    circle.classList.add('phase-go');
-  } else if (pct <= 0.2) {
-    sub.textContent = 'Ci siamo quasi...';
-    num.style.color = '#ff6d00';
-    circle.classList.add('phase-almost');
-  } else if (pct <= 0.45) {
-    sub.textContent = 'Preparati...';
-    num.style.color = '#ffc107';
-    circle.classList.add('phase-ready');
-  } else {
-    sub.textContent = 'Recupera...';
-    num.style.color = '#00e676';
-    circle.classList.add('phase-rest');
-  }
+  document.getElementById('t-sub').textContent = timerLeft > 0 ? 'secondi' : 'PRONTI!';
+  const pct = timerLeft / timerTotal;
+  document.getElementById('t-circle').style.strokeDashoffset = CIRC * (1 - pct);
 }
 
 // â”€â”€â”€ BUZZ / VIBRATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -4965,132 +4862,6 @@ function validateImportDraft(draft) {
   return '';
 }
 
-function renderExerciseMatchBadge(exercise, di, ei) {
-  if (!exercise.catalogId) {
-    return `<div class="imp-match-info">
-      <span class="imp-badge">Esercizio personalizzato · non nel catalogo</span>
-      <button class="imp-mini-btn" type="button" onclick="openExerciseMatchPicker(${di}, ${ei})">Cerca nel catalogo</button>
-    </div>`;
-  }
-  const confidence = Math.round((exercise.matchConfidence || 0) * 100);
-  const badgeClass = exercise.matchConfidence >= 0.90 ? 'good' : 'warn';
-  const needsConfirm = exercise.matchConfidence >= 0.72 && exercise.matchConfidence < 0.90;
-  return `<div class="imp-match-info">
-    <span class="imp-badge ${badgeClass}">${escapeHtml(exercise.canonicalName || exercise.name)} · ${confidence}% catalogo</span>
-    ${needsConfirm ? `<button class="imp-mini-btn" type="button" onclick="openExerciseMatchPicker(${di}, ${ei})">Conferma o cambia</button>` : ''}
-    <button class="imp-mini-btn" type="button" onclick="openExerciseMatchPicker(${di}, ${ei})">Cambia</button>
-  </div>`;
-}
-
-function openExerciseMatchPicker(di, ei) {
-  const exercise = importDraft?.days?.[di]?.exercises?.[ei];
-  if (!exercise) return;
-
-  const overlayId = 'exercise-match-overlay';
-  let overlay = document.getElementById(overlayId);
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = overlayId;
-    overlay.className = 'exercise-match-overlay';
-    document.body.appendChild(overlay);
-  }
-
-  overlay.innerHTML = `
-    <div class="exercise-match-backdrop" onclick="closeExerciseMatchPicker()"></div>
-    <div class="exercise-match-panel" onclick="event.stopPropagation()">
-      <div class="exercise-match-hdr">
-        <strong>Collega al catalogo</strong>
-        <button class="imp-mini-btn" type="button" onclick="closeExerciseMatchPicker()">Chiudi</button>
-      </div>
-      <div class="exercise-match-current">
-        <span>Esercizio:</span> <strong>${escapeHtml(exercise.name)}</strong>
-      </div>
-      <div class="exercise-match-search">
-        <input type="text" id="match-picker-input" placeholder="Cerca esercizio..."
-          value="${escapeHtml(exercise.canonicalName || exercise.name)}"
-          onkeydown="if(event.key==='Enter')searchCatalogForPicker(${di},${ei})">
-        <button class="imp-mini-btn" type="button" onclick="searchCatalogForPicker(${di},${ei})">Cerca</button>
-      </div>
-      <div class="exercise-match-actions">
-        <button class="imp-mini-btn danger" type="button" onclick="clearCatalogMatch(${di},${ei})">Lascia personalizzato</button>
-      </div>
-      <div class="exercise-match-results" id="match-picker-results"></div>
-    </div>
-  `;
-  overlay.classList.add('show');
-  searchCatalogForPicker(di, ei);
-}
-
-function closeExerciseMatchPicker() {
-  const overlay = document.getElementById('exercise-match-overlay');
-  if (overlay) overlay.classList.remove('show');
-}
-
-async function searchCatalogForPicker(di, ei) {
-  const input = document.getElementById('match-picker-input');
-  const resultsContainer = document.getElementById('match-picker-results');
-  if (!input || !resultsContainer) return;
-
-  const query = cleanText(input.value);
-  if (!query) {
-    resultsContainer.innerHTML = '';
-    return;
-  }
-
-  resultsContainer.innerHTML = '<div class="imp-state">Ricerca in corso...</div>';
-
-  try {
-    const response = await fetch(buildApiUrl('/api/exercises/search?q=' + encodeURIComponent(query)));
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(payload.error || 'Ricerca non disponibile.');
-
-    const results = Array.isArray(payload.results) ? payload.results : [];
-    if (!results.length) {
-      resultsContainer.innerHTML = '<div class="imp-state">Nessun esercizio trovato.</div>';
-      return;
-    }
-
-    resultsContainer.innerHTML = results.map((ex) => `
-      <button class="exercise-match-result" type="button"
-        onclick="assignCatalogMatch(${di},${ei},'${escapeHtml(ex.id)}','${escapeHtml(ex.canonicalName)}','${escapeHtml(ex.target)}','${escapeHtml(ex.equipment)}',${JSON.stringify(ex.secondaryMuscles || [])},'',0.95)">
-        <strong>${escapeHtml(ex.canonicalName)}</strong>
-        <span>${escapeHtml(ex.target || '-')} · ${escapeHtml(ex.equipment || '-')}</span>
-      </button>
-    `).join('');
-  } catch (error) {
-    console.error('Errore ricerca catalogo', error);
-    resultsContainer.innerHTML = '<div class="imp-error">' + escapeHtml(error.message) + '</div>';
-  }
-}
-
-function assignCatalogMatch(di, ei, catalogId, canonicalName, target, equipment, secondaryMuscles, instructionsIt, confidence) {
-  const exercise = importDraft?.days?.[di]?.exercises?.[ei];
-  if (!exercise) return;
-  exercise.catalogId = catalogId;
-  exercise.canonicalName = canonicalName;
-  exercise.matchConfidence = confidence;
-  exercise.target = target;
-  exercise.equipment = equipment;
-  exercise.secondaryMuscles = Array.isArray(secondaryMuscles) ? secondaryMuscles : [];
-  exercise.instructionsIt = instructionsIt || '';
-  closeExerciseMatchPicker();
-  renderImportReview();
-}
-
-function clearCatalogMatch(di, ei) {
-  const exercise = importDraft?.days?.[di]?.exercises?.[ei];
-  if (!exercise) return;
-  exercise.catalogId = '';
-  exercise.canonicalName = '';
-  exercise.matchConfidence = 0;
-  exercise.target = '';
-  exercise.equipment = '';
-  exercise.secondaryMuscles = [];
-  exercise.instructionsIt = '';
-  closeExerciseMatchPicker();
-  renderImportReview();
-}
-
 function renderImportReview(validationError = '') {
   if (!importDraft || !importMeta) return;
   const isAiDraft = cleanText(importMeta.origin || '') === 'ai';
@@ -5163,7 +4934,6 @@ function renderImportReview(validationError = '') {
               </div>
             </div>
             <div class="imp-field" style="margin-top:10px">
-              ${renderExerciseMatchBadge(exercise, di, ei)}
               <label>Note</label>
               <textarea oninput="updateImportExerciseField(${di}, ${ei}, 'note', this.value)">${escapeHtml(exercise.note)}</textarea>
             </div>

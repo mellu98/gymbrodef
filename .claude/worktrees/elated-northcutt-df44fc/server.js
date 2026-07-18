@@ -2,12 +2,9 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const OpenAI = require('openai');
-const exerciseCatalog = require('./lib/exercise-catalog');
-const exerciseMatcher = require('./lib/exercise-matcher');
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
-exerciseCatalog.loadSync();
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 10 * 1024 * 1024 },
@@ -41,10 +38,7 @@ const SUPERSET_ITEM_SCHEMA = {
   properties: {
     name: { type: 'string' },
     reps: { type: 'string' },
-    note: { type: 'string' },
-    catalogId: { type: 'string' },
-    matchConfidence: { type: 'number', minimum: 0, maximum: 1 },
-    canonicalName: { type: 'string' }
+    note: { type: 'string' }
   }
 };
 
@@ -104,17 +98,7 @@ const IMPORT_SCHEMA = {
                 supersetItems: {
                   type: 'array',
                   items: SUPERSET_ITEM_SCHEMA
-                },
-                catalogId: { type: 'string' },
-                matchConfidence: { type: 'number', minimum: 0, maximum: 1 },
-                canonicalName: { type: 'string' },
-                target: { type: 'string' },
-                equipment: { type: 'string' },
-                secondaryMuscles: {
-                  type: 'array',
-                  items: { type: 'string' }
-                },
-                instructionsIt: { type: 'string' }
+                }
               }
             }
           }
@@ -171,17 +155,7 @@ const IMPORT_SCHEMA_LEGACY = {
                 name: { type: 'string' },
                 series: { type: 'integer', minimum: 1 },
                 reps: { type: 'string' },
-                note: { type: 'string' },
-                catalogId: { type: 'string' },
-                matchConfidence: { type: 'number', minimum: 0, maximum: 1 },
-                canonicalName: { type: 'string' },
-                target: { type: 'string' },
-                equipment: { type: 'string' },
-                secondaryMuscles: {
-                  type: 'array',
-                  items: { type: 'string' }
-                },
-                instructionsIt: { type: 'string' }
+                note: { type: 'string' }
               }
             }
           }
@@ -229,17 +203,7 @@ const COACH_PROGRAM_SCHEMA = {
                       type: 'array',
                       items: { type: 'string' }
                     },
-                    note: { type: 'string' },
-                    catalogId: { type: 'string' },
-                    matchConfidence: { type: 'number', minimum: 0, maximum: 1 },
-                    canonicalName: { type: 'string' },
-                    target: { type: 'string' },
-                    equipment: { type: 'string' },
-                    secondaryMuscles: {
-                      type: 'array',
-                      items: { type: 'string' }
-                    },
-                    instructionsIt: { type: 'string' }
+                    note: { type: 'string' }
                   }
                 }
               }
@@ -1721,45 +1685,6 @@ function validateCandidateProgram(parsed, originalFilename) {
   };
 }
 
-function buildCatalogMatchOptions(profile = null) {
-  if (!profile) return { userEquipment: 'palestra_completa' };
-  return {
-    userEquipment: normalizeCoachEquipmentValue(profile.equipment || '') || 'palestra_completa',
-    focusMuscles: normalizeStringList(profile.focusAreas || [])
-  };
-}
-
-function enrichExerciseWithCatalog(exercise, options = {}) {
-  if (!exercise || !cleanString(exercise.name)) return exercise;
-  const match = exerciseMatcher.matchExercise(exercise.name, options);
-  if (match.catalogId) {
-    exercise.catalogId = match.catalogId;
-    exercise.matchConfidence = match.confidence;
-    exercise.canonicalName = match.matchedName;
-    const details = exerciseCatalog.getById(match.catalogId);
-    if (details) {
-      exercise.target = details.target;
-      exercise.equipment = details.equipment;
-      exercise.secondaryMuscles = details.secondaryMuscles;
-      exercise.instructionsIt = details.instructionsIt;
-    }
-  }
-  if (Array.isArray(exercise.supersetItems) && exercise.supersetItems.length) {
-    exercise.supersetItems = exercise.supersetItems.map((item) => enrichExerciseWithCatalog(item, options));
-  }
-  return exercise;
-}
-
-function enrichProgramWithCatalog(program, options = {}) {
-  const safe = program && typeof program === 'object' ? program : {};
-  const days = Array.isArray(safe.days) ? safe.days : [];
-  days.forEach((day) => {
-    if (!Array.isArray(day.exercises)) return;
-    day.exercises = day.exercises.map((exercise) => enrichExerciseWithCatalog(exercise, options));
-  });
-  return safe;
-}
-
 async function parseWorkoutPdf(file) {
   if (!client) {
     const error = new Error('OPENAI_API_KEY mancante sul server.');
@@ -1863,9 +1788,7 @@ async function parseWorkoutPdf(file) {
 
   try {
     const parsed = await runImportAttempt(IMPORT_SCHEMA, userPrompt, 'pt_workout_program_import');
-    const validated = validateCandidateProgram(parsed, filename);
-    enrichProgramWithCatalog(validated.candidateProgram, buildCatalogMatchOptions());
-    return validated;
+    return validateCandidateProgram(parsed, filename);
   } catch (error) {
     console.warn('Advanced PDF import attempt failed, retrying legacy parser.', {
       message: error?.message || String(error),
@@ -1875,9 +1798,7 @@ async function parseWorkoutPdf(file) {
   }
 
   const legacyParsed = await runImportAttempt(IMPORT_SCHEMA_LEGACY, legacyUserPrompt, 'pt_workout_program_import_legacy');
-  const legacyValidated = validateCandidateProgram(legacyParsed, filename);
-  enrichProgramWithCatalog(legacyValidated.candidateProgram, buildCatalogMatchOptions());
-  return legacyValidated;
+  return validateCandidateProgram(legacyParsed, filename);
 }
 
 async function createCoachReply(messages, context) {
@@ -1952,26 +1873,6 @@ async function createCoachReply(messages, context) {
   throw error;
 }
 
-function buildCatalogShortlistText(profile) {
-  const options = buildCatalogMatchOptions(profile);
-  const avoidExercises = normalizeStringList(profile?.avoidExercises || []);
-  const shortlist = exerciseCatalog.getShortlist({ ...options, avoidExercises, limit: 60 });
-  if (!shortlist.length) return '';
-  const lines = shortlist.map((ex) => {
-    const display = ex.canonicalIt || ex.name;
-    return '- ' + display + ' (' + ex.equipment + ', target: ' + ex.target + ')';
-  });
-  return [
-    'Shortlist di esercizi coerenti con attrezzatura e focus muscolari:',
-    ...lines,
-    '',
-    'Regole per la shortlist:',
-    '- preferisci esercizi presi da questa lista',
-    '- mantieni il nome originale quando lo usi, cosi` il sistema puo` collegarlo al catalogo',
-    '- se devi usare un esercizio fuori lista, scegline uno comunque realistico per l\'attrezzatura dichiarata'
-  ].join('\n');
-}
-
 async function generateAiProgram(profileInput, contextInput, answersInput) {
   if (!client) {
     const error = new Error('OPENAI_API_KEY mancante sul server.');
@@ -2010,7 +1911,6 @@ async function generateAiProgram(profileInput, contextInput, answersInput) {
               'Profilo e memoria utente:',
               buildCoachContextText(profile, context),
               '',
-              buildCatalogShortlistText(profile),
               'Regole operative:',
               '- crea ' + profile.daysPerWeek + ' giorni di allenamento',
               '- tieni le sedute realistiche per una durata media di ' + profile.sessionLength + ' minuti',
@@ -2041,9 +1941,7 @@ async function generateAiProgram(profileInput, contextInput, answersInput) {
   }
 
   const parsed = JSON.parse(response.output_text);
-  const validated = validateAiGeneratedProgram(parsed, profile);
-  enrichProgramWithCatalog(validated.candidateProgram, buildCatalogMatchOptions(profile));
-  return validated;
+  return validateAiGeneratedProgram(parsed, profile);
 }
 
 async function refineAiProgram(profileInput, contextInput, candidateProgramInput, messagesInput, requestInput) {
@@ -2086,7 +1984,6 @@ async function refineAiProgram(profileInput, contextInput, candidateProgramInput
               'Profilo e memoria utente:',
               buildCoachContextText(profile, context),
               '',
-              buildCatalogShortlistText(profile),
               'Bozza attuale:',
               JSON.stringify(draftProgram, null, 2),
               '',
@@ -2124,9 +2021,7 @@ async function refineAiProgram(profileInput, contextInput, candidateProgramInput
   }
 
   const parsed = JSON.parse(response.output_text);
-  const validated = validateAiRefinedProgram(parsed, profile);
-  enrichProgramWithCatalog(validated.candidateProgram, buildCatalogMatchOptions(profile));
-  return validated;
+  return validateAiRefinedProgram(parsed, profile);
 }
 
 async function generateNutritionPlan(profileInput, workoutProfileInput, contextInput, answersInput) {
@@ -2318,101 +2213,8 @@ app.get('/healthz', (_req, res) => {
     coachAiVersion: COACH_AI_VERSION,
     nutritionAiVersion: NUTRITION_AI_VERSION,
     assistantChatVersion: ASSISTANT_CHAT_VERSION,
-    assistantModel: OPENAI_ASSISTANT_MODEL,
-    exerciseCatalog: exerciseCatalog.getStats()
+    assistantModel: OPENAI_ASSISTANT_MODEL
   });
-});
-
-app.get('/api/exercises/search', (req, res) => {
-  try {
-    const query = cleanString(req.query.q || '');
-    const limit = Math.max(1, Math.min(50, parseInt(req.query.limit, 10) || 20));
-    if (!query) {
-      return sendJsonError(res, 400, 'Parametro q mancante.');
-    }
-    const results = exerciseCatalog.search(query, { limit });
-    res.json({
-      query,
-      results: results.map((ex) => ({
-        id: ex.id,
-        name: ex.name,
-        canonicalName: ex.canonicalIt || ex.name,
-        bodyPart: ex.bodyPart,
-        target: ex.target,
-        equipment: ex.equipment,
-        secondaryMuscles: ex.secondaryMuscles
-      }))
-    });
-  } catch (error) {
-    console.error('Exercise search error:', error);
-    sendJsonError(res, 500, 'Ricerca esercizi non disponibile.');
-  }
-});
-
-app.get('/api/exercises/:id', (req, res) => {
-  try {
-    const ex = exerciseCatalog.getById(req.params.id);
-    if (!ex) {
-      return sendJsonError(res, 404, 'Esercizio non trovato.');
-    }
-    res.json({
-      id: ex.id,
-      name: ex.name,
-      canonicalName: ex.canonicalIt || ex.name,
-      bodyPart: ex.bodyPart,
-      target: ex.target,
-      equipment: ex.equipment,
-      secondaryMuscles: ex.secondaryMuscles,
-      instructionsIt: ex.instructionsIt,
-      instructionStepsIt: ex.instructionStepsIt
-    });
-  } catch (error) {
-    console.error('Exercise get error:', error);
-    sendJsonError(res, 500, 'Recupero esercizio non disponibile.');
-  }
-});
-
-app.post('/api/exercises/match', (req, res) => {
-  try {
-    const name = cleanString(req.body?.name || '');
-    if (!name) {
-      return sendJsonError(res, 400, 'Nome esercizio mancante.');
-    }
-    const options = {
-      userEquipment: normalizeCoachEquipmentValue(req.body?.userEquipment || '') || 'palestra_completa',
-      focusMuscles: normalizeStringList(req.body?.focusMuscles || [])
-    };
-    const result = exerciseMatcher.matchExercise(name, options);
-    res.json(result);
-  } catch (error) {
-    console.error('Exercise match error:', error);
-    sendJsonError(res, 500, 'Matching esercizio non disponibile.');
-  }
-});
-
-app.get('/api/exercises/:id/alternatives', (req, res) => {
-  try {
-    const ex = exerciseCatalog.getById(req.params.id);
-    if (!ex) {
-      return sendJsonError(res, 404, 'Esercizio non trovato.');
-    }
-    const limit = Math.max(1, Math.min(20, parseInt(req.query.limit, 10) || 5));
-    const alternatives = exerciseCatalog.getAlternatives(req.params.id, { limit });
-    res.json({
-      id: ex.id,
-      alternatives: alternatives.map((alt) => ({
-        id: alt.id,
-        name: alt.name,
-        canonicalName: alt.canonicalIt || alt.name,
-        bodyPart: alt.bodyPart,
-        target: alt.target,
-        equipment: alt.equipment
-      }))
-    });
-  } catch (error) {
-    console.error('Exercise alternatives error:', error);
-    sendJsonError(res, 500, 'Recupero alternative non disponibile.');
-  }
 });
 
 app.post('/api/import-pdf', upload.single('file'), async (req, res) => {

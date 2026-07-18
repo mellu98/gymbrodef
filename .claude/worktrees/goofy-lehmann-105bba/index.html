@@ -1,0 +1,551 @@
+﻿<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>HyperCore AI</title>
+<link rel="manifest" href="./app.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="./icons/hypercore-app-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="./icons/hypercore-app-512.png">
+<link rel="apple-touch-icon" href="./icons/hypercore-apple-touch-icon.png">
+<meta name="theme-color" content="#00e676">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;500;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./assets/css/app.css">
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="hdr" id="main-hdr">
+  <div class="hdr-left"></div>
+  <div class="hdr-brand">
+    <img class="hdr-logo" src="./icons/hypercore-header-logo.png" alt="HyperCore AI logo">
+  </div>
+  <div class="hdr-actions">
+    <button class="hdr-btn" id="history-btn" onclick="openHist()" style="display:none">Storico</button>
+    <button class="hdr-btn" id="importBtn" onclick="triggerPdfImport()">Importa PDF</button>
+    <button class="hdr-btn" id="installBtn">Installa</button>
+  </div>
+</div>
+
+<div class="section-shell" id="section-shell" role="navigation" aria-label="Navigazione principale">
+  <div class="section-shell-row">
+    <div class="section-dock">
+      <button class="section-tab on" id="section-tab-plans" type="button" onclick="setAppSection('plans')" aria-label="Schede">
+        <span class="section-tab-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/></svg>
+        </span>
+        <span class="section-tab-label">Schede</span>
+      </button>
+      <button class="section-tab" id="section-tab-today" type="button" onclick="setAppSection('today')" aria-label="Settimana attiva">
+        <span class="section-tab-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+        </span>
+        <span class="section-tab-label">Settimana</span>
+      </button>
+      <button class="section-tab" id="section-tab-nutrition" type="button" onclick="setAppSection('nutrition')" aria-label="Nutrizione">
+        <span class="section-tab-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-4 0-7 3-7 7 0 5 4 9 7 11 3-2 7-6 7-11 0-4-3-7-7-7z"/><path d="M12 8v8M9 11h6"/></svg>
+        </span>
+        <span class="section-tab-label">Nutrizione</span>
+      </button>
+      <button class="section-tab" id="section-tab-progress" type="button" onclick="setAppSection('progress')" aria-label="Progressi">
+        <span class="section-tab-ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 17l5-5 4 4 7-8"/><path d="M14 8h5v5"/></svg>
+        </span>
+        <span class="section-tab-label">Progressi</span>
+      </button>
+      <button class="section-tab" id="section-tab-chat" type="button" onclick="setAppSection('chat')" aria-label="Coach AI">
+        <span class="section-tab-ico section-tab-ico-text" aria-hidden="true">AI</span>
+        <span class="section-tab-label">Coach</span>
+      </button>
+    </div>
+  </div>
+</div>
+<div class="bottom-safe-fill" aria-hidden="true"></div>
+
+<!-- APP SCROLL AREA -->
+<div id="app">
+
+<!-- PROGRAMS -->
+<div id="programs" class="app-section">
+  <div class="programs-intro" style="padding:20px 16px 0">
+    <div class="home-greeting">Le tue <span>schede</span></div>
+    <div class="home-sub" id="programs-subtitle">Importa il PDF del PT per iniziare</div>
+    <div class="section-label" id="programs-label">Programmi disponibili</div>
+    <div class="program-grid" id="program-grid"></div>
+  </div>
+</div>
+
+<!-- HOME -->
+<div id="home" class="app-section" style="display:none">
+  <div style="padding:20px 16px 0">
+    <div class="home-top">
+      <div class="home-top-actions">
+        <button class="hdr-btn" onclick="showPrograms()">&larr; Schede</button>
+      </div>
+      <div class="home-top-actions" id="home-top-actions"></div>
+    </div>
+    <div class="week-panel" id="week-panel"></div>
+    <div class="home-greeting">Ciao, <span>atleta</span></div>
+    <div class="home-sub" style="margin-bottom:20px">Scegli l'allenamento di oggi</div>
+    <div class="section-label">I tuoi giorni</div>
+    <div class="day-grid" id="day-grid"></div>
+  </div>
+</div>
+
+<!-- PROGRESS -->
+<div id="progress" class="app-section">
+  <div class="section-wrap">
+    <div class="section-hero">
+      <div class="section-copy">
+        <div class="section-badge">Progressi e memoria carichi</div>
+        <h2>Progressi</h2>
+        <p>Monitora la settimana corrente, rivedi lo storico e tieni sempre sotto controllo la progressione dei carichi.</p>
+      </div>
+    </div>
+    <div id="progress-content"></div>
+  </div>
+</div>
+
+<!-- NUTRITION -->
+<div id="nutrition" class="app-section">
+  <div id="nutrition-root" class="nutrition-shell"></div>
+</div>
+
+<!-- COACH -->
+<div id="coach" class="app-section">
+  <div id="coach-root" class="coach-shell"></div>
+</div>
+
+<!-- SESSION -->
+<div id="session" style="display:none">
+  <div class="sess-hdr">
+    <button class="back-btn" onclick="goHome()">&larr; Torna ai giorni</button>
+    <div class="sess-title" id="sess-title"></div>
+    <div class="sess-info" id="sess-info"></div>
+    <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn on" id="tab-list" onclick="switchTab('list')">Lista</button>
+    <button class="tab-btn" id="tab-focus" onclick="switchTab('focus')">Focus</button>
+  </div>
+  <div class="sess-scroll">
+    <div id="list-view"></div>
+    <div id="focus-view" style="display:none">
+      <div class="focus-nav">
+        <button class="fnav-btn" id="fnav-prev" onclick="focusNav(-1)">&larr; Prec</button>
+        <span class="fnav-ctr" id="fnav-ctr"></span>
+        <button class="fnav-btn" id="fnav-next" onclick="focusNav(1)">Succ &rarr;</button>
+      </div>
+      <div class="focus-card" id="focus-card"></div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end #app -->
+
+<!-- FLOATING ASSISTANT -->
+<button id="assistant-fab" class="assistant-fab" type="button" onclick="toggleAssistantOverlay()" aria-label="Apri assistente AI" title="Assistente AI">
+  <span aria-hidden="true">🤖</span>
+</button>
+
+<div id="assistant-layer" class="assistant-layer" aria-hidden="true">
+  <div class="assistant-backdrop" onclick="closeAssistantOverlay()"></div>
+  <div class="assistant-panel" role="dialog" aria-label="Assistente AI rapido" onclick="event.stopPropagation()">
+    <div class="assistant-top">
+      <div class="assistant-top-copy">
+        <strong>Assistente AI</strong>
+        <span>Chiedi chiarimenti rapidi su scheda, esercizi, carichi e recupero.</span>
+      </div>
+      <div class="assistant-top-actions">
+        <button class="assistant-top-btn" type="button" onclick="resetAssistantSession()">Nuova</button>
+        <button class="assistant-top-btn close" type="button" onclick="closeAssistantOverlay()" aria-label="Chiudi assistente">×</button>
+      </div>
+    </div>
+    <div class="assistant-thread-wrap">
+      <div id="assistant-thread" class="assistant-thread"></div>
+    </div>
+    <div class="assistant-compose">
+      <div class="assistant-compose-row">
+        <textarea id="assistant-input" class="assistant-input" placeholder="Scrivi al volo al tuo assistente AI..."></textarea>
+        <button id="assistant-send-btn" class="assistant-send" type="button" onclick="sendAssistantMessage()">Invia</button>
+      </div>
+      <div id="assistant-status" class="assistant-status">Pronto.</div>
+    </div>
+  </div>
+</div>
+
+<!-- FAB TIMER -->
+<button id="fab" onclick="openTimer()">T</button>
+
+<!-- FINISH BTN -->
+<button id="btn-finish" onclick="finishSession()">Termina</button>
+
+<!-- TIMER OVERLAY -->
+<div id="timer-ov">
+  <div class="t-label" id="t-label">RECUPERO TRA SERIE</div>
+  <div class="t-dur-row" id="t-dur-row">
+    <button class="t-dur-btn" onclick="setDur(60,this)">60"</button>
+    <button class="t-dur-btn" onclick="setDur(75,this)">75"</button>
+    <button class="t-dur-btn on" onclick="setDur(90,this)">90"</button>
+    <button class="t-dur-btn" onclick="setDur(120,this)">120"</button>
+  </div>
+  <div class="t-ring">
+    <svg width="190" height="190" viewBox="0 0 190 190">
+      <circle class="t-ring-bg" cx="95" cy="95" r="82" fill="none" stroke-width="8"/>
+      <circle class="t-ring-fg" id="t-circle" cx="95" cy="95" r="82" fill="none" stroke-width="8"
+        stroke-dasharray="515" stroke-dashoffset="0"/>
+    </svg>
+    <div class="t-display">
+      <div class="t-num" id="t-num">90</div>
+      <div class="t-sub" id="t-sub">secondi</div>
+    </div>
+  </div>
+  <div class="t-btns">
+    <button class="t-btn" id="t-pause-btn" onclick="toggleTimer()">Pausa</button>
+    <button class="t-btn danger" onclick="closeTimer()">Chiudi</button>
+  </div>
+</div>
+
+<!-- HISTORY MODAL -->
+<div id="hist-modal">
+  <div class="hist-hdr">
+    <h2>Storico</h2>
+    <button class="hist-close" onclick="closeHist()">X</button>
+  </div>
+  <div class="hist-scroll" id="hist-content"></div>
+  <button class="hist-clear" onclick="clearHist()">Cancella tutto lo storico</button>
+</div>
+
+<!-- WEEK REPORT MODAL -->
+<div id="week-modal">
+  <div class="week-hdr">
+    <h2 id="week-report-title">Report settimana</h2>
+    <button class="week-close" onclick="closeWeekReport()">X</button>
+  </div>
+  <div class="week-scroll" id="week-report-content"></div>
+  <div class="week-report-actions">
+    <button class="t-btn" onclick="closeWeekReport()">Chiudi</button>
+    <button class="t-btn" id="week-report-next-btn" style="display:none" onclick="goToNextWeek()">Vai alla settimana successiva</button>
+  </div>
+</div>
+
+<input id="pdf-file-input" type="file" accept="application/pdf" hidden>
+
+<!-- IMPORT MODAL -->
+<div id="import-modal">
+  <div class="imp-hdr">
+    <div>
+      <div class="imp-title">Importa PDF PT</div>
+      <div class="imp-sub" id="import-subtitle">Carica una scheda PDF del personal trainer, controlla la bozza e aggiungila alle schede esistenti.</div>
+    </div>
+    <button class="hist-close" onclick="closeImportModal()">X</button>
+  </div>
+  <div class="imp-scroll" id="import-content"></div>
+  <div class="imp-actions">
+    <button class="t-btn" id="import-close-btn" onclick="closeImportModal()">Chiudi</button>
+    <button class="t-btn" id="import-save-btn" onclick="saveImportedProgram()" style="display:none">Aggiungi scheda</button>
+  </div>
+</div>
+
+<script id="programs-inline" type="application/json">
+{
+  "programs": [
+    {
+      "id": "recomp-5w",
+      "title": "Recomp 5 Weeks",
+      "subtitle": "Protocollo Luca Biolo Â· scheda attuale",
+      "weeks": "5 settimane",
+      "days": [
+        {
+          "name": "Day 1",
+          "label": "Petto & Spalle",
+          "exercises": [
+            {
+              "name": "Distensioni inclinata bilanciere multipower",
+              "series": 4,
+              "reps": "8",
+              "note": "Negativa lenta, fermo 1\" a 2cm dal petto, esplodi su"
+            },
+            {
+              "name": "Chest Press",
+              "series": 3,
+              "reps": "8-10",
+              "note": "Ultima serie: 1 rest pause 15\""
+            },
+            {
+              "name": "Croci cavi bassi / Pectoral",
+              "series": 3,
+              "reps": "20",
+              "note": "Tensione lenta e continua, enfatizza lo stretch"
+            },
+            {
+              "name": "Distensioni piana manubri / macchina",
+              "series": 3,
+              "reps": "8-12",
+              "note": "3-5\" pausa in stretch su ogni rep"
+            },
+            {
+              "name": "Alzate laterali",
+              "series": 3,
+              "reps": "20/15/10",
+              "note": "2 rest pause 20\", parziali ad esaurimento"
+            },
+            {
+              "name": "Alzate laterali singole al cavo",
+              "series": 3,
+              "reps": "12",
+              "note": "Ultima serie: 2 drop set"
+            },
+            {
+              "name": "Leg Raises",
+              "series": 3,
+              "reps": "10-15",
+              "note": "Ultimo con 2 rest pause 15\""
+            },
+            {
+              "name": "Crunches",
+              "series": 3,
+              "reps": "30",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "name": "Day 2",
+          "label": "Back & Biceps",
+          "exercises": [
+            {
+              "name": "Pulley",
+              "series": 3,
+              "reps": "8-12",
+              "note": "1 rep+1/4 in contrazione"
+            },
+            {
+              "name": "Lat presa inversa",
+              "series": 4,
+              "reps": "8-10",
+              "note": "Negativa 4\", ultima serie 2 rest pause 20\""
+            },
+            {
+              "name": "Curl bilanciere Scott",
+              "series": 3,
+              "reps": "8 / 8 / 8-12",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Curl manubri su inclinata",
+              "series": 3,
+              "reps": "8-10",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Curl alla fune",
+              "series": 4,
+              "reps": "15",
+              "note": "20\" rest tra le serie"
+            },
+            {
+              "name": "Alzate busto flesso su panca 30Â°",
+              "series": 2,
+              "reps": "20",
+              "note": ""
+            },
+            {
+              "name": "Calf seduto",
+              "series": 3,
+              "reps": "20/15/10",
+              "note": "Pausa 5\" in stretch"
+            }
+          ]
+        },
+        {
+          "name": "Day 3",
+          "label": "Legs",
+          "exercises": [
+            {
+              "name": "Leg Curl sdraiato",
+              "series": 4,
+              "reps": "8 / 6-10",
+              "note": "Contrazione picco 2\", ultima 2 rest pause 20\""
+            },
+            {
+              "name": "Stacchi gambe semitese singole",
+              "series": 3,
+              "reps": "12",
+              "note": ""
+            },
+            {
+              "name": "Leg Extensions",
+              "series": 4,
+              "reps": "30/20/15/10",
+              "note": "2 rest pause 20\", parziali a cedimento"
+            },
+            {
+              "name": "Hack Squat",
+              "series": 4,
+              "reps": "10",
+              "note": "Negativa controllata 4\", ultima 2 rest pause 20\""
+            },
+            {
+              "name": "Leg Press",
+              "series": 4,
+              "reps": "8/20/20/30",
+              "note": ""
+            },
+            {
+              "name": "Stretch quadricipiti",
+              "series": 1,
+              "reps": "60\"",
+              "note": "Continuati"
+            },
+            {
+              "name": "Calf in piedi",
+              "series": 3,
+              "reps": "15",
+              "note": ""
+            },
+            {
+              "name": "Calf seduto",
+              "series": 3,
+              "reps": "20",
+              "note": ""
+            }
+          ]
+        },
+        {
+          "name": "Day 4",
+          "label": "Spalle & Tricipiti",
+          "exercises": [
+            {
+              "name": "Distensioni verticali multipower",
+              "series": 3,
+              "reps": "6-8",
+              "note": "2 rest pause 15\""
+            },
+            {
+              "name": "Alzate laterali",
+              "series": 3,
+              "reps": "12/10/8",
+              "note": "2 rest pause 15\""
+            },
+            {
+              "name": "Tirate al petto presa larga",
+              "series": 3,
+              "reps": "15",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Distensioni panca stretta Smith",
+              "series": 4,
+              "reps": "15/10/8/6-8",
+              "note": "2 rest pause 15\""
+            },
+            {
+              "name": "French Press manubri",
+              "series": 3,
+              "reps": "10",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Estensioni dietro testa fune",
+              "series": 3,
+              "reps": "15",
+              "note": "+20\" in stretch"
+            },
+            {
+              "name": "Crunches al cavo",
+              "series": 3,
+              "reps": "8-12",
+              "note": "Ultimo: 2 rest pause 15\""
+            }
+          ]
+        },
+        {
+          "name": "Day 5",
+          "label": "Dorso",
+          "exercises": [
+            {
+              "name": "Rematore bilanciere presa inversa",
+              "series": 4,
+              "reps": "10/8/6/20",
+              "note": ""
+            },
+            {
+              "name": "Rack Chins presa larga",
+              "series": 3,
+              "reps": "10/10/10-12",
+              "note": "Ultima: 2 rest pause 20\""
+            },
+            {
+              "name": "Pulley presa medio larga",
+              "series": 4,
+              "reps": "10/10/10/8",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Shrugs manubri",
+              "series": 3,
+              "reps": "12",
+              "note": "Ultima: 2 rest pause 15\""
+            },
+            {
+              "name": "Calf in piedi",
+              "series": 4,
+              "reps": "10",
+              "note": "3-5\" pausa in stretch"
+            },
+            {
+              "name": "Appeso (stretch dorso)",
+              "series": 1,
+              "reps": "60\"",
+              "note": "Stretch sul dorso"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "nuova-scheda",
+      "title": "Nuova Scheda PT",
+      "subtitle": "Template pronto per il prossimo ciclo",
+      "weeks": "da aggiornare",
+      "days": [
+        {
+          "name": "Day 1",
+          "label": "Da compilare",
+          "exercises": [
+            {
+              "name": "Nuovo esercizio 1",
+              "series": 3,
+              "reps": "8-12",
+              "note": "Sostituisci questa scheda quando il PT ti manda il nuovo programma."
+            }
+          ]
+        },
+        {
+          "name": "Day 2",
+          "label": "Da compilare",
+          "exercises": [
+            {
+              "name": "Nuovo esercizio 2",
+              "series": 3,
+              "reps": "8-12",
+              "note": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+
+</script>
+
+<script src="./assets/js/app.js"></script>
+</body>
+</html>
+
+

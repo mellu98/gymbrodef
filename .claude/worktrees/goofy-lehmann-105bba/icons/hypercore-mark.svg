@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 160" role="img" aria-labelledby="title desc">
+  <title id="title">HyperCore AI mark</title>
+  <desc id="desc">HC monogram for HyperCore AI.</desc>
+  <defs>
+    <linearGradient id="markGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#b8ff3d"/>
+      <stop offset="55%" stop-color="#00e676"/>
+      <stop offset="100%" stop-color="#05c7ff"/>
+    </linearGradient>
+    <linearGradient id="markDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#101917"/>
+      <stop offset="100%" stop-color="#07100e"/>
+    </linearGradient>
+  </defs>
+  <rect x="14" y="14" width="132" height="132" rx="38" fill="url(#markDark)" stroke="rgba(255,255,255,0.12)"/>
+  <path d="M42 46h21v26h31V46h21v68H94V90H63v24H42z" fill="url(#markGlow)"/>
+  <path d="M118 46h-5c-19 0-34 15-34 34s15 34 34 34h5V95h-5c-8 0-15-7-15-15s7-15 15-15h5z" fill="#ffffff"/>
+  <circle cx="120" cy="36" r="7" fill="#b8ff3d"/>
+</svg>

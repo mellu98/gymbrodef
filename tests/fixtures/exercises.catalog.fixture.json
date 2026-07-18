@@ -1,0 +1,104 @@
+{
+  "exercises": [
+    {
+      "id": "0001",
+      "name": "3/4 sit-up",
+      "bodyPart": "waist",
+      "target": "abs",
+      "secondaryMuscles": ["hip flexors"],
+      "equipment": "body weight",
+      "instructionsIt": "Sdraiati sulla schiena con le ginocchia piegate...",
+      "instructionStepsIt": ["Posizione di partenza", "Solleva il busto"]
+    },
+    {
+      "id": "0002",
+      "name": "barbell bench press",
+      "bodyPart": "chest",
+      "target": "pectorals",
+      "secondaryMuscles": ["triceps", "delts"],
+      "equipment": "barbell",
+      "instructionsIt": "Distenditi su panca piana con gli occhi sotto il bilanciere...",
+      "instructionStepsIt": ["Afferra il bilanciere", "Abbassa al petto", "Spingi verso l'alto"]
+    },
+    {
+      "id": "0003",
+      "name": "dumbbell bench press",
+      "bodyPart": "chest",
+      "target": "pectorals",
+      "secondaryMuscles": ["triceps", "delts"],
+      "equipment": "dumbbell",
+      "instructionsIt": "Seduto su panca piana con un manubrio per mano...",
+      "instructionStepsIt": ["Porta i manubri al petto", "Spingi verso l'alto"]
+    },
+    {
+      "id": "0004",
+      "name": "cable crossover",
+      "bodyPart": "chest",
+      "target": "pectorals",
+      "secondaryMuscles": ["delts"],
+      "equipment": "cable",
+      "instructionsIt": "In piedi al centro dei cavi alti...",
+      "instructionStepsIt": ["Tira i cavi davanti a te", "Controlla il ritorno"]
+    },
+    {
+      "id": "0005",
+      "name": "barbell squat",
+      "bodyPart": "upper legs",
+      "target": "quads",
+      "secondaryMuscles": ["glutes", "hamstrings", "lower back"],
+      "equipment": "barbell",
+      "instructionsIt": "Posiziona il bilanciere sulle spalle...",
+      "instructionStepsIt": ["Scendi controllando", "Risali spingendo dai talloni"]
+    },
+    {
+      "id": "0006",
+      "name": "dumbbell lateral raise",
+      "bodyPart": "shoulders",
+      "target": "delts",
+      "secondaryMuscles": ["traps"],
+      "equipment": "dumbbell",
+      "instructionsIt": "In piedi con un manubrio per mano...",
+      "instructionStepsIt": ["Alza lateralmente", "Scendi lentamente"]
+    },
+    {
+      "id": "0007",
+      "name": "triceps pushdown",
+      "bodyPart": "upper arms",
+      "target": "triceps",
+      "secondaryMuscles": [],
+      "equipment": "cable",
+      "instructionsIt": "Al cavo alto con corda o barra...",
+      "instructionStepsIt": ["Spingi verso il basso", "Torna su lentamente"]
+    },
+    {
+      "id": "0008",
+      "name": "pull-up",
+      "bodyPart": "back",
+      "target": "lats",
+      "secondaryMuscles": ["biceps", "delts"],
+      "equipment": "body weight",
+      "instructionsIt": "Appeso alla sbarra con presa leggermente più larga delle spalle...",
+      "instructionStepsIt": ["Tira su fino al mento", "Scendi in controllo"]
+    },
+    {
+      "id": "0009",
+      "name": "barbell biceps curl",
+      "bodyPart": "upper arms",
+      "target": "biceps",
+      "secondaryMuscles": ["forearms"],
+      "equipment": "barbell",
+      "instructionsIt": "In piedi con bilanciere, braccia tese...",
+      "instructionStepsIt": ["Curl verso le spalle", "Scendi lentamente"]
+    },
+    {
+      "id": "0010",
+      "name": "machine chest press",
+      "bodyPart": "chest",
+      "target": "pectorals",
+      "secondaryMuscles": ["triceps", "delts"],
+      "equipment": "machine",
+      "instructionsIt": "Seduto alla macchina chest press...",
+      "instructionStepsIt": ["Spingi i manubri", "Torna lentamente"]
+    }
+  ]
+}

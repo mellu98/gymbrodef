@@ -1,0 +1,42 @@
+{
+  "0001": {
+    "canonicalIt": "Sit-up 3/4",
+    "aliases": ["sit-up parziale", "crunch 3/4"]
+  },
+  "0002": {
+    "canonicalIt": "Panca piana con bilanciere",
+    "aliases": ["panca piana", "distensioni su panca piana", "bench press bilanciere", "panca"]
+  },
+  "0003": {
+    "canonicalIt": "Panca piana con manubri",
+    "aliases": ["panca manubri", "dumbbell press", "panca piana db"]
+  },
+  "0004": {
+    "canonicalIt": "Croci ai cavi",
+    "aliases": ["crossover", "cable fly", "croci cavi"]
+  },
+  "0005": {
+    "canonicalIt": "Squat con bilanciere",
+    "aliases": ["squat bilanciere"]
+  },
+  "0006": {
+    "canonicalIt": "Alzate laterali con manubri",
+    "aliases": ["lateral raise manubri", "alzate laterali"]
+  },
+  "0007": {
+    "canonicalIt": "Pushdown tricipiti al cavo",
+    "aliases": ["pushdown tricipiti", "triceps pushdown", "pushdown"]
+  },
+  "0008": {
+    "canonicalIt": "Pull-up",
+    "aliases": ["pull up", "trazione"]
+  },
+  "0009": {
+    "canonicalIt": "Curl bicipiti con bilanciere",
+    "aliases": ["curl bilanciere"]
+  },
+  "0010": {
+    "canonicalIt": "Chest press al macchinario",
+    "aliases": ["chest press macchina", "pressa petto"]
+  }
+}

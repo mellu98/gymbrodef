@@ -1,4 +1,4 @@
-const PROGRAMS_URL = './programs.json';
+﻿const PROGRAMS_URL = './programs.json';
 const IMPORT_API_BASE_URL = String(window.MASSI_CONFIG?.importApiBaseUrl || '').replace(/\/$/, '');
 const USER_PROGRAMS_KEY = 'massi_user_programs';
 const USER_PROFILE_KEY = 'massi_user_profile';
@@ -6,8 +6,6 @@ const NUTRITION_PROFILE_KEY = 'massi_user_nutrition_profile';
 const NUTRITION_PLANS_KEY = 'massi_user_nutrition_plans';
 const NUTRITION_LOG_KEY = 'massi_nutrition_log_v1';
 const ASSISTANT_SESSION_KEY = 'massi_overlay_assistant_v1';
-const ONBOARDING_DONE_KEY = 'massi_onboarding_done';
-const THEME_PREF_KEY = 'massi_theme_pref';
 const PROGRAM_STATE_PREFIX = 'massi_state_';
 const SHOW_BUNDLED_PROGRAMS = false;
 const MAIN_SECTION_IDS = ['programs', 'home', 'progress', 'nutrition', 'coach'];
@@ -61,16 +59,15 @@ let timerInterval = null;
 let timerTotal = 90;
 let timerLeft = 90;
 let timerRunning = false;
-let timerDi = -1;
-let timerEi = -1;
 // Chrono state
 let chronoInterval = null;
 let chronoSecs = 0;
 let chronoRunning = false;
-let timerWarnedMarks = new Set();
-let countdownTimer = null;
-let countdownDone = null;
-let lastSessionSummary = null;
+// Neg timer
+let negInterval = null;
+let negLeft = 4;
+let negRunning = false;
+let negDur = 4;
 
 function repairText(value) {
   if (typeof value !== 'string') return value;
@@ -218,8 +215,7 @@ function getSupersetItems(exercise) {
     .map((item) => ({
       name: cleanText(item?.name || ''),
       reps: normalizeRepToken(item?.reps || ''),
-      note: cleanText(item?.note || ''),
-      ...normalizeCatalogFields(item)
+      note: cleanText(item?.note || '')
     }))
     .filter((item) => item.name || item.reps || item.note);
 }
@@ -335,18 +331,6 @@ function formatSupersetKgForHistory(exercise, state) {
   return rows.join(' | ');
 }
 
-function normalizeCatalogFields(ex) {
-  return {
-    catalogId: String(ex?.catalogId || ''),
-    matchConfidence: Math.max(0, Math.min(1, Number(ex?.matchConfidence) || 0)),
-    canonicalName: cleanText(ex?.canonicalName || ''),
-    target: cleanText(ex?.target || ''),
-    equipment: cleanText(ex?.equipment || ''),
-    secondaryMuscles: Array.isArray(ex?.secondaryMuscles) ? ex.secondaryMuscles.map(String) : [],
-    instructionsIt: cleanText(ex?.instructionsIt || '')
-  };
-}
-
 function normalizePrograms(programs, sourceFallback = 'bundled') {
   return (Array.isArray(programs) ? programs : []).map((program, pi) => ({
     id: String(program?.id || 'program-' + (pi + 1)).replace(/[^a-zA-Z0-9_-]/g, '_'),
@@ -380,8 +364,7 @@ function normalizePrograms(programs, sourceFallback = 'bundled') {
             ? Array.from({ length: Math.max(1, series || 1) }, (_, index) => 'Round ' + (index + 1))
             : deriveRepsPlan(ex?.reps, ex?.series, ex?.repsPlan),
           note: cleanText(ex?.note || ''),
-          supersetItems,
-          ...normalizeCatalogFields(ex)
+          supersetItems
         };
       })
     }))
@@ -530,8 +513,7 @@ function createWeekState(weekNumber, seedWeek = null) {
     exerciseData,
     report: null,
     completedAt: '',
-    reportSeen: false,
-    livePrs: []
+    reportSeen: false
   };
 }
 
@@ -544,17 +526,7 @@ function normalizeWeekState(rawWeek, weekNumber) {
     exerciseData: {},
     report: normalizeWeekReport(safeWeek.report, weekNumber),
     completedAt: cleanText(safeWeek.completedAt || ''),
-    reportSeen: Boolean(safeWeek.reportSeen),
-    livePrs: (Array.isArray(safeWeek.livePrs) ? safeWeek.livePrs : []).map((item) => ({
-      key: cleanText(item?.key || ''),
-      week: Math.max(1, parseInt(item?.week, 10) || weekNumber || 1),
-      dayIndex: Math.max(0, parseInt(item?.dayIndex, 10) || 0),
-      exerciseIndex: Math.max(0, parseInt(item?.exerciseIndex, 10) || 0),
-      exercise: cleanText(item?.exercise || ''),
-      previousBest: Number.isFinite(Number(item?.previousBest)) ? Number(item.previousBest) : null,
-      currentBest: Number.isFinite(Number(item?.currentBest)) ? Number(item.currentBest) : null,
-      createdAt: cleanText(item?.createdAt || '')
-    })).filter((item) => item.key && item.exercise)
+    reportSeen: Boolean(safeWeek.reportSeen)
   };
   getDays().forEach((day, di) => {
     normalizedWeek.daysDone[di] = Boolean(daysDone[di]);
@@ -624,11 +596,7 @@ function ensureWeekState(weekNumber = currentWeek) {
     if (!state.weeks[key]) {
       state.weeks[key] = createWeekState(index, state.weeks[String(index - 1)] || null);
     } else {
-      // Mutate in-place to preserve external references. Replacing the object
-      // would orphan any caller currently holding a reference (e.g. finishSession,
-      // openWeekReport), causing assignments like `weekState.report = ...` to be
-      // lost on the next persistProgramState().
-      Object.assign(state.weeks[key], normalizeWeekState(state.weeks[key], index));
+      state.weeks[key] = normalizeWeekState(state.weeks[key], index);
     }
   }
   if (!state.currentWeek) state.currentWeek = 1;
@@ -899,723 +867,12 @@ function getCurrentProgramHistoryPreview(limit = 4) {
   return getHistory().slice(0, limit);
 }
 
-
-function safeVibrate(pattern) {
-  try {
-    if (navigator.vibrate) navigator.vibrate(pattern);
-  } catch(e) {}
-}
-
-function getTimeBand(date = new Date()) {
-  const hour = date.getHours();
-  if (hour >= 5 && hour < 9) return 'morning';
-  if (hour >= 9 && hour < 18) return 'day';
-  if (hour >= 18 && hour < 22) return 'evening';
-  return 'night';
-}
-
-function syncVisualContext(section = currentSection) {
-  document.body.dataset.section = currentDay !== null ? 'workout' : section;
-  document.body.dataset.time = getTimeBand();
-}
-
-function ensureDockIndicator() {
-  const dock = document.querySelector('.section-dock');
-  if (!dock) return null;
-  let indicator = document.getElementById('dock-indicator');
-  if (!indicator) {
-    indicator = document.createElement('span');
-    indicator.id = 'dock-indicator';
-    indicator.className = 'dock-indicator';
-    indicator.setAttribute('aria-hidden', 'true');
-    dock.prepend(indicator);
-  }
-  return indicator;
-}
-
-function updateDockIndicator() {
-  const dock = document.querySelector('.section-dock');
-  const active = document.querySelector('.section-tab.on');
-  const indicator = ensureDockIndicator();
-  if (!dock || !active || !indicator) return;
-  requestAnimationFrame(() => {
-    const dockRect = dock.getBoundingClientRect();
-    const activeRect = active.getBoundingClientRect();
-    indicator.style.width = activeRect.width + 'px';
-    indicator.style.height = activeRect.height + 'px';
-    indicator.style.transform = 'translate3d(' + (activeRect.left - dockRect.left) + 'px,' + (activeRect.top - dockRect.top) + 'px,0)';
-  });
-}
-
-function applyTheme(theme) {
-  const allowed = ['oled', 'cool', 'warm'];
-  const nextTheme = allowed.includes(theme) ? theme : 'oled';
-  document.documentElement.dataset.theme = nextTheme;
-  try { localStorage.setItem(THEME_PREF_KEY, nextTheme); } catch(e) {}
-}
-
-function initTheme() {
-  let stored = '';
-  try { stored = localStorage.getItem(THEME_PREF_KEY) || ''; } catch(e) {}
-  applyTheme(stored || 'oled');
-}
-
-function cycleTheme() {
-  const order = ['oled', 'cool', 'warm'];
-  const current = document.documentElement.dataset.theme || 'oled';
-  const next = order[(order.indexOf(current) + 1) % order.length] || 'oled';
-  applyTheme(next);
-  showMiniToast('Tema ' + next.toUpperCase());
-}
-
-function bindHeaderScroll() {
-  const app = document.getElementById('app');
-  const header = document.getElementById('main-hdr');
-  if (!app || !header) return;
-  app.addEventListener('scroll', () => {
-    header.classList.toggle('shrunk', app.scrollTop > 24);
-  }, { passive: true });
-}
-
-function showMiniToast(message) {
-  let toast = document.getElementById('mini-toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'mini-toast';
-    toast.className = 'mini-toast';
-    document.body.appendChild(toast);
-  }
-  toast.textContent = message;
-  toast.classList.add('show');
-  clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => toast.classList.remove('show'), 1800);
-}
-
-
-function getEmptyIllustration(kind = 'plans') {
-  const labels = {
-    plans: ['M12 50 C28 16 68 14 84 46', 'M22 62 L74 62', 'M36 76 L60 76'],
-    today: ['M22 24 H74 V78 H22 Z', 'M34 16 V32', 'M62 16 V32', 'M34 48 H62', 'M34 62 H52'],
-    nutrition: ['M52 78 C30 64 28 40 56 26 C78 43 74 66 52 78', 'M52 78 C54 58 60 42 72 30'],
-    progress: ['M18 76 H84', 'M26 66 L42 52 L56 58 L76 30', 'M26 66 V46', 'M42 52 V34', 'M56 58 V42', 'M76 30 V20'],
-    coach: ['M28 40 H72 V68 H28 Z', 'M38 40 V28 H62 V40', 'M40 54 H44', 'M56 54 H60']
-  };
-  const paths = labels[kind] || labels.plans;
-  return `
-    <div class="empty-illustration" aria-hidden="true">
-      <svg viewBox="0 0 100 100" role="img">
-        ${paths.map((d) => `<path d="${d}" pathLength="1"></path>`).join('')}
-      </svg>
-    </div>`;
-}
-
-function renderAiSkeleton(label = 'Coach AI al lavoro') {
-  return `
-    <div class="ai-skeleton" aria-live="polite">
-      <div class="ai-skeleton-orb"><span></span></div>
-      <div class="ai-skeleton-copy">
-        <strong>${escapeHtml(label)}</strong>
-        <span></span><span></span><span></span>
-      </div>
-    </div>`;
-}
-
-function getCurrentExerciseBestKg(di, ei) {
-  const exercise = getDays()?.[di]?.exercises?.[ei];
-  const state = getCurrentWeekState()?.exerciseData?.[di]?.[ei] || null;
-  const values = getExerciseKgValues(state, exercise).map(parseKgNumber).filter((value) => value !== null);
-  return values.length ? Math.max(...values) : null;
-}
-
-function getPreviousExerciseBestKg(di, ei) {
-  if (currentWeek <= 1) return null;
-  const exercise = getDays()?.[di]?.exercises?.[ei];
-  const previous = readProgramState().weeks?.[String(currentWeek - 1)]?.exerciseData?.[di]?.[ei] || null;
-  const values = getExerciseKgValues(previous, exercise).map(parseKgNumber).filter((value) => value !== null);
-  return values.length ? Math.max(...values) : null;
-}
-
-function ensureLivePrList(weekState = getCurrentWeekState()) {
-  if (!Array.isArray(weekState.livePrs)) weekState.livePrs = [];
-  return weekState.livePrs;
-}
-
-function getLivePrCount(weekNumber = currentWeek, dayIndex = null) {
-  const weekState = ensureWeekState(weekNumber);
-  const prs = Array.isArray(weekState.livePrs) ? weekState.livePrs : [];
-  return dayIndex === null ? prs.length : prs.filter((item) => Number(item.dayIndex) === Number(dayIndex)).length;
-}
-
-function checkLivePr(di, ei, anchor = null) {
-  const exercise = getDays()?.[di]?.exercises?.[ei];
-  if (!exercise || currentWeek <= 1) return false;
-  const previousBest = getPreviousExerciseBestKg(di, ei);
-  const currentBest = getCurrentExerciseBestKg(di, ei);
-  if (previousBest === null || currentBest === null || currentBest <= previousBest) return false;
-  const weekState = getCurrentWeekState();
-  const livePrs = ensureLivePrList(weekState);
-  const key = [currentWeek, di, ei, currentBest.toFixed(2)].join(':');
-  if (livePrs.some((item) => item.key === key)) return false;
-  livePrs.push({
-    key,
-    week: currentWeek,
-    dayIndex: di,
-    exerciseIndex: ei,
-    exercise: cleanText(exercise.name),
-    previousBest: Number(previousBest.toFixed(1)),
-    currentBest: Number(currentBest.toFixed(1)),
-    createdAt: new Date().toISOString()
-  });
-  persistProgramState();
-  showPrToast(exercise.name, previousBest, currentBest, anchor);
-  return true;
-}
-
-function showPrToast(exerciseName, previousBest, currentBest, anchor = null) {
-  let toast = document.getElementById('pr-toast');
-  if (!toast) {
-    toast = document.createElement('div');
-    toast.id = 'pr-toast';
-    toast.className = 'pr-toast';
-    document.body.appendChild(toast);
-  }
-  toast.innerHTML = `<strong>NUOVO PR</strong><span>${escapeHtml(exerciseName)}: ${formatKg(previousBest)}kg -> ${formatKg(currentBest)}kg</span>`;
-  toast.classList.add('show');
-  clearTimeout(toast._timer);
-  toast._timer = setTimeout(() => toast.classList.remove('show'), 2600);
-  if (anchor) anchor.classList.add('pr-hit');
-  if (anchor) setTimeout(() => anchor.classList.remove('pr-hit'), 850);
-  safeVibrate([100, 50, 100]);
-}
-
-function runSharedElementTransition(sourceEl, title = '') {
-  if (!sourceEl || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const rect = sourceEl.getBoundingClientRect();
-  if (!rect.width || !rect.height) return;
-  const clone = document.createElement('div');
-  clone.className = 'shared-clone';
-  clone.style.left = rect.left + 'px';
-  clone.style.top = rect.top + 'px';
-  clone.style.width = rect.width + 'px';
-  clone.style.height = rect.height + 'px';
-  clone.innerHTML = `<span>${escapeHtml(title || 'HyperCore')}</span>`;
-  document.body.appendChild(clone);
-  clone.animate([
-    { transform: 'translate3d(0,0,0) scale(1)', opacity: .75, borderRadius: getComputedStyle(sourceEl).borderRadius || '20px' },
-    { transform: 'translate3d(0,-18px,0) scale(1.035)', opacity: .28, borderRadius: '28px' },
-    { transform: 'translate3d(0,-28px,0) scale(1.08)', opacity: 0, borderRadius: '34px' }
-  ], { duration: 460, easing: 'cubic-bezier(.16,1,.3,1)' }).onfinish = () => clone.remove();
-}
-
-function parseHistoryDateKey(entry) {
-  if (entry?.dateKey) return cleanText(entry.dateKey);
-  const raw = cleanText(entry?.date || '');
-  const match = raw.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
-  if (match) {
-    const day = match[1].padStart(2, '0');
-    const month = match[2].padStart(2, '0');
-    return `${match[3]}-${month}-${day}`;
-  }
-  return '';
-}
-
-function getHistoryExerciseMax(exerciseEntry) {
-  const values = String(exerciseEntry?.kg || '').match(/([0-9]+(?:[\.,][0-9]+)?)/g) || [];
-  const nums = values.map((value) => parseFloat(value.replace(',', '.'))).filter(Number.isFinite);
-  return nums.length ? Math.max(...nums) : null;
-}
-
-function formatHeatmapLabel(date, count) {
-  const months = ['gen', 'feb', 'mar', 'apr', 'mag', 'giu', 'lug', 'ago', 'set', 'ott', 'nov', 'dic'];
-  const weekdays = ['dom', 'lun', 'mar', 'mer', 'gio', 'ven', 'sab'];
-  const d = date.getDate();
-  const m = months[date.getMonth()];
-  const wd = weekdays[date.getDay()];
-  const sessions = count === 0 ? 'nessuna sessione' : count === 1 ? '1 sessione' : `${count} sessioni`;
-  return `${wd} ${d} ${m} · ${sessions}`;
-}
-
-function showHeatmapInfo(btn) {
-  const info = document.getElementById('progressHeatmapInfo');
-  if (!info) return;
-  info.textContent = btn.getAttribute('data-label') || '';
-  info.classList.add('active');
-  document.querySelectorAll('.progress-heatmap .heat-cell.focused').forEach((el) => el.classList.remove('focused'));
-  btn.classList.add('focused');
-}
-
-function buildProgressHeatmapHtml() {
-  const history = getHistory();
-  const counts = new Map();
-  history.forEach((entry) => {
-    const key = parseHistoryDateKey(entry);
-    if (!key) return;
-    counts.set(key, (counts.get(key) || 0) + 1);
-  });
-  const today = new Date();
-  const cells = [];
-  let totalSessions = 0;
-  let activeDays = 0;
-  for (let offset = 83; offset >= 0; offset--) {
-    const date = new Date(today);
-    date.setDate(today.getDate() - offset);
-    const key = date.toISOString().slice(0, 10);
-    const count = counts.get(key) || 0;
-    if (count > 0) { totalSessions += count; activeDays += 1; }
-    const level = Math.min(4, count);
-    const label = formatHeatmapLabel(date, count);
-    cells.push(`<button type="button" class="heat-cell l${level}" data-label="${escapeHtml(label)}" aria-label="${escapeHtml(label)}" onclick="showHeatmapInfo(this)"></button>`);
-  }
-  const summary = activeDays
-    ? `${totalSessions} sessioni in ${activeDays} giorni · tocca per il dettaglio`
-    : 'Nessuna sessione negli ultimi 84 giorni · tocca un giorno per il dettaglio';
-  return `<div class="progress-heatmap-wrap">
-    <div class="progress-heatmap" role="grid" aria-label="Heatmap ultime 12 settimane">${cells.join('')}</div>
-    <div class="progress-heatmap-info" id="progressHeatmapInfo" aria-live="polite">${escapeHtml(summary)}</div>
-    <div class="progress-heatmap-legend" aria-hidden="true">
-      <span class="legend-label">Meno</span>
-      <span class="heat-cell l0"></span>
-      <span class="heat-cell l1"></span>
-      <span class="heat-cell l2"></span>
-      <span class="heat-cell l3"></span>
-      <span class="heat-cell l4"></span>
-      <span class="legend-label">Più</span>
-    </div>
-  </div>`;
-}
-
-function buildExerciseSparklineHtml(limit = 3) {
-  const seriesByName = new Map();
-  getHistory().slice().reverse().forEach((entry) => {
-    (entry.exercises || []).forEach((exercise) => {
-      const max = getHistoryExerciseMax(exercise);
-      if (max === null) return;
-      const name = cleanText(exercise.name);
-      if (!seriesByName.has(name)) seriesByName.set(name, []);
-      seriesByName.get(name).push(max);
-    });
-  });
-  const rows = Array.from(seriesByName.entries())
-    .filter(([, values]) => values.length >= 2)
-    .sort((a, b) => Math.max(...b[1]) - Math.max(...a[1]))
-    .slice(0, limit);
-  if (!rows.length) return '<div class="surface-empty">Salva almeno due sessioni con kg per vedere le sparkline dei carichi.</div>';
-  return `<div class="sparkline-list">${rows.map(([name, values]) => {
-    const min = Math.min(...values);
-    const max = Math.max(...values);
-    const range = Math.max(.1, max - min);
-    const points = values.map((value, index) => {
-      const x = values.length === 1 ? 4 : 4 + (index / (values.length - 1)) * 92;
-      const y = 34 - ((value - min) / range) * 28;
-      return `${x.toFixed(1)},${y.toFixed(1)}`;
-    }).join(' ');
-    const delta = values[values.length - 1] - values[0];
-    return `<div class="sparkline-row">
-      <div><strong>${escapeHtml(name)}</strong><span>${formatKg(values[0])}kg -> ${formatKg(values[values.length - 1])}kg</span></div>
-      <svg viewBox="0 0 100 40" preserveAspectRatio="none"><polyline points="${points}"></polyline></svg>
-      <b class="${delta >= 0 ? 'up' : 'down'}">${delta >= 0 ? '+' : ''}${formatKg(delta)}kg</b>
-    </div>`;
-  }).join('')}</div>`;
-}
-
-function buildTodayRingSvg(label, value, pct, extra = '') {
-  const safePct = Math.max(0, Math.min(1, Number(pct) || 0));
-  const offset = 100 - Math.round(safePct * 100);
-  return `<div class="activity-ring"><svg viewBox="0 0 44 44"><circle class="ring-bg" cx="22" cy="22" r="16" pathLength="100"></circle><circle class="ring-fg" cx="22" cy="22" r="16" pathLength="100" stroke-dasharray="100" stroke-dashoffset="${offset}"></circle></svg><strong>${escapeHtml(value)}</strong><span>${escapeHtml(label)}</span>${extra ? `<em>${escapeHtml(extra)}</em>` : ''}</div>`;
-}
-
-function celebrateSet(anchor) {
-  safeVibrate(50);
-  if (!anchor || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  const rect = anchor.getBoundingClientRect();
-  const burst = document.createElement('div');
-  burst.className = 'set-burst';
-  burst.style.left = (rect.left + rect.width / 2) + 'px';
-  burst.style.top = (rect.top + rect.height / 2) + 'px';
-  for (let i = 0; i < 8; i++) {
-    const dot = document.createElement('span');
-    dot.style.setProperty('--a', (i * 45) + 'deg');
-    burst.appendChild(dot);
-  }
-  document.body.appendChild(burst);
-  anchor.classList.add('just-done');
-  setTimeout(() => anchor.classList.remove('just-done'), 520);
-  setTimeout(() => burst.remove(), 720);
-}
-
-function stepKg(di, ei, s, delta, inputId) {
-  const input = inputId ? document.getElementById(inputId) : null;
-  const sd = getSD(di, ei);
-  const current = parseFloat(String(input?.value || sd.kg[s] || '0').replace(',', '.')) || 0;
-  const next = Math.max(0, Math.round((current + delta) * 2) / 2);
-  const value = String(next).replace('.', ',');
-  if (input) input.value = value;
-  saveKg(di, ei, s, value);
-}
-
-function addTimerSeconds(seconds) {
-  timerLeft = Math.max(0, timerLeft + seconds);
-  timerTotal = Math.max(timerTotal, timerLeft);
-  updateTimerDisplay();
-  safeVibrate(10);
-}
-
-function showWorkoutCountdown() {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  let overlay = document.getElementById('workout-countdown');
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = 'workout-countdown';
-    overlay.className = 'workout-countdown';
-    overlay.innerHTML = '<div class="countdown-num">3</div><div class="countdown-sub">Tocca per saltare</div>';
-    overlay.onclick = skipWorkoutCountdown;
-    document.body.appendChild(overlay);
-  }
-  let value = 3;
-  const num = overlay.querySelector('.countdown-num');
-  overlay.classList.add('show');
-  num.textContent = value;
-  safeVibrate([80]);
-  clearInterval(countdownTimer);
-  countdownDone = () => {
-    overlay.classList.remove('show');
-    clearInterval(countdownTimer);
-    countdownDone = null;
-  };
-  countdownTimer = setInterval(() => {
-    value -= 1;
-    if (value <= 0) {
-      num.textContent = 'GO';
-      safeVibrate([100, 50, 100]);
-      setTimeout(() => countdownDone && countdownDone(), 380);
-      return;
-    }
-    num.textContent = value;
-    safeVibrate([80]);
-  }, 800);
-}
-
-function skipWorkoutCountdown() {
-  if (countdownDone) countdownDone();
-}
-
-function classifyExerciseIntensity(name) {
-  var n = (name || '').toLowerCase();
-  if (/(?:squat|stacco|deadlift|leg press|hack|hip thrust|panca piana|distensioni piana|bench press)/i.test(n)) return 3;
-  if (/(?:inclinat|declin|chest press|lat |tirate|rematore|row|pulldown|pulley|overhead|military|distensioni verticali|dip|affond|lunge|leg curl|leg ext|estensioni|french|push down|pull down)/i.test(n)) return 2;
-  return 1;
-}
-
-function countCompletedSets(kgStr) {
-  var s = (String(kgStr || '').match(/S\d+\s*:/g) || []).length;
-  if (s) return s;
-  var r = (String(kgStr || '').match(/R\d+\s/g) || []).length;
-  return r || 0;
-}
-
-function extractSetWeights(kgStr) {
-  return (String(kgStr || '').match(/([0-9]+(?:[\.,][0-9]+)?)\s*kg/gi) || [])
-    .map(function(m) { return parseFloat(m.replace(',', '.')) || 0; });
-}
-
-function estimateSessionCalories(entry) {
-  var exercises = (entry.exercises || []).filter(function(e) { return e.done; });
-  if (!exercises.length) return 0;
-
-  var totalSets = 0;
-  var intensitySum = 0;
-
-  exercises.forEach(function(exercise) {
-    var sets = Math.max(1, countCompletedSets(exercise.kg));
-    totalSets += sets;
-    intensitySum += sets * classifyExerciseIntensity(exercise.name);
-  });
-
-  if (!totalSets) return 80;
-
-  var avgIntensity = intensitySum / totalSets;
-  var met = 3.5 + (avgIntensity - 1) * 1.25;
-  var estimatedDurationMin = (totalSets * 130) / 60;
-  var durationHours = estimatedDurationMin / 60;
-
-  var nutritionProfile = getNutritionProfile();
-  var bodyweight = nutritionProfile.currentWeightKg || 70;
-
-  var calories = Math.round(met * bodyweight * durationHours);
-  return Math.max(80, Math.min(900, calories));
-}
-
-function getSessionVolume(entry) {
-  var total = 0;
-  (entry.exercises || []).forEach(function(exercise) {
-    var sets = Math.max(1, countCompletedSets(exercise.kg));
-    var weights = extractSetWeights(exercise.kg);
-    var avgWeight = weights.length ? weights.reduce(function(a, b) { return a + b; }, 0) / weights.length : 0;
-    total += avgWeight * sets * 10;
-  });
-  return Math.round(total / 10);
-}
-
-function showSessionSummary(entry, weekCompleted = false, weekNumber = currentWeek) {
-  let modal = document.getElementById('session-summary-modal');
-  if (!modal) {
-    modal = document.createElement('div');
-    modal.id = 'session-summary-modal';
-    modal.className = 'session-summary-modal';
-    modal.innerHTML = '<div class="session-summary-card"><button class="session-summary-close" type="button" onclick="closeSessionSummary()">&times;</button><div id="session-summary-content"></div></div>';
-    document.body.appendChild(modal);
-  }
-  lastSessionSummary = { entry: cloneValue(entry), weekCompleted, weekNumber };
-  const exercises = entry.exercises || [];
-  const doneCount = exercises.filter((exercise) => exercise.done).length;
-  const volume = getSessionVolume(entry);
-  const prCount = getLivePrCount(weekNumber, entry.dayIndex ?? null);
-  const estimatedCalories = estimateSessionCalories(entry);
-  const content = document.getElementById('session-summary-content');
-  content.innerHTML = `
-    <div class="session-summary-kicker">Sessione completata</div>
-    <h2>${escapeHtml(entry.day || 'Allenamento')}</h2>
-    <div class="session-summary-stats">
-      <div><strong data-count-to="${doneCount}">${doneCount}</strong><span>Esercizi fatti</span></div>
-      <div><strong data-count-to="${prCount}">${prCount}</strong><span>PR battuti</span></div>
-      <div><strong>${volume ? volume + ' kg' : '?'}</strong><span>Volume segnato</span></div>
-      <div><strong data-count-to="${estimatedCalories}">${estimatedCalories}</strong><span>Kcal stimate</span></div>
-    </div>
-    <p>${weekCompleted ? 'Hai chiuso tutta la settimana: il report progressi e` pronto.' : 'Storico aggiornato, memoria carichi salvata e PR live archiviati.'}</p>
-    <p class="session-summary-canvas-note">Condividi genera una story 1080x1920 pronta per Instagram.</p>
-    <div class="session-summary-actions">
-      ${weekCompleted ? `<button class="t-btn" type="button" onclick="closeSessionSummary();openWeekReport(${weekNumber})">Apri report settimana</button>` : ''}
-      <button class="t-btn" type="button" onclick="shareSessionSummary()">Condividi</button>
-      <button class="t-btn danger" type="button" onclick="closeSessionSummary()">Chiudi</button>
-    </div>`;
-  modal.dataset.week = String(weekNumber);
-  modal.classList.add('show');
-  animateCountNumbers(content);
-  syncAssistantUi();
-}
-
-function closeSessionSummary() {
-  document.getElementById('session-summary-modal')?.classList.remove('show');
-  syncAssistantUi();
-}
-
-function animateCountNumbers(root = document) {
-  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-  root.querySelectorAll('[data-count-to]').forEach((el) => {
-    const target = parseInt(el.getAttribute('data-count-to'), 10);
-    if (!Number.isFinite(target)) return;
-    const start = performance.now();
-    const duration = 600;
-    const step = (now) => {
-      const pct = Math.min(1, (now - start) / duration);
-      const eased = 1 - Math.pow(1 - pct, 3);
-      el.textContent = String(Math.round(target * eased));
-      if (pct < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  });
-}
-
-async function shareSessionSummary() {
-  const summary = lastSessionSummary || { entry: { day: 'Allenamento', exercises: [] }, weekNumber: currentWeek };
-  const entry = summary.entry || {};
-  const exercises = entry.exercises || [];
-  const doneCount = exercises.filter((exercise) => exercise.done).length;
-  const volume = getSessionVolume(entry);
-  const prCount = getLivePrCount(summary.weekNumber || currentWeek, entry.dayIndex ?? null);
-  const title = cleanText(entry.day || 'Allenamento completato');
-
-  try {
-    const canvas = document.createElement('canvas');
-    canvas.width = 1080;
-    canvas.height = 1920;
-    const ctx = canvas.getContext('2d');
-    const grad = ctx.createLinearGradient(0, 0, 1080, 1920);
-    grad.addColorStop(0, '#001f12');
-    grad.addColorStop(.42, '#050505');
-    grad.addColorStop(1, '#000000');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, 1080, 1920);
-
-    ctx.strokeStyle = 'rgba(0,230,118,.32)';
-    ctx.lineWidth = 3;
-    for (let i = 0; i < 9; i++) {
-      ctx.beginPath();
-      ctx.arc(860, 260, 120 + i * 52, 0, Math.PI * 2);
-      ctx.stroke();
-    }
-
-    ctx.fillStyle = '#00e676';
-    ctx.font = '700 46px Arial, sans-serif';
-    ctx.letterSpacing = '8px';
-    ctx.fillText('HYPERCORE AI', 72, 120);
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '900 118px Arial, sans-serif';
-    wrapCanvasText(ctx, title.toUpperCase(), 72, 360, 920, 126, 4);
-
-    const stats = [
-      ['Esercizi', String(doneCount)],
-      ['Volume', volume ? volume + 'kg' : '-'],
-      ['PR', String(prCount)],
-      ['Week', 'W' + (summary.weekNumber || currentWeek)]
-    ];
-    stats.forEach((item, index) => {
-      const x = 72 + (index % 2) * 468;
-      const y = 980 + Math.floor(index / 2) * 260;
-      ctx.fillStyle = 'rgba(255,255,255,.06)';
-      roundRect(ctx, x, y, 420, 190, 34);
-      ctx.fill();
-      ctx.strokeStyle = 'rgba(255,255,255,.12)';
-      ctx.stroke();
-      ctx.fillStyle = '#00e676';
-      ctx.font = '900 82px Arial, sans-serif';
-      ctx.fillText(item[1], x + 34, y + 92);
-      ctx.fillStyle = 'rgba(255,255,255,.62)';
-      ctx.font = '700 28px Arial, sans-serif';
-      ctx.fillText(item[0].toUpperCase(), x + 34, y + 142);
-    });
-
-    ctx.fillStyle = 'rgba(255,255,255,.68)';
-    ctx.font = '500 34px Arial, sans-serif';
-    ctx.fillText('Allenamento completato e memoria carichi aggiornata.', 72, 1640);
-    ctx.fillStyle = '#00e676';
-    ctx.font = '800 36px Arial, sans-serif';
-    ctx.fillText('hypercore.ai', 72, 1744);
-
-    const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png', .92));
-    if (!blob) throw new Error('canvas-empty');
-    const file = new File([blob], 'hypercore-session.png', { type: 'image/png' });
-    if (navigator.canShare && navigator.canShare({ files: [file] }) && navigator.share) {
-      await navigator.share({ title: 'HyperCore AI', text: title + ' completato con HyperCore AI.', files: [file] });
-      return;
-    }
-    if (navigator.share) {
-      await navigator.share({ title: 'HyperCore AI', text: title + ' completato con HyperCore AI.' });
-      return;
-    }
-    const url = URL.createObjectURL(blob);
-    window.open(url, '_blank', 'noopener,noreferrer');
-    setTimeout(() => URL.revokeObjectURL(url), 30000);
-  } catch (error) {
-    console.error('Errore condivisione report', error);
-    showMiniToast('Condivisione non supportata su questo dispositivo.');
-  }
-}
-
-function wrapCanvasText(ctx, text, x, y, maxWidth, lineHeight, maxLines = 4) {
-  const words = String(text || '').split(/\s+/).filter(Boolean);
-  let line = '';
-  let lines = [];
-  words.forEach((word) => {
-    const next = line ? line + ' ' + word : word;
-    if (ctx.measureText(next).width > maxWidth && line) {
-      lines.push(line);
-      line = word;
-    } else {
-      line = next;
-    }
-  });
-  if (line) lines.push(line);
-  lines.slice(0, maxLines).forEach((item, index) => ctx.fillText(item, x, y + index * lineHeight));
-}
-
-function roundRect(ctx, x, y, w, h, r) {
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.arcTo(x + w, y, x + w, y + h, r);
-  ctx.arcTo(x + w, y + h, x, y + h, r);
-  ctx.arcTo(x, y + h, x, y, r);
-  ctx.arcTo(x, y, x + w, y, r);
-  ctx.closePath();
-}
-
-function showInstallSheet() {
-  let sheet = document.getElementById('install-sheet');
-  if (!sheet) {
-    sheet = document.createElement('div');
-    sheet.id = 'install-sheet';
-    sheet.className = 'install-sheet';
-    sheet.innerHTML = `
-      <div class="install-card">
-        <button class="install-close" type="button" onclick="closeInstallSheet()">?</button>
-        <div class="install-kicker">App installabile</div>
-        <h2>Porta HyperCore nella Home</h2>
-        <p>Accesso rapido, uso offline della scheda e timer sempre a portata durante l'allenamento.</p>
-        <div class="install-benefits"><span>Timer</span><span>Offline</span><span>PWA</span></div>
-        <button class="t-btn" type="button" onclick="performInstallPrompt()">Installa adesso</button>
-      </div>`;
-    document.body.appendChild(sheet);
-  }
-  sheet.classList.add('show');
-}
-
-function closeInstallSheet() {
-  document.getElementById('install-sheet')?.classList.remove('show');
-}
-
-async function performInstallPrompt() {
-  if (!deferredPrompt) {
-    showMiniToast('Su iPhone usa Condividi > Aggiungi alla schermata Home.');
-    closeInstallSheet();
-    return;
-  }
-  deferredPrompt.prompt();
-  await deferredPrompt.userChoice;
-  deferredPrompt = null;
-  document.getElementById('installBtn').style.display = 'none';
-  closeInstallSheet();
-}
-
-function initOnboarding() {
-  let done = false;
-  try { done = localStorage.getItem(ONBOARDING_DONE_KEY) === '1'; } catch(e) {}
-  if (done) return;
-  setTimeout(showOnboarding, 500);
-}
-
-function showOnboarding() {
-  if (currentDay !== null) return;
-  let layer = document.getElementById('onboarding-layer');
-  if (!layer) {
-    layer = document.createElement('div');
-    layer.id = 'onboarding-layer';
-    layer.className = 'onboarding-layer';
-    layer.innerHTML = `
-      <div class="onboarding-card">
-        <div class="onboarding-mark">&#9889;</div>
-        <div class="onboarding-kicker">HyperCore AI</div>
-        <h2>Allenamento, progressi e AI in una sola app.</h2>
-        <div class="onboarding-steps">
-          <div><strong>1</strong><span>Importa il PDF del PT.</span></div>
-          <div><strong>2</strong><span>Scegli settimana e giorno.</span></div>
-          <div><strong>3</strong><span>Salva carichi, report e nutrizione.</span></div>
-        </div>
-        <div class="onboarding-actions">
-          <button class="t-btn" type="button" onclick="finishOnboarding('import')">Importa PDF</button>
-          <button class="t-btn" type="button" onclick="finishOnboarding('coach')">Coach AI</button>
-          <button class="t-btn danger" type="button" onclick="finishOnboarding('skip')">Salta</button>
-        </div>
-      </div>`;
-    document.body.appendChild(layer);
-  }
-  layer.classList.add('show');
-}
-
-function finishOnboarding(action) {
-  try { localStorage.setItem(ONBOARDING_DONE_KEY, '1'); } catch(e) {}
-  document.getElementById('onboarding-layer')?.classList.remove('show');
-  if (action === 'import') triggerPdfImport();
-  if (action === 'coach') setAppSection('chat');
-}
-
 function renderSectionNav() {
-  ensureDockIndicator();
   ['plans', 'today', 'nutrition', 'progress', 'chat'].forEach((section) => {
     const button = document.getElementById('section-tab-' + section);
     if (!button) return;
     button.classList.toggle('on', currentSection === section);
   });
-  updateDockIndicator();
 }
 
 function syncHeaderMenuUi() {
@@ -1753,7 +1010,6 @@ function renderProgressSection() {
   if (!currentProgram && !activeNutritionPlan) {
     container.innerHTML = `
       <div class="empty-pane">
-        ${getEmptyIllustration('progress')}
         <h3>Nessuna scheda attiva</h3>
         <p>Seleziona o importa una scheda per vedere progressi allenamento, oppure crea un piano alimentare per iniziare a tracciare anche la nutrizione.</p>
         <button class="hdr-btn" type="button" onclick="setAppSection('plans')">Vai alle schede</button>
@@ -1766,7 +1022,6 @@ function renderProgressSection() {
     container.innerHTML = `
       <div class="progress-layout">
         <div class="surface-card">
-          ${getEmptyIllustration('progress')}
           <div class="surface-title">Allenamento</div>
           <div class="surface-empty">Non hai una scheda allenamento attiva in questo momento. La parte nutrizione pero' e' gia' disponibile qui sotto.</div>
           <div class="action-row">
@@ -1781,15 +1036,6 @@ function renderProgressSection() {
   const stats = getProgramStats(currentProgram);
   const completedDays = getCompletedDaysCount(currentWeek);
   const completedWeeks = getCompletedWeeksCount(currentProgram);
-  // Heal pre-fix saved state: if the week is complete but the report is missing
-  // (legacy bug from stale references), build and persist it now.
-  if (isWeekComplete(currentWeek) && !getCurrentWeekState()?.report) {
-    const healedReport = buildWeekReport(currentWeek);
-    const healedWeekState = getCurrentWeekState();
-    if (!healedWeekState.completedAt) healedWeekState.completedAt = new Date().toISOString();
-    healedWeekState.report = healedReport;
-    persistProgramState();
-  }
   const reportReady = getCurrentWeekState()?.report;
   const historyPreview = getCurrentProgramHistoryPreview(4);
 
@@ -1856,14 +1102,6 @@ function renderProgressSection() {
                 <span class="mini-pill">${entry.week ? 'W' + entry.week : 'Sessione'}</span>
               </div>`).join('')}
           </div>` : '<div class="surface-empty">Nessuna sessione salvata ancora. Quando termini un allenamento, qui vedrai i riferimenti piu` recenti.</div>'}
-      </div>
-      <div class="surface-card progress-visual-card">
-        <div class="surface-title">Heatmap 12 settimane</div>
-        ${buildProgressHeatmapHtml()}
-      </div>
-      <div class="surface-card progress-visual-card">
-        <div class="surface-title">Sparkline carichi principali</div>
-        ${buildExerciseSparklineHtml()}
       </div>
       ${nutritionCardHtml}
     </div>`;
@@ -2592,7 +1830,7 @@ function resetAssistantSession() {
 }
 
 function hasBlockingOverlayOpen() {
-  return ['timer-ov', 'hist-modal', 'week-modal', 'import-modal', 'session-summary-modal', 'install-sheet', 'onboarding-layer', 'workout-countdown'].some((id) => document.getElementById(id)?.classList.contains('show'));
+  return ['timer-ov', 'hist-modal', 'week-modal', 'import-modal'].some((id) => document.getElementById(id)?.classList.contains('show'));
 }
 
 function syncAssistantUi() {
@@ -2603,7 +1841,7 @@ function syncAssistantUi() {
   if (!fab || !layer) return;
 
   const inSession = currentDay !== null;
-  const hasVisibleAppSection = inSession || ['plans', 'progress', 'chat', 'today', 'nutrition'].includes(currentSection);
+  const hasVisibleAppSection = inSession || ['plans', 'progress', 'chat', 'today'].includes(currentSection);
   const blocked = hasBlockingOverlayOpen();
   const showFab = hasVisibleAppSection && !blocked;
 
@@ -2882,7 +2120,6 @@ function renderCoachSection() {
         `).join('')}
       </div>
     </div>` : '';
-  const busyHtml = aiCoachState.busy ? renderAiSkeleton(aiCoachState.phase === 'refining' ? 'Aggiorno la bozza' : 'Coach AI sta ragionando') : '';
   const draftHtml = aiCoachState.draftProgram ? `
     <div class="coach-draft-banner">
       Ultima bozza pronta: <strong>${escapeHtml(aiCoachState.draftProgram.title || 'Nuova scheda Coach AI')}</strong>
@@ -2907,7 +2144,6 @@ function renderCoachSection() {
   root.innerHTML = `
     <div class="coach-head">
       <div>
-        <div class="coach-ai-orb" aria-hidden="true"><span></span></div>
         <div class="section-badge">Coach AI PT</div>
         <h2>Crea la prossima scheda</h2>
         <p>Il Coach AI parte dalle schede che hai importato, dai progressi reali e da poche domande mirate per costruire una nuova bozza pronta da salvare nell'app.</p>
@@ -3579,19 +2815,12 @@ async function sendNutritionRefinement() {
 }
 
 function renderNutritionTargets(targets) {
-  const calories = Math.max(0, Number(targets.calories) || 0);
-  const protein = Math.max(0, Number(targets.proteinGrams) || 0);
-  const carbs = Math.max(0, Number(targets.carbsGrams) || 0);
-  const fats = Math.max(0, Number(targets.fatsGrams) || 0);
-  const rings = [
-    ['Kcal', calories ? String(calories) : '-', calories / 3200, 'target'],
-    ['Proteine', protein ? protein + 'g' : '-', protein / 220, 'target'],
-    ['Carbo', carbs ? carbs + 'g' : '-', carbs / 420, 'target'],
-    ['Grassi', fats ? fats + 'g' : '-', fats / 130, 'target']
-  ];
   return `
-    <div class="nutrition-ring-grid">
-      ${rings.map(([label, value, pct, extra]) => buildTodayRingSvg(label, value, pct, extra)).join('')}
+    <div class="nutrition-target-grid">
+      <div class="nutrition-target"><strong>Kcal</strong><span>${targets.calories}</span></div>
+      <div class="nutrition-target"><strong>Proteine</strong><span>${targets.proteinGrams} g</span></div>
+      <div class="nutrition-target"><strong>Carbo</strong><span>${targets.carbsGrams} g</span></div>
+      <div class="nutrition-target"><strong>Grassi</strong><span>${targets.fatsGrams} g</span></div>
     </div>
   `;
 }
@@ -3675,7 +2904,6 @@ function renderNutritionSection() {
         `).join('')}
       </div>
     </div>` : '';
-  const busyHtml = nutritionAiState.busy ? renderAiSkeleton(nutritionAiState.phase === 'refining' ? 'Aggiorno il piano alimentare' : 'Nutrition Coach AI sta preparando il piano') : '';
   const draftHtml = nutritionAiState.draftPlan ? `
     <div class="coach-draft-banner">
       Ultima bozza pronta: <strong>${escapeHtml(nutritionAiState.draftPlan.title || 'Nuovo piano alimentare')}</strong>
@@ -3809,7 +3037,6 @@ function renderNutritionSection() {
   root.innerHTML = `
     <div class="coach-head">
       <div>
-        <div class="coach-ai-orb nutrition" aria-hidden="true"><span></span></div>
         <div class="section-badge">Nutrizione AI</div>
         <h2 style="font-family:'Bebas Neue',sans-serif;font-size:36px;letter-spacing:2px;line-height:1;margin-top:10px">Piano alimentare</h2>
         <p style="font-size:13px;color:var(--tm);margin-top:6px;line-height:1.6;max-width:620px">Genera un piano alimentare realistico con training day e rest day, rifiniscilo in chat e traccia aderenza, peso e acqua direttamente nell'app.</p>
@@ -3906,7 +3133,6 @@ function renderNutritionSection() {
             ${nutritionAiState.draftPlan ? `<button class="hdr-btn" type="button" onclick="saveNutritionDraftPlan()"${nutritionAiState.busy ? ' disabled' : ''}>Salva piano</button>` : ''}
           </div>
           ${(nutritionAiState.error || nutritionAiState.status) ? `<div class="${statusClass}">${escapeHtml(nutritionAiState.error || nutritionAiState.status)}</div>` : ''}
-          ${busyHtml}
           ${draftHtml}
           ${refineCardHtml}
         </div>
@@ -3939,7 +3165,6 @@ function openExerciseDemo(di, ei) {
 function setAppSection(section) {
   closeHeaderMenu();
   currentSection = section;
-  syncVisualContext(section);
   const sectionMap = {
     today: 'home',
     plans: 'programs',
@@ -3952,7 +3177,7 @@ function setAppSection(section) {
   document.getElementById('fab').classList.remove('show');
   document.getElementById('btn-finish').classList.remove('show');
   currentDay = null;
-  stopTimer(); stopChrono();
+  stopTimer(); stopChrono(); stopNeg();
   renderSectionNav();
   if (section === 'today') renderHome();
   if (section === 'plans') renderPrograms();
@@ -3995,7 +3220,6 @@ function renderPrograms() {
     label.textContent = 'Nessuna scheda ancora';
     grid.innerHTML = `
       <div class="program-card program-empty">
-        ${getEmptyIllustration('plans')}
         <h3>Nessuna scheda ancora</h3>
         <p>Puoi iniziare importando il PDF del personal trainer oppure lasciare che il Coach AI ti prepari una nuova bozza da personalizzare.</p>
         <div class="action-row" style="justify-content:center">
@@ -4016,8 +3240,6 @@ function renderPrograms() {
     const card = document.createElement('div');
     card.className = 'program-card pop' + (currentProgram && currentProgram.id === program.id ? ' active' : '');
     card.style.animationDelay = (i * 0.05) + 's';
-    card.style.setProperty('--i', i);
-    const previewExercises = (program.days || []).flatMap((day) => day.exercises || []).slice(0, 3);
     card.innerHTML = `
       <div class="program-card-top">
         <div class="program-card-copy">
@@ -4034,7 +3256,6 @@ function renderPrograms() {
         <span>${stats.done} fatti</span>
         <span>${stats.hist} sessioni</span>
       </div>
-      ${previewExercises.length ? `<div class="program-preview"><span>Preview</span>${previewExercises.map((exercise) => `<b>${escapeHtml(exercise.name)}</b>`).join('')}</div>` : ''}
     `;
     if (program.source === 'imported') {
       const deleteBtn = card.querySelector('.program-delete');
@@ -4043,7 +3264,7 @@ function renderPrograms() {
         deleteImportedProgram(program.id);
       };
     }
-    card.onclick = () => { runSharedElementTransition(card, program.title); openProgram(i); };
+    card.onclick = () => openProgram(i);
     grid.appendChild(card);
   });
 }
@@ -4109,9 +3330,15 @@ function initPwa() {
     document.getElementById('installBtn').style.display = 'none';
     syncHeaderBalance();
   });
-  document.getElementById('installBtn').addEventListener('click', showInstallSheet);
-  window.addEventListener('resize', () => { syncHeaderBalance(); updateDockIndicator(); });
-  window.addEventListener('orientationchange', () => setTimeout(updateDockIndicator, 250));
+  document.getElementById('installBtn').addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    deferredPrompt = null;
+    document.getElementById('installBtn').style.display = 'none';
+    syncHeaderBalance();
+  });
+  window.addEventListener('resize', syncHeaderBalance);
 }
 
 
@@ -4130,7 +3357,6 @@ function renderHome() {
     weekPanel.innerHTML = '';
     grid.innerHTML = `
       <div class="empty-pane" style="grid-column:1/-1">
-        ${getEmptyIllustration('today')}
         <h3>Nessuna scheda attiva</h3>
         <p>Importa il PDF del PT oppure apri una delle tue schede per trasformare questa sezione nella tua dashboard giornaliera.</p>
         <button class="hdr-btn" type="button" onclick="setAppSection('plans')">Vai alle schede</button>
@@ -4151,22 +3377,10 @@ function renderHome() {
           <div class="week-status">${escapeHtml(selectedStatus)}</div>
         </div>
       </div>
-      <div class="week-rings">
-        ${buildTodayRingSvg('Giorni', completedDays + '/' + days.length, days.length ? completedDays / days.length : 0)}
-        ${buildTodayRingSvg('Settimana', 'W' + currentWeek, visibleWeeks.length ? currentWeek / Math.max(...visibleWeeks) : 0)}
-        ${buildTodayRingSvg('Sessioni', String(getHistory().length), Math.min(1, getHistory().length / 12))}
-      </div>
       <div class="week-grid">
         ${visibleWeeks.map((weekNumber) => {
           const exists = existingWeeks.has(weekNumber);
           const complete = exists ? isWeekComplete(weekNumber) : false;
-          if (exists && complete && !ensureWeekState(weekNumber).report) {
-            const healed = buildWeekReport(weekNumber);
-            const ws = ensureWeekState(weekNumber);
-            if (!ws.completedAt) ws.completedAt = new Date().toISOString();
-            ws.report = healed;
-            persistProgramState();
-          }
           const report = exists ? ensureWeekState(weekNumber).report : null;
           let badge = 'Inizia';
           if (!exists) badge = 'Nuova';
@@ -4206,16 +3420,13 @@ function renderHome() {
     const card = document.createElement('div');
     card.className = 'day-card pop';
     card.style.animationDelay = (i*0.07)+'s';
-    const completedExercises = day.exercises.reduce((total, _ex, ei) => total + (getSD(i, ei).exDone ? 1 : 0), 0);
-    const dayPct = day.exercises.length ? Math.round((completedExercises / day.exercises.length) * 100) : 0;
     card.innerHTML = `
       ${done ? '<div class="dc-done">FATTO</div>' : ''}
       <div class="dc-num">${i+1}</div>
       <div class="dc-name">${day.label || day.name}</div>
-      <div class="dc-count">${completedExercises}/${day.exercises.length} esercizi</div>
-      <div class="day-card-progress"><span style="width:${dayPct}%"></span></div>
+      <div class="dc-count">${day.exercises.length} esercizi</div>
     `;
-    card.onclick = () => { runSharedElementTransition(card, day.label || day.name); startSession(i); };
+    card.onclick = () => startSession(i);
     grid.appendChild(card);
   });
 }
@@ -4236,8 +3447,6 @@ function startSession(di) {
   document.getElementById('btn-finish').classList.add('show');
   switchTab('list');
   updateProgress(di);
-  syncVisualContext('workout');
-  showWorkoutCountdown();
   updateHeader();
 }
 
@@ -4251,12 +3460,7 @@ function updateProgress(di) {
   let done = 0;
   exs.forEach((_, ei) => { if (getSD(di, ei).exDone) done++; });
   const pct = Math.round((done / exs.length) * 100);
-  const fill = document.getElementById('prog-fill');
-  fill.style.width = pct + '%';
-  fill.dataset.progress = String(pct);
-  fill.classList.toggle('energy-low', pct < 35);
-  fill.classList.toggle('energy-mid', pct >= 35 && pct < 75);
-  fill.classList.toggle('energy-high', pct >= 75);
+  document.getElementById('prog-fill').style.width = pct + '%';
 }
 
 function switchTab(tab) {
@@ -4342,7 +3546,7 @@ function toggleSerie(di, ei, s) {
   const box = document.getElementById('sb-' + ei + '-' + s);
   const exercise = getDays()?.[di]?.exercises?.[ei];
   box.className = 'serie-box' + (isSupersetExercise(exercise) ? ' superset-box' : '') + (sd.seriesDone[s] ? ' done' : '');
-  if (sd.seriesDone[s]) { celebrateSet(box); checkLivePr(di, ei, box); openTimer(di, ei); }
+  if (sd.seriesDone[s]) openTimer();
 }
 
 function toggleExDone(di, ei) {
@@ -4365,7 +3569,6 @@ function saveKg(di, ei, s, val) {
   persistProgramState();
   const label = document.getElementById('sb-kg-' + ei + '-' + s);
   if (label) label.textContent = sd.kg[s];
-  checkLivePr(di, ei, label || document.getElementById('fchk-' + ei + '-' + s));
 }
 
 function saveSupersetKg(di, ei, roundIndex, itemIndex, val) {
@@ -4378,7 +3581,6 @@ function saveSupersetKg(di, ei, roundIndex, itemIndex, val) {
   weekState.report = null;
   weekState.reportSeen = false;
   persistProgramState();
-  checkLivePr(di, ei, document.getElementById('fchk-' + ei + '-' + roundIndex) || document.getElementById('sb-' + ei + '-' + roundIndex));
 }
 
 function saveNote(di, ei, val) {
@@ -4387,25 +3589,6 @@ function saveNote(di, ei, val) {
 }
 
 // â”€â”€â”€ FOCUS VIEW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-function renderFocusCatalogSection(ex) {
-  if (!ex.catalogId) return '';
-  const secondary = Array.isArray(ex.secondaryMuscles) && ex.secondaryMuscles.length
-    ? `<div class="fc-catalog-meta">Muscoli secondari: ${ex.secondaryMuscles.map(escapeHtml).join(', ')}</div>`
-    : '';
-  const instructions = ex.instructionsIt
-    ? `<div class="fc-catalog-instructions">${escapeHtml(ex.instructionsIt)}</div>`
-    : '';
-  return `
-    <div class="fc-catalog">
-      <div class="fc-catalog-title">Come si esegue</div>
-      <div class="fc-catalog-name">${escapeHtml(ex.canonicalName || ex.name)}</div>
-      <div class="fc-catalog-meta">Target: ${escapeHtml(ex.target || '-')} · Equipment: ${escapeHtml(ex.equipment || '-')}</div>
-      ${secondary}
-      ${instructions}
-    </div>
-  `;
-}
-
 function renderFocusView(di, ei) {
   const days = getDays();
   focusIdx = ei;
@@ -4416,31 +3599,17 @@ function renderFocusView(di, ei) {
   document.getElementById('fnav-prev').disabled = ei === 0;
   document.getElementById('fnav-next').disabled = ei === days[di].exercises.length - 1;
 
-  const completedSets = sd.seriesDone.filter(Boolean).length;
-  const nextSetIndex = sd.seriesDone.findIndex((done) => !done);
-  const activeSetNumber = nextSetIndex === -1 ? Math.max(1, ex.series) : nextSetIndex + 1;
-  const energyPct = ex.series ? Math.max(0, Math.round(((ex.series - completedSets) / ex.series) * 100)) : 0;
-  const focusMeterHtml = `
-    <div class="fc-hero-meter" id="fc-meter" style="--energy:${energyPct}%">
-      <div class="fc-hero-set"><span>Serie attiva</span><strong>${activeSetNumber}</strong></div>
-      <div class="fc-hero-energy"><span></span></div>
-      <div class="fc-hero-copy">${completedSets}/${ex.series} completate - energia residua ${energyPct}%</div>
-    </div>`;
-
   // Build series rows
   let seriesHtml = `<div class="fc-series-lbl">${isSupersetExercise(ex) ? 'Round superset' : 'Serie'}</div>`;
   for (let s = 0; s < ex.series; s++) {
     const seriesReps = getSeriesRepDisplay(ex, s);
     const supersetKgHtml = isSupersetExercise(ex) ? renderSupersetKgInputs(ex, sd, di, ei, s, 'focus') : '';
-    const inputId = `fkg-${ei}-${s}`;
     const normalKgHtml = !isSupersetExercise(ex) ? `
-        <div class="fsr-kg kg-stepper">
-          <button type="button" onclick="event.stopPropagation();stepKg(${di},${ei},${s},-2.5,'${inputId}')">−</button>
-          <input id="${inputId}" type="number" inputmode="decimal" placeholder="kg"
+        <div class="fsr-kg">
+          <input type="number" inputmode="decimal" placeholder="kg"
             value="${sd.kg[s]||''}"
             onchange="saveKg(${di},${ei},${s},this.value)"
             oninput="saveKg(${di},${ei},${s},this.value)">
-          <button type="button" onclick="event.stopPropagation();stepKg(${di},${ei},${s},2.5,'${inputId}')">+</button>
         </div>` : '';
     seriesHtml += `
       <div class="fc-serie-row${isSupersetExercise(ex) ? ' superset-round' : ''}">
@@ -4483,8 +3652,6 @@ function renderFocusView(di, ei) {
     </div>
     ${renderSupersetItemsHtml(ex, 'focus')}
     ${ex.note ? `<div class="fc-note">${ex.note}</div>` : ''}
-    ${renderFocusCatalogSection(ex)}
-    ${focusMeterHtml}
     ${nextHtml}
     <div class="chrono-row">
       <span class="chrono-lbl">Cronometro serie:</span>
@@ -4494,18 +3661,30 @@ function renderFocusView(di, ei) {
         <button class="chrono-btn" onclick="resetChrono()">Reset</button>
       </div>
     </div>
+    <div class="neg-timer-row">
+      <span class="neg-label">Neg:</span>
+      <span class="neg-secs" id="neg-disp">${negLeft}</span>
+      <select class="neg-dur-sel" onchange="negDur=parseInt(this.value);negLeft=negDur;updateNegDisp()" >
+        <option value="3"${negDur===3?' selected':''}>3"</option>
+        <option value="4"${negDur===4?' selected':''}>4"</option>
+        <option value="5"${negDur===5?' selected':''}>5"</option>
+      </select>
+      <div class="neg-btns">
+        <button class="neg-btn" onclick="startNeg()">Start</button>
+        <button class="neg-btn" onclick="stopNeg()">Reset</button>
+      </div>
+    </div>
     ${seriesHtml}
     <textarea class="fc-textnote" rows="2" placeholder="Note..."
       onchange="saveNote(${di},${ei},this.value)"
       oninput="saveNote(${di},${ei},this.value)">${sd.note}</textarea>
   `;
+  updateNegDisp();
 }
 
 function toggleFSerie(di, ei, s) {
   const sd = getSD(di, ei);
   sd.seriesDone[s] = !sd.seriesDone[s];
-  const ex = getDays()[di].exercises[ei];
-  sd.exDone = sd.seriesDone.filter(Boolean).length >= ex.series;
   const weekState = getCurrentWeekState();
   weekState.report = null;
   weekState.reportSeen = false;
@@ -4515,28 +3694,13 @@ function toggleFSerie(di, ei, s) {
   const box = document.getElementById('sb-' + ei + '-' + s);
   const exercise = getDays()?.[di]?.exercises?.[ei];
   if (box) box.className = 'serie-box' + (isSupersetExercise(exercise) ? ' superset-box' : '') + (sd.seriesDone[s] ? ' done' : '');
-  if (sd.seriesDone[s]) { celebrateSet(chk || box); checkLivePr(di, ei, chk || box); openTimer(di, ei); }
-  updateFocusMeter(di, ei);
-}
-
-function updateFocusMeter(di, ei) {
-  const meter = document.getElementById('fc-meter');
-  if (!meter) return;
-  const sd = getSD(di, ei);
-  const ex = getDays()[di].exercises[ei];
-  const completedSets = sd.seriesDone.filter(Boolean).length;
-  const nextSetIndex = sd.seriesDone.findIndex((done) => !done);
-  const activeSetNumber = nextSetIndex === -1 ? Math.max(1, ex.series) : nextSetIndex + 1;
-  const energyPct = ex.series ? Math.max(0, Math.round(((ex.series - completedSets) / ex.series) * 100)) : 0;
-  meter.style.setProperty('--energy', energyPct + '%');
-  meter.querySelector('.fc-hero-set strong').textContent = activeSetNumber;
-  meter.querySelector('.fc-hero-copy').textContent = completedSets + '/' + ex.series + ' completate - energia residua ' + energyPct + '%';
+  if (sd.seriesDone[s]) openTimer();
 }
 
 function focusNav(dir) {
   const next = focusIdx + dir;
   if (next < 0 || next >= getDays()[currentDay].exercises.length) return;
-  stopChrono();
+  stopChrono(); stopNeg();
   renderFocusView(currentDay, next);
 }
 
@@ -4564,15 +3728,33 @@ function resetChrono() {
 }
 function stopChrono() { clearInterval(chronoInterval); chronoRunning = false; chronoSecs = 0; }
 
+// â”€â”€â”€ NEG TIMER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function updateNegDisp() {
+  const el = document.getElementById('neg-disp');
+  if (el) el.textContent = negLeft;
+}
+function startNeg() {
+  if (negRunning) return;
+  negLeft = negDur;
+  updateNegDisp();
+  negRunning = true;
+  negInterval = setInterval(() => {
+    negLeft--;
+    updateNegDisp();
+    if (negLeft <= 0) {
+      stopNeg();
+      buzzVibrate();
+    }
+  }, 1000);
+}
+function stopNeg() {
+  clearInterval(negInterval); negRunning = false; negLeft = negDur; updateNegDisp();
+}
 
 // â”€â”€â”€ REST TIMER â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const CIRC = 515;
-function openTimer(di, ei) {
-  timerDi = di ?? currentDay;
-  timerEi = ei ?? focusIdx;
+function openTimer() {
   timerLeft = timerTotal;
-  timerWarnedMarks = new Set();
-  populateTimerContext();
   updateTimerDisplay();
   document.getElementById('timer-ov').classList.add('show');
   syncAssistantUi();
@@ -4597,11 +3779,7 @@ function startTimer() {
   timerInterval = setInterval(() => {
     timerLeft--;
     updateTimerDisplay();
-    if ([5, 3, 1].includes(timerLeft) && !timerWarnedMarks.has(timerLeft)) {
-      timerWarnedMarks.add(timerLeft);
-      safeVibrate(timerLeft === 1 ? [60, 40, 60] : 40);
-    }
-    if (timerLeft <= 0) { stopTimer(); buzzVibrate(); }
+    if (timerLeft <= 0) { stopTimer(); buzzVibrate(); document.getElementById('t-sub').textContent = 'PRONTI!'; }
   }, 1000);
 }
 function stopTimer() {
@@ -4612,56 +3790,16 @@ function toggleTimer() {
   if (timerRunning) stopTimer();
   else { if (timerLeft <= 0) { timerLeft = timerTotal; } startTimer(); }
 }
-function populateTimerContext() {
-  if (timerDi == null || timerDi < 0) return;
-  var days = getDays();
-  var day = days[timerDi];
-  if (!day) return;
-  var currentEx = day.exercises[timerEi];
-  var nextEx = day.exercises[timerEi + 1] || null;
-  var ctxEl = document.getElementById('t-exercise-ctx');
-  var nextEl = document.getElementById('t-up-next');
-  if (currentEx) {
-    ctxEl.innerHTML = '<span class="t-ctx-label">Stai facendo</span><span class="t-ctx-name">' + escapeHtml(currentEx.name) + '</span>';
-  } else {
-    ctxEl.innerHTML = '';
-  }
-  if (nextEx) {
-    nextEl.innerHTML = '<div class="t-next-kicker">Prossimo esercizio</div><div class="t-next-name">' + escapeHtml(nextEx.name) + '</div><div class="t-next-meta">' + escapeHtml(getExerciseMetaLabel(nextEx)) + '</div>';
-  } else {
-    nextEl.innerHTML = '<div class="t-next-kicker">Finale</div><div class="t-next-name">Ultimo esercizio del giorno!</div><div class="t-next-meta">Chiudi alla grande.</div>';
-  }
-}
 function updateTimerDisplay() {
   document.getElementById('t-num').textContent = timerLeft;
-  var pct = timerTotal > 0 ? timerLeft / timerTotal : 0;
-  var circle = document.getElementById('t-circle');
-  var sub = document.getElementById('t-sub');
-  var num = document.getElementById('t-num');
-  circle.style.strokeDashoffset = CIRC * (1 - pct);
-  circle.classList.remove('phase-rest', 'phase-ready', 'phase-almost', 'phase-go');
-  if (timerLeft <= 0) {
-    sub.textContent = 'VIA!';
-    num.style.color = '#00e676';
-    circle.classList.add('phase-go');
-  } else if (pct <= 0.2) {
-    sub.textContent = 'Ci siamo quasi...';
-    num.style.color = '#ff6d00';
-    circle.classList.add('phase-almost');
-  } else if (pct <= 0.45) {
-    sub.textContent = 'Preparati...';
-    num.style.color = '#ffc107';
-    circle.classList.add('phase-ready');
-  } else {
-    sub.textContent = 'Recupera...';
-    num.style.color = '#00e676';
-    circle.classList.add('phase-rest');
-  }
+  document.getElementById('t-sub').textContent = timerLeft > 0 ? 'secondi' : 'PRONTI!';
+  const pct = timerLeft / timerTotal;
+  document.getElementById('t-circle').style.strokeDashoffset = CIRC * (1 - pct);
 }
 
 // â”€â”€â”€ BUZZ / VIBRATE â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function buzzVibrate() {
-  safeVibrate([300, 100, 300]);
+  if (navigator.vibrate) navigator.vibrate([300, 100, 300]);
   try {
     const ctx = new (window.AudioContext || window.webkitAudioContext)();
     [0, 0.3, 0.6].forEach(t => {
@@ -4687,8 +3825,6 @@ function finishSession() {
     date: new Date().toLocaleString('it-IT'),
     program: currentProgram ? currentProgram.title : '',
     week: currentWeek,
-    dayIndex: di,
-    prCount: getLivePrCount(currentWeek, di),
     day: days[di].name + ' - ' + (days[di].label || ''),
     exercises: []
   };
@@ -4716,9 +3852,8 @@ function finishSession() {
     persistProgramState();
   }
   renderPrograms();
-  if (currentSection === 'progress' && typeof renderProgressSection === 'function') renderProgressSection();
   goHome();
-  showSessionSummary(entry, weekJustCompleted, currentWeek);
+  if (weekJustCompleted) openWeekReport(currentWeek);
 }
 
 // â”€â”€â”€ HISTORY MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -4965,132 +4100,6 @@ function validateImportDraft(draft) {
   return '';
 }
 
-function renderExerciseMatchBadge(exercise, di, ei) {
-  if (!exercise.catalogId) {
-    return `<div class="imp-match-info">
-      <span class="imp-badge">Esercizio personalizzato · non nel catalogo</span>
-      <button class="imp-mini-btn" type="button" onclick="openExerciseMatchPicker(${di}, ${ei})">Cerca nel catalogo</button>
-    </div>`;
-  }
-  const confidence = Math.round((exercise.matchConfidence || 0) * 100);
-  const badgeClass = exercise.matchConfidence >= 0.90 ? 'good' : 'warn';
-  const needsConfirm = exercise.matchConfidence >= 0.72 && exercise.matchConfidence < 0.90;
-  return `<div class="imp-match-info">
-    <span class="imp-badge ${badgeClass}">${escapeHtml(exercise.canonicalName || exercise.name)} · ${confidence}% catalogo</span>
-    ${needsConfirm ? `<button class="imp-mini-btn" type="button" onclick="openExerciseMatchPicker(${di}, ${ei})">Conferma o cambia</button>` : ''}
-    <button class="imp-mini-btn" type="button" onclick="openExerciseMatchPicker(${di}, ${ei})">Cambia</button>
-  </div>`;
-}
-
-function openExerciseMatchPicker(di, ei) {
-  const exercise = importDraft?.days?.[di]?.exercises?.[ei];
-  if (!exercise) return;
-
-  const overlayId = 'exercise-match-overlay';
-  let overlay = document.getElementById(overlayId);
-  if (!overlay) {
-    overlay = document.createElement('div');
-    overlay.id = overlayId;
-    overlay.className = 'exercise-match-overlay';
-    document.body.appendChild(overlay);
-  }
-
-  overlay.innerHTML = `
-    <div class="exercise-match-backdrop" onclick="closeExerciseMatchPicker()"></div>
-    <div class="exercise-match-panel" onclick="event.stopPropagation()">
-      <div class="exercise-match-hdr">
-        <strong>Collega al catalogo</strong>
-        <button class="imp-mini-btn" type="button" onclick="closeExerciseMatchPicker()">Chiudi</button>
-      </div>
-      <div class="exercise-match-current">
-        <span>Esercizio:</span> <strong>${escapeHtml(exercise.name)}</strong>
-      </div>
-      <div class="exercise-match-search">
-        <input type="text" id="match-picker-input" placeholder="Cerca esercizio..."
-          value="${escapeHtml(exercise.canonicalName || exercise.name)}"
-          onkeydown="if(event.key==='Enter')searchCatalogForPicker(${di},${ei})">
-        <button class="imp-mini-btn" type="button" onclick="searchCatalogForPicker(${di},${ei})">Cerca</button>
-      </div>
-      <div class="exercise-match-actions">
-        <button class="imp-mini-btn danger" type="button" onclick="clearCatalogMatch(${di},${ei})">Lascia personalizzato</button>
-      </div>
-      <div class="exercise-match-results" id="match-picker-results"></div>
-    </div>
-  `;
-  overlay.classList.add('show');
-  searchCatalogForPicker(di, ei);
-}
-
-function closeExerciseMatchPicker() {
-  const overlay = document.getElementById('exercise-match-overlay');
-  if (overlay) overlay.classList.remove('show');
-}
-
-async function searchCatalogForPicker(di, ei) {
-  const input = document.getElementById('match-picker-input');
-  const resultsContainer = document.getElementById('match-picker-results');
-  if (!input || !resultsContainer) return;
-
-  const query = cleanText(input.value);
-  if (!query) {
-    resultsContainer.innerHTML = '';
-    return;
-  }
-
-  resultsContainer.innerHTML = '<div class="imp-state">Ricerca in corso...</div>';
-
-  try {
-    const response = await fetch(buildApiUrl('/api/exercises/search?q=' + encodeURIComponent(query)));
-    const payload = await response.json().catch(() => ({}));
-    if (!response.ok) throw new Error(payload.error || 'Ricerca non disponibile.');
-
-    const results = Array.isArray(payload.results) ? payload.results : [];
-    if (!results.length) {
-      resultsContainer.innerHTML = '<div class="imp-state">Nessun esercizio trovato.</div>';
-      return;
-    }
-
-    resultsContainer.innerHTML = results.map((ex) => `
-      <button class="exercise-match-result" type="button"
-        onclick="assignCatalogMatch(${di},${ei},'${escapeHtml(ex.id)}','${escapeHtml(ex.canonicalName)}','${escapeHtml(ex.target)}','${escapeHtml(ex.equipment)}',${JSON.stringify(ex.secondaryMuscles || [])},'',0.95)">
-        <strong>${escapeHtml(ex.canonicalName)}</strong>
-        <span>${escapeHtml(ex.target || '-')} · ${escapeHtml(ex.equipment || '-')}</span>
-      </button>
-    `).join('');
-  } catch (error) {
-    console.error('Errore ricerca catalogo', error);
-    resultsContainer.innerHTML = '<div class="imp-error">' + escapeHtml(error.message) + '</div>';
-  }
-}
-
-function assignCatalogMatch(di, ei, catalogId, canonicalName, target, equipment, secondaryMuscles, instructionsIt, confidence) {
-  const exercise = importDraft?.days?.[di]?.exercises?.[ei];
-  if (!exercise) return;
-  exercise.catalogId = catalogId;
-  exercise.canonicalName = canonicalName;
-  exercise.matchConfidence = confidence;
-  exercise.target = target;
-  exercise.equipment = equipment;
-  exercise.secondaryMuscles = Array.isArray(secondaryMuscles) ? secondaryMuscles : [];
-  exercise.instructionsIt = instructionsIt || '';
-  closeExerciseMatchPicker();
-  renderImportReview();
-}
-
-function clearCatalogMatch(di, ei) {
-  const exercise = importDraft?.days?.[di]?.exercises?.[ei];
-  if (!exercise) return;
-  exercise.catalogId = '';
-  exercise.canonicalName = '';
-  exercise.matchConfidence = 0;
-  exercise.target = '';
-  exercise.equipment = '';
-  exercise.secondaryMuscles = [];
-  exercise.instructionsIt = '';
-  closeExerciseMatchPicker();
-  renderImportReview();
-}
-
 function renderImportReview(validationError = '') {
   if (!importDraft || !importMeta) return;
   const isAiDraft = cleanText(importMeta.origin || '') === 'ai';
@@ -5163,7 +4172,6 @@ function renderImportReview(validationError = '') {
               </div>
             </div>
             <div class="imp-field" style="margin-top:10px">
-              ${renderExerciseMatchBadge(exercise, di, ei)}
               <label>Note</label>
               <textarea oninput="updateImportExerciseField(${di}, ${ei}, 'note', this.value)">${escapeHtml(exercise.note)}</textarea>
             </div>
@@ -5353,14 +4361,6 @@ document.addEventListener('keydown', (event) => {
   if (event.key === 'Escape') {
     if (assistantOpen) { closeAssistantOverlay(); return; }
     if (headerMenuOpen) { closeHeaderMenu(); return; }
-    const countdown = document.getElementById('workout-countdown');
-    if (countdown && countdown.classList.contains('show')) { skipWorkoutCountdown(); return; }
-    const onboarding = document.getElementById('onboarding-layer');
-    if (onboarding && onboarding.classList.contains('show')) { finishOnboarding('skip'); return; }
-    const installSheet = document.getElementById('install-sheet');
-    if (installSheet && installSheet.classList.contains('show')) { closeInstallSheet(); return; }
-    const sessionSummary = document.getElementById('session-summary-modal');
-    if (sessionSummary && sessionSummary.classList.contains('show')) { closeSessionSummary(); return; }
     const importModal = document.getElementById('import-modal');
     if (importModal && importModal.classList.contains('show')) { closeImportModal(); return; }
     const weekModal = document.getElementById('week-modal');
@@ -5384,9 +4384,6 @@ document.addEventListener('click', (event) => {
     closeHeaderMenu();
   }
 });
-initTheme();
-bindHeaderScroll();
-syncVisualContext('plans');
 syncAssistantInputHeight();
 renderAssistantThread();
 renderSectionNav();
@@ -5395,4 +4392,3 @@ renderNutritionSection();
 syncHeaderMenuUi();
 setAppSection('plans');
 loadPrograms();
-initOnboarding();
