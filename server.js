@@ -2582,6 +2582,7 @@ app.post('/api/ai/nutrition/refine-plan', async (req, res) => {
 
 app.use('/icons', express.static(ICONS_DIR, { maxAge: '7d', index: false }));
 app.use('/assets', express.static(ASSETS_DIR, { maxAge: '7d', index: false }));
+app.use('/exercises-dataset', express.static(path.join(ROOT_DIR, 'data', 'exercises-dataset'), { maxAge: '7d', index: false }));
 
 [
   ['/', 'index.html'],
