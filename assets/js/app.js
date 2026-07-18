@@ -4324,7 +4324,7 @@ function collectExerciseCandidates(di) {
 }
 
 function parseExerciseLocally(text, candidates) {
-  const normalized = cleanString(text).trim();
+  const normalized = cleanText(text).trim();
   if (!normalized) return null;
 
   const patterns = [
@@ -4480,7 +4480,7 @@ async function submitAddExercise() {
   const input = document.getElementById('add-exercise-input');
   const preview = document.getElementById('add-exercise-preview');
   const submit = document.getElementById('add-exercise-submit');
-  const text = cleanString(input?.value || '');
+  const text = cleanText(input?.value || '');
 
   if (!text) {
     showMiniToast('Scrivi l\'esercizio');
