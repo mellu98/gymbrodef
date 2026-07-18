@@ -2402,11 +2402,7 @@ app.post('/api/import-pdf', upload.single('file'), async (req, res) => {
     const message = statusCode >= 500
       ? 'Import PDF non disponibile in questo momento. Riprova tra poco.'
       : error.message;
-    sendJsonError(res, statusCode, message, {
-      debugMessage: error.message,
-      debugCode: error.code || '',
-      debugStatus: error.status || error.statusCode || ''
-    });
+    sendJsonError(res, statusCode, message);
   }
 });
 
