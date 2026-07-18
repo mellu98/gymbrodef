@@ -2435,7 +2435,45 @@ app.post('/api/import-pdf', upload.single('file'), async (req, res) => {
     const message = statusCode >= 500
       ? 'Import PDF non disponibile in questo momento. Riprova tra poco.'
       : error.message;
-    sendJsonError(res, statusCode, message);
+    sendJsonError(res, statusCode, message, {
+      debugMessage: error.message,
+      debugCode: error.code || '',
+      debugStatus: error.status || error.statusCode || ''
+    });
+  }
+});
+
+app.get('/api/health/openai', async (_req, res) => {
+  try {
+    if (!client) {
+      throw new Error('OPENAI_API_KEY mancante sul server.');
+    }
+    const response = await client.responses.create({
+      model: 'gpt-4.1',
+      input: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'input_text',
+              text: 'Ciao'
+            }
+          ]
+        }
+      ]
+    });
+    res.json({
+      ok: true,
+      model: 'gpt-4.1',
+      reply: (response.output_text || '').slice(0, 50)
+    });
+  } catch (error) {
+    res.status(500).json({
+      ok: false,
+      error: error.message,
+      code: error.code || '',
+      status: error.status || error.statusCode || ''
+    });
   }
 });
 
