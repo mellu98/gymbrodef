@@ -41,10 +41,7 @@ const SUPERSET_ITEM_SCHEMA = {
   properties: {
     name: { type: 'string' },
     reps: { type: 'string' },
-    note: { type: 'string' },
-    catalogId: { type: 'string' },
-    matchConfidence: { type: 'number', minimum: 0, maximum: 1 },
-    canonicalName: { type: 'string' }
+    note: { type: 'string' }
   }
 };
 
@@ -104,17 +101,7 @@ const IMPORT_SCHEMA = {
                 supersetItems: {
                   type: 'array',
                   items: SUPERSET_ITEM_SCHEMA
-                },
-                catalogId: { type: 'string' },
-                matchConfidence: { type: 'number', minimum: 0, maximum: 1 },
-                canonicalName: { type: 'string' },
-                target: { type: 'string' },
-                equipment: { type: 'string' },
-                secondaryMuscles: {
-                  type: 'array',
-                  items: { type: 'string' }
-                },
-                instructionsIt: { type: 'string' }
+                }
               }
             }
           }
@@ -171,17 +158,7 @@ const IMPORT_SCHEMA_LEGACY = {
                 name: { type: 'string' },
                 series: { type: 'integer', minimum: 1 },
                 reps: { type: 'string' },
-                note: { type: 'string' },
-                catalogId: { type: 'string' },
-                matchConfidence: { type: 'number', minimum: 0, maximum: 1 },
-                canonicalName: { type: 'string' },
-                target: { type: 'string' },
-                equipment: { type: 'string' },
-                secondaryMuscles: {
-                  type: 'array',
-                  items: { type: 'string' }
-                },
-                instructionsIt: { type: 'string' }
+                note: { type: 'string' }
               }
             }
           }
@@ -229,17 +206,7 @@ const COACH_PROGRAM_SCHEMA = {
                       type: 'array',
                       items: { type: 'string' }
                     },
-                    note: { type: 'string' },
-                    catalogId: { type: 'string' },
-                    matchConfidence: { type: 'number', minimum: 0, maximum: 1 },
-                    canonicalName: { type: 'string' },
-                    target: { type: 'string' },
-                    equipment: { type: 'string' },
-                    secondaryMuscles: {
-                      type: 'array',
-                      items: { type: 'string' }
-                    },
-                    instructionsIt: { type: 'string' }
+                    note: { type: 'string' }
                   }
                 }
               }
