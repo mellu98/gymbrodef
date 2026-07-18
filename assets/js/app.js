@@ -4428,17 +4428,6 @@ function renderFocusView(di, ei) {
   document.getElementById('fnav-prev').disabled = ei === 0;
   document.getElementById('fnav-next').disabled = ei === days[di].exercises.length - 1;
 
-  const completedSets = sd.seriesDone.filter(Boolean).length;
-  const nextSetIndex = sd.seriesDone.findIndex((done) => !done);
-  const activeSetNumber = nextSetIndex === -1 ? Math.max(1, ex.series) : nextSetIndex + 1;
-  const energyPct = ex.series ? Math.max(0, Math.round(((ex.series - completedSets) / ex.series) * 100)) : 0;
-  const focusMeterHtml = `
-    <div class="fc-hero-meter" id="fc-meter" style="--energy:${energyPct}%">
-      <div class="fc-hero-set"><span>Serie attiva</span><strong>${activeSetNumber}</strong></div>
-      <div class="fc-hero-energy"><span></span></div>
-      <div class="fc-hero-copy">${completedSets}/${ex.series} completate - energia residua ${energyPct}%</div>
-    </div>`;
-
   // Build series rows
   let seriesHtml = `<div class="fc-series-lbl">${isSupersetExercise(ex) ? 'Round superset' : 'Serie'}</div>`;
   for (let s = 0; s < ex.series; s++) {
@@ -4496,7 +4485,6 @@ function renderFocusView(di, ei) {
     ${renderSupersetItemsHtml(ex, 'focus')}
     ${ex.note ? `<div class="fc-note">${ex.note}</div>` : ''}
     ${renderFocusCatalogSection(ex)}
-    ${focusMeterHtml}
     ${nextHtml}
     <div class="chrono-row">
       <span class="chrono-lbl">Cronometro serie:</span>
@@ -4528,21 +4516,6 @@ function toggleFSerie(di, ei, s) {
   const exercise = getDays()?.[di]?.exercises?.[ei];
   if (box) box.className = 'serie-box' + (isSupersetExercise(exercise) ? ' superset-box' : '') + (sd.seriesDone[s] ? ' done' : '');
   if (sd.seriesDone[s]) { celebrateSet(chk || box); checkLivePr(di, ei, chk || box); openTimer(di, ei); }
-  updateFocusMeter(di, ei);
-}
-
-function updateFocusMeter(di, ei) {
-  const meter = document.getElementById('fc-meter');
-  if (!meter) return;
-  const sd = getSD(di, ei);
-  const ex = getDays()[di].exercises[ei];
-  const completedSets = sd.seriesDone.filter(Boolean).length;
-  const nextSetIndex = sd.seriesDone.findIndex((done) => !done);
-  const activeSetNumber = nextSetIndex === -1 ? Math.max(1, ex.series) : nextSetIndex + 1;
-  const energyPct = ex.series ? Math.max(0, Math.round(((ex.series - completedSets) / ex.series) * 100)) : 0;
-  meter.style.setProperty('--energy', energyPct + '%');
-  meter.querySelector('.fc-hero-set strong').textContent = activeSetNumber;
-  meter.querySelector('.fc-hero-copy').textContent = completedSets + '/' + ex.series + ' completate - energia residua ' + energyPct + '%';
 }
 
 function focusNav(dir) {
