@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
 
-const DATASET_PATH = path.join(__dirname, '..', '.claude', 'tmp', 'exercises-dataset', 'data', 'exercises.json');
+const DATASET_PATH = path.join(__dirname, '..', 'data', 'exercises-dataset', 'data', 'exercises.json');
 const CATALOG_OUT = path.join(__dirname, '..', 'data', 'exercises.catalog.json');
 const ALIASES_OUT = path.join(__dirname, '..', 'data', 'exercise-aliases.it.json');
 
@@ -779,7 +779,9 @@ function main() {
       instructionsIt: String((ex.instructions && ex.instructions.it) || ''),
       instructionStepsIt: Array.isArray(ex.instruction_steps && ex.instruction_steps.it)
         ? ex.instruction_steps.it.map(String)
-        : []
+        : [],
+      image: String(ex.image || ''),
+      video: String(ex.video || '')
     })).filter((ex) => ex.id && ex.name)
   };
 

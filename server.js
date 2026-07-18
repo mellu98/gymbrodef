@@ -1709,6 +1709,8 @@ function enrichExerciseWithCatalog(exercise, options = {}) {
       exercise.equipment = details.equipment;
       exercise.secondaryMuscles = details.secondaryMuscles;
       exercise.instructionsIt = details.instructionsIt;
+      exercise.image = details.image || '';
+      exercise.video = details.video || '';
     }
   }
   if (Array.isArray(exercise.supersetItems) && exercise.supersetItems.length) {
@@ -2307,7 +2309,9 @@ app.get('/api/exercises/search', (req, res) => {
         bodyPart: ex.bodyPart,
         target: ex.target,
         equipment: ex.equipment,
-        secondaryMuscles: ex.secondaryMuscles
+        secondaryMuscles: ex.secondaryMuscles,
+        image: ex.image || '',
+        video: ex.video || ''
       }))
     });
   } catch (error) {

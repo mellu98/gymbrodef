@@ -343,7 +343,9 @@ function normalizeCatalogFields(ex) {
     target: cleanText(ex?.target || ''),
     equipment: cleanText(ex?.equipment || ''),
     secondaryMuscles: Array.isArray(ex?.secondaryMuscles) ? ex.secondaryMuscles.map(String) : [],
-    instructionsIt: cleanText(ex?.instructionsIt || '')
+    instructionsIt: cleanText(ex?.instructionsIt || ''),
+    image: cleanText(ex?.image || ''),
+    video: cleanText(ex?.video || '')
   };
 }
 
@@ -4395,9 +4397,19 @@ function renderFocusCatalogSection(ex) {
   const instructions = ex.instructionsIt
     ? `<div class="fc-catalog-instructions">${escapeHtml(ex.instructionsIt)}</div>`
     : '';
+  const imageUrl = ex.image ? `/exercises-dataset/${ex.image}` : '';
+  const videoUrl = ex.video ? `/exercises-dataset/${ex.video}` : '';
+  const imageTag = imageUrl
+    ? `<img class="fc-catalog-image" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(ex.canonicalName || ex.name)}" loading="lazy">`
+    : '';
+  const videoTag = videoUrl
+    ? `<video class="fc-catalog-video" controls preload="none" src="${escapeHtml(videoUrl)}"></video>`
+    : '';
   return `
     <div class="fc-catalog">
       <div class="fc-catalog-title">Come si esegue</div>
+      ${imageTag}
+      ${videoTag}
       <div class="fc-catalog-name">${escapeHtml(ex.canonicalName || ex.name)}</div>
       <div class="fc-catalog-meta">Target: ${escapeHtml(ex.target || '-')} · Equipment: ${escapeHtml(ex.equipment || '-')}</div>
       ${secondary}
@@ -5052,7 +5064,7 @@ async function searchCatalogForPicker(di, ei) {
 
     resultsContainer.innerHTML = results.map((ex) => `
       <button class="exercise-match-result" type="button"
-        onclick="assignCatalogMatch(${di},${ei},'${escapeHtml(ex.id)}','${escapeHtml(ex.canonicalName)}','${escapeHtml(ex.target)}','${escapeHtml(ex.equipment)}',${JSON.stringify(ex.secondaryMuscles || [])},'',0.95)">
+        onclick="assignCatalogMatch(${di},${ei},'${escapeHtml(ex.id)}','${escapeHtml(ex.canonicalName)}','${escapeHtml(ex.target)}','${escapeHtml(ex.equipment)}',${JSON.stringify(ex.secondaryMuscles || [])},'',0.95,'${escapeHtml(ex.image || '')}','${escapeHtml(ex.video || '')}')">
         <strong>${escapeHtml(ex.canonicalName)}</strong>
         <span>${escapeHtml(ex.target || '-')} · ${escapeHtml(ex.equipment || '-')}</span>
       </button>
@@ -5063,7 +5075,7 @@ async function searchCatalogForPicker(di, ei) {
   }
 }
 
-function assignCatalogMatch(di, ei, catalogId, canonicalName, target, equipment, secondaryMuscles, instructionsIt, confidence) {
+function assignCatalogMatch(di, ei, catalogId, canonicalName, target, equipment, secondaryMuscles, instructionsIt, confidence, image, video) {
   const exercise = importDraft?.days?.[di]?.exercises?.[ei];
   if (!exercise) return;
   exercise.catalogId = catalogId;
@@ -5073,6 +5085,8 @@ function assignCatalogMatch(di, ei, catalogId, canonicalName, target, equipment,
   exercise.equipment = equipment;
   exercise.secondaryMuscles = Array.isArray(secondaryMuscles) ? secondaryMuscles : [];
   exercise.instructionsIt = instructionsIt || '';
+  exercise.image = image || '';
+  exercise.video = video || '';
   closeExerciseMatchPicker();
   renderImportReview();
 }

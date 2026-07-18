@@ -1044,6 +1044,8 @@ body[data-time="night"]{background:radial-gradient(circle at 50% 0,rgba(41,182,2
 .fc-catalog-name{font-size:17px;font-weight:700;color:#fff;margin-bottom:6px}
 .fc-catalog-meta{font-size:12px;color:var(--tm);line-height:1.5;margin-bottom:4px}
 .fc-catalog-instructions{font-size:13px;color:#d7d7d7;line-height:1.6;margin-top:10px;white-space:pre-line}
+.fc-catalog-image{width:100%;max-width:260px;border-radius:14px;margin-bottom:10px;display:block}
+.fc-catalog-video{width:100%;max-width:320px;border-radius:14px;margin-bottom:10px;display:block;background:#000}
 
 @media (max-width:760px){
   .exercise-match-panel{padding:16px;border-radius:22px}
