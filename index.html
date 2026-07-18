@@ -253,6 +253,28 @@
   </div>
 </div>
 
+<!-- ADD EXERCISE MODAL -->
+<div id="add-exercise-modal">
+  <div class="add-ex-hdr">
+    <div>
+      <div class="add-ex-title">Aggiungi esercizio</div>
+      <div class="add-ex-sub">Scrivi nome, serie e reps, es. "chest press 3x8"</div>
+    </div>
+    <button class="hist-close" onclick="closeAddExerciseModal()">X</button>
+  </div>
+  <div class="add-ex-scroll" id="add-exercise-content">
+    <div class="imp-field">
+      <label>Testo esercizio</label>
+      <input type="text" id="add-exercise-input" placeholder="es. alzate laterali 3x15" onkeydown="if(event.key==='Enter')submitAddExercise()">
+    </div>
+    <div id="add-exercise-preview" class="add-ex-preview" style="display:none"></div>
+  </div>
+  <div class="add-ex-actions">
+    <button class="t-btn" onclick="closeAddExerciseModal()">Annulla</button>
+    <button class="t-btn primary" id="add-exercise-submit" onclick="submitAddExercise()">Aggiungi</button>
+  </div>
+</div>
+
 <script id="programs-inline" type="application/json">
 {
   "programs": [

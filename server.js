@@ -237,6 +237,18 @@ const COACH_REFINEMENT_SCHEMA = {
   }
 };
 
+const EXERCISE_PARSE_SCHEMA = {
+  type: 'object',
+  additionalProperties: false,
+  required: ['name', 'series', 'reps', 'note'],
+  properties: {
+    name: { type: 'string' },
+    series: { type: 'integer', minimum: 1 },
+    reps: { type: 'string' },
+    note: { type: 'string' }
+  }
+};
+
 const NUTRITION_FOOD_SCHEMA = {
   type: 'object',
   additionalProperties: false,
@@ -494,6 +506,263 @@ function deriveRepsPlan(reps, series, explicitPlan = []) {
   }
 
   return Array.from({ length: targetSeries }, () => raw);
+}
+
+// --- Exercise text parser (add-exercise feature) ---
+
+const EXERCISE_PARSER_STOPWORDS = new Set([
+  'il', 'lo', 'la', 'i', 'gli', 'le', 'un', 'uno', 'una', 'di', 'del', 'della', 'dei', 'delle',
+  'a', 'al', 'alla', 'ai', 'alle', 'da', 'dal', 'dalla', 'dai', 'dalle', 'in', 'nel', 'nella',
+  'nei', 'nelle', 'con', 'su', 'sul', 'sulla', 'sui', 'sulle', 'per', 'tra', 'fra', 'e', 'o',
+  'ma', 'se', 'come', 'che', 'chi', 'cui', 'sono', 'sei', 'e', 'ho', 'ha', 'abbiamo',
+  'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
+  'from', 'up', 'about', 'into', 'through', 'during', 'before', 'after', 'above', 'below',
+  'between', 'among', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had',
+  'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'reps', 'rep',
+  'serie', 'series', 'set', 'sets', 'kg'
+]);
+
+function normalizeParserText(value) {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function tokenizeParserText(value) {
+  return normalizeParserText(value)
+    .split(' ')
+    .filter((token) => token.length >= 2 && !EXERCISE_PARSER_STOPWORDS.has(token));
+}
+
+function levenshteinDistance(a, b) {
+  const matrix = [];
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      matrix[i][j] = b.charAt(i - 1) === a.charAt(j - 1)
+        ? matrix[i - 1][j - 1]
+        : Math.min(
+            matrix[i - 1][j - 1] + 1,
+            matrix[i][j - 1] + 1,
+            matrix[i - 1][j] + 1
+          );
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+function parserCharSimilarity(a, b) {
+  const maxLen = Math.max(a.length, b.length);
+  if (!maxLen) return 0;
+  return 1 - levenshteinDistance(a, b) / maxLen;
+}
+
+function parserTokensFuzzyMatch(tokenA, tokenB) {
+  if (tokenA === tokenB) return true;
+  if (tokenA.includes(tokenB) || tokenB.includes(tokenA)) return true;
+  const maxLen = Math.max(tokenA.length, tokenB.length);
+  if (maxLen <= 3) return false;
+  const dist = levenshteinDistance(tokenA, tokenB);
+  return dist / maxLen <= 0.35;
+}
+
+function parserTokenJaccard(a, b) {
+  const tokensA = Array.from(new Set(tokenizeParserText(a)));
+  const tokensB = Array.from(new Set(tokenizeParserText(b)));
+  if (!tokensA.length && !tokensB.length) return 0;
+
+  let matches = 0;
+  const matchedB = new Set();
+  for (const tokenA of tokensA) {
+    for (let i = 0; i < tokensB.length; i++) {
+      if (matchedB.has(i)) continue;
+      if (parserTokensFuzzyMatch(tokenA, tokensB[i])) {
+        matches++;
+        matchedB.add(i);
+        break;
+      }
+    }
+  }
+
+  const unionSize = tokensA.length + tokensB.length - matches;
+  return unionSize ? matches / unionSize : 0;
+}
+
+function parserNameSimilarity(input, candidateName) {
+  const normalizedInput = normalizeParserText(input);
+  const normalizedCandidate = normalizeParserText(candidateName);
+  if (!normalizedInput || !normalizedCandidate) return 0;
+
+  if (normalizedInput === normalizedCandidate) return 1;
+
+  const charSim = parserCharSimilarity(normalizedInput, normalizedCandidate);
+  const tokenJac = parserTokenJaccard(normalizedInput, normalizedCandidate);
+
+  let partialBoost = 0;
+  if (normalizedCandidate.includes(normalizedInput)) {
+    partialBoost = 0.15;
+  } else if (normalizedInput.includes(normalizedCandidate)) {
+    partialBoost = 0.1;
+  }
+
+  if (tokenJac >= 0.6) {
+    return Math.min(1, 0.35 * charSim + 0.55 * tokenJac + partialBoost + 0.05);
+  }
+  return Math.min(1, 0.65 * charSim + 0.3 * tokenJac + partialBoost);
+}
+
+function extractSeriesReps(text) {
+  const normalized = cleanString(text).trim();
+  if (!normalized) return null;
+
+  // Patterns: "3x8", "3 x 8", "3*8", "3X8", "3 serie da 8", "3 sets of 8", "3 giri da 8"
+  const patterns = [
+    /(\d+)\s*[xX*]\s*(\d+(?:\s*-\s*\d+)?)/,
+    /(\d+)\s*(?:serie|series|set|sets|giri|rounds?)\s*(?:da|of|x)?\s*(\d+(?:\s*-\s*\d+)?)/i,
+    /(\d+)\s*(?:rep|reps)\s*(?:per|a)?\s*(?:serie|series|set|sets)?\s*(?:da|of)?\s*(\d+)/i
+  ];
+
+  for (const pattern of patterns) {
+    const match = normalized.match(pattern);
+    if (match) {
+      const series = Math.max(1, parseInt(match[1], 10) || 1);
+      const reps = normalizeRepToken(match[2]);
+      if (reps) {
+        const matchedText = match[0];
+        const nameText = normalized.replace(matchedText, ' ').trim();
+        return { series, reps, nameText };
+      }
+    }
+  }
+
+  // Try to find just a reps number at the end, e.g. "chest press 8"
+  const trailingReps = normalized.match(/^(.*?)\s+(\d+(?:\s*-\s*\d+)?)\s*$/);
+  if (trailingReps && parseInt(trailingReps[2], 10) > 0) {
+    const reps = normalizeRepToken(trailingReps[2]);
+    const nameText = trailingReps[1].trim();
+    if (reps && nameText) {
+      return { series: 3, reps, nameText };
+    }
+  }
+
+  return null;
+}
+
+function parseExerciseTextLocally(text, candidates) {
+  const extracted = extractSeriesReps(text);
+  if (!extracted) return null;
+
+  const { series, reps, nameText } = extracted;
+  const safeCandidates = Array.isArray(candidates) ? candidates : [];
+
+  let best = null;
+  for (const candidate of safeCandidates) {
+    const candidateName = typeof candidate === 'string' ? candidate : candidate?.name;
+    if (!candidateName) continue;
+    const score = parserNameSimilarity(nameText, candidateName);
+    if (!best || score > best.score) {
+      best = { name: candidateName, score };
+    }
+  }
+
+  if (!best || best.score < 0.75) return null;
+
+  return {
+    name: cleanString(best.name),
+    series,
+    reps: normalizeRepToken(reps),
+    note: '',
+    confidence: Math.round(best.score * 100) / 100,
+    source: 'local'
+  };
+}
+
+async function parseExerciseTextWithAI(text, candidates) {
+  if (!client) {
+    const error = new Error('Parser AI non disponibile: manca OPENAI_API_KEY.');
+    error.statusCode = 503;
+    throw error;
+  }
+
+  const candidateNames = (Array.isArray(candidates) ? candidates : [])
+    .map((c) => typeof c === 'string' ? c : c?.name)
+    .filter(Boolean)
+    .slice(0, 20);
+
+  const systemPrompt = `Sei un parser di esercizi da palestra. L'utente scrive in linguaggio naturale un esercizio, serie e reps (es. "chest press 3x8"). Estrai nome esercizio, numero di serie e reps. NON estrarre kg. NON inventare dati. Se il nome non e' chiaro, usa i candidati forniti come hint. Restituisci JSON.`;
+
+  const userPrompt = `Testo: "${cleanString(text)}"\n\nCandidati esercizi conosciuti:\n${candidateNames.length ? candidateNames.join('\n') : 'Nessuno'}\n\nEstrai nome, serie e reps.`;
+
+  const response = await client.responses.create({
+    model: OPENAI_MODEL,
+    temperature: 0,
+    input: [
+      { role: 'system', content: [{ type: 'input_text', text: systemPrompt }] },
+      { role: 'user', content: [{ type: 'input_text', text: userPrompt }] }
+    ],
+    text: {
+      format: {
+        type: 'json_schema',
+        name: 'exercise_parse',
+        strict: true,
+        schema: EXERCISE_PARSE_SCHEMA
+      }
+    }
+  });
+
+  const rawText = response?.output_text || '';
+  const parsed = JSON.parse(rawText || '{}');
+
+  const series = Math.max(1, parseInt(parsed.series, 10) || 3);
+  const reps = normalizeRepToken(parsed.reps || '8-12');
+
+  return {
+    name: cleanString(parsed.name || text),
+    series,
+    reps,
+    note: cleanString(parsed.note || ''),
+    confidence: 1,
+    source: 'ai'
+  };
+}
+
+async function parseExerciseText(text, existingExercises, historyExercises) {
+  const rawText = cleanString(text);
+  if (!rawText) {
+    const error = new Error('Testo esercizio mancante.');
+    error.statusCode = 422;
+    throw error;
+  }
+
+  const candidates = [
+    ...(Array.isArray(existingExercises) ? existingExercises : []),
+    ...(Array.isArray(historyExercises) ? historyExercises : [])
+  ];
+
+  // Try local parse first
+  const localResult = parseExerciseTextLocally(rawText, candidates);
+  if (localResult) {
+    return {
+      ...localResult,
+      repsPlan: deriveRepsPlan(localResult.reps, localResult.series)
+    };
+  }
+
+  // Fallback to AI
+  const aiResult = await parseExerciseTextWithAI(rawText, candidates);
+  return {
+    ...aiResult,
+    repsPlan: deriveRepsPlan(aiResult.reps, aiResult.series)
+  };
 }
 
 function normalizeSupersetItems(items) {
@@ -2236,6 +2505,24 @@ app.post('/api/import-pdf', upload.single('file'), async (req, res) => {
     const statusCode = error.statusCode || 500;
     const message = statusCode >= 500
       ? 'Import PDF non disponibile in questo momento. Riprova tra poco.'
+      : error.message;
+    sendJsonError(res, statusCode, message);
+  }
+});
+
+app.post('/api/parse-exercise', async (req, res) => {
+  try {
+    const result = await parseExerciseText(
+      req.body?.text,
+      req.body?.existingExercises,
+      req.body?.historyExercises
+    );
+    res.json(result);
+  } catch (error) {
+    console.error('Parse exercise error:', error);
+    const statusCode = error.statusCode || 500;
+    const message = statusCode >= 500
+      ? 'Parser non disponibile in questo momento. Riprova tra poco.'
       : error.message;
     sendJsonError(res, statusCode, message);
   }

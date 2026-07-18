@@ -26,6 +26,8 @@ let deferredPrompt = null;
 let importDraft = null;
 let importMeta = null;
 let importBusy = false;
+let addExerciseDayIndex = -1;
+let addExerciseCandidate = null;
 let assistantOpen = false;
 let assistantBusy = false;
 let headerMenuOpen = false;
@@ -143,6 +145,10 @@ function getNutritionAiRefineEndpoint() {
 
 function getChatEndpoint() {
   return buildApiUrl('/api/chat');
+}
+
+function getParseExerciseEndpoint() {
+  return buildApiUrl('/api/parse-exercise');
 }
 
 function normalizeRepToken(value) {
@@ -2578,7 +2584,7 @@ function resetAssistantSession() {
 }
 
 function hasBlockingOverlayOpen() {
-  return ['timer-ov', 'hist-modal', 'week-modal', 'import-modal', 'session-summary-modal', 'install-sheet', 'onboarding-layer', 'workout-countdown'].some((id) => document.getElementById(id)?.classList.contains('show'));
+  return ['timer-ov', 'hist-modal', 'week-modal', 'import-modal', 'add-exercise-modal', 'session-summary-modal', 'install-sheet', 'onboarding-layer', 'workout-countdown'].some((id) => document.getElementById(id)?.classList.contains('show'));
 }
 
 function syncAssistantUi() {
@@ -4256,6 +4262,321 @@ function switchTab(tab) {
   else renderFocusView(currentDay, focusIdx);
 }
 
+// â”€â”€â”€ ADD EXERCISE MODAL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+function openAddExerciseModal(di) {
+  addExerciseDayIndex = di;
+  addExerciseCandidate = null;
+  const input = document.getElementById('add-exercise-input');
+  const preview = document.getElementById('add-exercise-preview');
+  const submit = document.getElementById('add-exercise-submit');
+  if (input) {
+    input.value = '';
+    input.focus();
+  }
+  if (preview) {
+    preview.style.display = 'none';
+    preview.innerHTML = '';
+  }
+  if (submit) {
+    submit.textContent = 'Aggiungi';
+    submit.disabled = false;
+  }
+  document.getElementById('add-exercise-modal').classList.add('show');
+}
+
+function closeAddExerciseModal() {
+  document.getElementById('add-exercise-modal').classList.remove('show');
+  addExerciseDayIndex = -1;
+  addExerciseCandidate = null;
+}
+
+function collectExerciseCandidates(di) {
+  const existing = [];
+  const seenExisting = new Set();
+  getDays().forEach((day) => {
+    (day.exercises || []).forEach((ex) => {
+      const name = cleanText(ex?.name || '');
+      if (name && !seenExisting.has(name.toLowerCase())) {
+        seenExisting.add(name.toLowerCase());
+        existing.push({ name: ex.name, series: ex.series, reps: ex.reps });
+      }
+    });
+  });
+
+  const history = [];
+  const seenHistory = new Set();
+  try {
+    const hist = getHistory();
+    (Array.isArray(hist) ? hist : []).forEach((entry) => {
+      (entry?.exercises || []).forEach((ex) => {
+        const name = cleanText(ex?.name || '');
+        if (name && !seenHistory.has(name.toLowerCase()) && !seenExisting.has(name.toLowerCase())) {
+          seenHistory.add(name.toLowerCase());
+          history.push({ name: ex.name });
+        }
+      });
+    });
+  } catch (e) {
+    // ignore history read errors
+  }
+
+  return { existingExercises: existing, historyExercises: history };
+}
+
+function parseExerciseLocally(text, candidates) {
+  const normalized = cleanString(text).trim();
+  if (!normalized) return null;
+
+  const patterns = [
+    /(\d+)\s*[xX*]\s*(\d+(?:\s*-\s*\d+)?)/,
+    /(\d+)\s*(?:serie|series|set|sets|giri|rounds?)\s*(?:da|of|x)?\s*(\d+(?:\s*-\s*\d+)?)/i,
+    /(\d+)\s*(?:rep|reps)\s*(?:per|a)?\s*(?:serie|series|set|sets)?\s*(?:da|of)?\s*(\d+)/i
+  ];
+
+  let series = 3;
+  let reps = '8-12';
+  let nameText = normalized;
+
+  for (const pattern of patterns) {
+    const match = normalized.match(pattern);
+    if (match) {
+      series = Math.max(1, parseInt(match[1], 10) || 1);
+      const parsedReps = normalizeRepToken(match[2]);
+      if (parsedReps) {
+        reps = parsedReps;
+        nameText = normalized.replace(match[0], ' ').trim();
+        break;
+      }
+    }
+  }
+
+  if (nameText === normalized) {
+    const trailing = normalized.match(/^(.*?)\s+(\d+(?:\s*-\s*\d+)?)\s*$/);
+    if (trailing && parseInt(trailing[2], 10) > 0) {
+      reps = normalizeRepToken(trailing[2]);
+      nameText = trailing[1].trim();
+    }
+  }
+
+  const safeCandidates = Array.isArray(candidates) ? candidates : [];
+  let best = null;
+  for (const candidate of safeCandidates) {
+    const candidateName = typeof candidate === 'string' ? candidate : candidate?.name;
+    if (!candidateName) continue;
+    const score = exerciseNameSimilarity(nameText, candidateName);
+    if (!best || score > best.score) {
+      best = { name: candidateName, score };
+    }
+  }
+
+  if (!best || best.score < 0.75) {
+    return {
+      name: nameText,
+      series,
+      reps,
+      note: '',
+      confidence: 0.5,
+      source: 'local-raw'
+    };
+  }
+
+  return {
+    name: cleanText(best.name),
+    series,
+    reps,
+    note: '',
+    confidence: Math.round(best.score * 100) / 100,
+    source: 'local'
+  };
+}
+
+function exerciseNameSimilarity(a, b) {
+  const na = normalizeParserText(a);
+  const nb = normalizeParserText(b);
+  if (!na || !nb) return 0;
+  if (na === nb) return 1;
+
+  const tokensA = tokenizeParserText(a);
+  const tokensB = tokenizeParserText(b);
+
+  let matches = 0;
+  const used = new Set();
+  for (const ta of tokensA) {
+    for (let i = 0; i < tokensB.length; i++) {
+      if (used.has(i)) continue;
+      const tb = tokensB[i];
+      if (ta === tb || ta.includes(tb) || tb.includes(ta)) {
+        matches++;
+        used.add(i);
+        break;
+      }
+      if (ta.length > 3 && tb.length > 3) {
+        const dist = levenshteinDistance(ta, tb);
+        const max = Math.max(ta.length, tb.length);
+        if (dist / max <= 0.35) {
+          matches++;
+          used.add(i);
+          break;
+        }
+      }
+    }
+  }
+
+  const charSim = 1 - levenshteinDistance(na, nb) / Math.max(na.length, nb.length);
+  const union = new Set([...tokensA, ...tokensB]).size || 1;
+  const tokenSim = (matches * 2) / (tokensA.length + tokensB.length || 1);
+  const jaccard = matches / union;
+
+  let boost = 0;
+  if (nb.includes(na)) boost = 0.15;
+  else if (na.includes(nb)) boost = 0.1;
+
+  return Math.min(1, charSim * 0.35 + tokenSim * 0.35 + jaccard * 0.25 + boost);
+}
+
+function normalizeParserText(value) {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-z0-9\s]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function tokenizeParserText(value) {
+  return normalizeParserText(value)
+    .split(' ')
+    .filter((token) => token.length >= 2 && !EXERCISE_PARSER_STOPWORDS.has(token));
+}
+
+function levenshteinDistance(a, b) {
+  const matrix = [];
+  for (let i = 0; i <= b.length; i++) matrix[i] = [i];
+  for (let j = 0; j <= a.length; j++) matrix[0][j] = j;
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      matrix[i][j] = b.charAt(i - 1) === a.charAt(j - 1)
+        ? matrix[i - 1][j - 1]
+        : Math.min(matrix[i - 1][j - 1] + 1, matrix[i][j - 1] + 1, matrix[i - 1][j] + 1);
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+const EXERCISE_PARSER_STOPWORDS = new Set([
+  'il', 'lo', 'la', 'i', 'gli', 'le', 'un', 'uno', 'una', 'di', 'del', 'della', 'dei', 'delle',
+  'a', 'al', 'alla', 'ai', 'alle', 'da', 'dal', 'dalla', 'dai', 'dalle', 'in', 'nel', 'nella',
+  'nei', 'nelle', 'con', 'su', 'sul', 'sulla', 'sui', 'sulle', 'per', 'tra', 'fra', 'e', 'o',
+  'ma', 'se', 'come', 'che', 'chi', 'cui', 'sono', 'sei', 'ho', 'ha', 'abbiamo',
+  'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by',
+  'from', 'up', 'about', 'into', 'through', 'during', 'before', 'after', 'above', 'below',
+  'between', 'among', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had',
+  'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'must', 'reps', 'rep',
+  'serie', 'series', 'set', 'sets', 'kg'
+]);
+
+async function submitAddExercise() {
+  const input = document.getElementById('add-exercise-input');
+  const preview = document.getElementById('add-exercise-preview');
+  const submit = document.getElementById('add-exercise-submit');
+  const text = cleanString(input?.value || '');
+
+  if (!text) {
+    showMiniToast('Scrivi l\'esercizio');
+    return;
+  }
+
+  if (submit) {
+    submit.textContent = '...';
+    submit.disabled = true;
+  }
+
+  const candidates = collectExerciseCandidates(addExerciseDayIndex);
+  const local = parseExerciseLocally(text, [...candidates.existingExercises, ...candidates.historyExercises]);
+
+  let parsed = local;
+  if (!local || local.source === 'local-raw' || local.confidence < 0.75) {
+    try {
+      const res = await fetch(getParseExerciseEndpoint(), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text, ...candidates })
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.error || 'Errore parser');
+      }
+      parsed = await res.json();
+    } catch (error) {
+      console.error('Parser remoto fallito, uso locale:', error);
+      parsed = local;
+    }
+  }
+
+  if (submit) {
+    submit.textContent = 'Aggiungi';
+    submit.disabled = false;
+  }
+
+  addExerciseCandidate = parsed;
+  renderAddExercisePreview(parsed);
+}
+
+function renderAddExercisePreview(parsed) {
+  const preview = document.getElementById('add-exercise-preview');
+  if (!preview) return;
+
+  const name = cleanText(parsed?.name || 'Esercizio');
+  const series = Math.max(1, parseInt(parsed?.series, 10) || 3);
+  const reps = normalizeRepToken(parsed?.reps || '8-12');
+  const sourceLabel = parsed?.source === 'ai' ? 'Riconosciuto con AI' : 'Riconosciuto dallo storico';
+
+  preview.style.display = 'block';
+  preview.innerHTML = `
+    <div class="add-ex-preview-row"><span>Nome</span><strong>${escapeHtml(name)}</strong></div>
+    <div class="add-ex-preview-row"><span>Serie</span><strong>${series}</strong></div>
+    <div class="add-ex-preview-row"><span>Reps</span><strong>${escapeHtml(reps)}</strong></div>
+    <div class="add-ex-preview-row" style="font-size:11px;color:var(--tm);margin-top:12px">${escapeHtml(sourceLabel)}</div>
+    <button class="t-btn primary" style="width:100%;margin-top:14px" onclick="confirmAddExercise()">Conferma e aggiungi</button>
+  `;
+}
+
+function confirmAddExercise() {
+  if (!addExerciseCandidate || addExerciseDayIndex === -1) return;
+
+  const parsed = addExerciseCandidate;
+  const series = Math.max(1, parseInt(parsed.series, 10) || 3);
+  const reps = normalizeRepToken(parsed.reps || '8-12');
+  const newEx = {
+    type: 'exercise',
+    name: cleanText(parsed.name || 'Esercizio'),
+    series,
+    reps,
+    repsPlan: deriveRepsPlan(reps, series),
+    note: cleanText(parsed.note || ''),
+    supersetItems: []
+  };
+
+  const di = addExerciseDayIndex;
+  currentProgram.days[di].exercises.push(newEx);
+
+  const userPrograms = getUserPrograms();
+  const idx = userPrograms.findIndex((p) => p.id === currentProgram.id);
+  if (idx !== -1) userPrograms[idx] = cloneValue(currentProgram);
+  saveUserPrograms(userPrograms);
+  mergePrograms();
+
+  const newIndex = currentProgram.days[di].exercises.length - 1;
+  getSD(di, newIndex);
+  persistProgramState();
+
+  closeAddExerciseModal();
+  renderListView(di);
+  updateProgress(di);
+  showMiniToast('Aggiunto: ' + newEx.name);
+}
+
 // â”€â”€â”€ LIST VIEW â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function renderListView(di) {
   const days = getDays();
@@ -4311,6 +4632,13 @@ function renderListView(di) {
     `;
     wrap.appendChild(card);
   });
+
+  const addBtn = document.createElement('button');
+  addBtn.className = 'add-ex-btn';
+  addBtn.type = 'button';
+  addBtn.innerHTML = '<span>+</span> Aggiungi esercizio';
+  addBtn.onclick = () => openAddExerciseModal(di);
+  wrap.appendChild(addBtn);
 }
 
 function toggleCard(ei) {
@@ -5175,6 +5503,8 @@ document.addEventListener('keydown', (event) => {
     if (sessionSummary && sessionSummary.classList.contains('show')) { closeSessionSummary(); return; }
     const importModal = document.getElementById('import-modal');
     if (importModal && importModal.classList.contains('show')) { closeImportModal(); return; }
+    const addExerciseModal = document.getElementById('add-exercise-modal');
+    if (addExerciseModal && addExerciseModal.classList.contains('show')) { closeAddExerciseModal(); return; }
     const weekModal = document.getElementById('week-modal');
     if (weekModal && weekModal.classList.contains('show')) { closeWeekReport(); return; }
     const histModal = document.getElementById('hist-modal');
